@@ -1,4 +1,4 @@
-#kyuubi-config
+# kyuubi-config
 
 ## build
 
