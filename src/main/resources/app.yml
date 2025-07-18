@@ -1,0 +1,19 @@
+solon:
+  #  debug: 1
+  app:
+    name: kyuubi-config
+  logging:
+    logger:
+      "io.undertow":
+        level: "WARN"
+      "org.thymeleaf.standard.processor":
+        level: "ERROR"
+    appender:
+      console:
+        level: INFO
+        enable: false
+      file:
+        level: INFO
+        maxFileSize: "1 MB"
+        maxHistory: "7"
+        enable: true
