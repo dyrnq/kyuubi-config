@@ -1,6 +1,7 @@
 package com.dyrnq.kyuubi;
 
 import com.dyrnq.kyuubi.command.FlinkConfig;
+import com.dyrnq.kyuubi.command.KafkaConfig;
 import com.dyrnq.kyuubi.command.KyuubiConfig;
 import com.dyrnq.kyuubi.command.SparkConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,8 @@ import picocli.CommandLine;
         subcommands = {
                 KyuubiConfig.class,
                 SparkConfig.class,
-                FlinkConfig.class
+                FlinkConfig.class,
+                KafkaConfig.class
         },
         mixinStandardHelpOptions = true,
         showDefaultValues = true
