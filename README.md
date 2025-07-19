@@ -60,3 +60,7 @@ flink
 
 
 ```
+
+### trino
+
+see <https://github.com/nineinchnick/trino-properties-index>.
