@@ -1,6 +1,7 @@
 package com.dyrnq.kyuubi;
 
-import com.dyrnq.kyuubi.command.Config;
+import com.dyrnq.kyuubi.command.FlinkConfig;
+import com.dyrnq.kyuubi.command.KyuubiConfig;
 import com.dyrnq.kyuubi.command.SparkConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.noear.solon.Solon;
@@ -8,8 +9,9 @@ import picocli.CommandLine;
 
 @picocli.CommandLine.Command(
         subcommands = {
-                Config.class,
-                SparkConfig.class
+                KyuubiConfig.class,
+                SparkConfig.class,
+                FlinkConfig.class
         },
         mixinStandardHelpOptions = true,
         showDefaultValues = true

@@ -12,5 +12,5 @@ import java.util.Map;
 @NoArgsConstructor
 public class KyuubiConfigSection {
     private String name;
-    private List<Map<String,String>> list;
+    private List<Map<String, String>> list;
 }

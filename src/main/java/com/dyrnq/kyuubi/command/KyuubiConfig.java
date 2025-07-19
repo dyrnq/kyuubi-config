@@ -15,14 +15,14 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-@CommandLine.Command(name = "config", aliases = {"c"}, description = "config")
+@CommandLine.Command(name = "kyuubi", aliases = {"k"}, description = "kyuubi")
 
 @Slf4j
-public class Config extends CommonOptions implements Callable<Integer> {
+public class KyuubiConfig extends CommonOptions implements Callable<Integer> {
     @CommandLine.Option(names = {"-n", "--no-section"}, description = "")
     boolean noSection;
 
-    @CommandLine.Option(names = {"-kv", "--kyuubi-version"}, description = "kyuubi version e.g v1.10.2", defaultValue = "master")
+    @CommandLine.Option(names = {"-ver", "-kv", "--kyuubi-version"}, description = "kyuubi version e.g v1.10.2", defaultValue = "master")
     String kyuubiVersion;
 
     @CommandLine.Option(names = {"-f", "--format"}, description = "format", defaultValue = "json")
@@ -77,7 +77,7 @@ public class Config extends CommonOptions implements Callable<Integer> {
             }
             if (Strings.CI.equals("conf", format)) {
                 for (KyuubiConfigSection kyuubiConfigSection : result) {
-                    if(!noSection){
+                    if (!noSection) {
                         System.out.println("#" + kyuubiConfigSection.getName());
                     }
                     kyuubiConfigSection.getList().forEach(c -> {

@@ -15,15 +15,15 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-@CommandLine.Command(name = "spark", aliases = {"s"}, description = "spark")
+@CommandLine.Command(name = "flink", aliases = {"fl"}, description = "flink")
 
 @Slf4j
-public class SparkConfig extends CommonOptions implements Callable<Integer> {
+public class FlinkConfig extends CommonOptions implements Callable<Integer> {
     @CommandLine.Option(names = {"-n", "--no-section"}, description = "")
     boolean noSection;
 
-    @CommandLine.Option(names = {"-ver", "-sv", "--spark-version"}, description = "spark version e.g. 3.5.4", defaultValue = "latest")
-    String sparkVersion;
+    @CommandLine.Option(names = {"-ver", "-fv", "--flink-version"}, description = "flink version e.g. 1.20", defaultValue = "master")
+    String flinkVersion;
 
     @CommandLine.Option(names = {"-f", "--format"}, description = "format", defaultValue = "json")
     String format;
@@ -37,27 +37,24 @@ public class SparkConfig extends CommonOptions implements Callable<Integer> {
 
         for (String url :
                 new String[]{
-                        "https://spark.apache.org/docs/%s/configuration.html",
-                        "https://spark.apache.org/docs/%s/security.html",
-                        "https://spark.apache.org/docs/%s/monitoring.html",
-                        "https://spark.apache.org/docs/%s/running-on-yarn.html",
-                        "https://spark.apache.org/docs/%s/running-on-kubernetes.html",
-                        "https://spark.apache.org/docs/%s/spark-standalone.html"
+                        "https://nightlies.apache.org/flink/flink-docs-%s/docs/deployment/config/",
 
                 }
         ) {
             try {
-                if (!Strings.CI.equals("latest", sparkVersion)) {
-                    url = Strings.CS.replace(url, "spark.apache.org", "archive.apache.org/dist/spark");
+                if (!Strings.CI.equals("master", flinkVersion)) {
+                    url = Strings.CS.replace(url, "flink-docs-", "flink-docs-release-");
                 }
-                Connection connection = Jsoup.connect(String.format(url, sparkVersion));
+                Connection connection = Jsoup.connect(String.format(url, flinkVersion));
                 Document doc = connection.timeout(10 * 1000).get();
                 Elements tables = doc.select("table");
 
 
                 for (Element table : tables) {
 
-                    if (!(table.html().contains("Property Name") || table.html().contains("System property"))) {
+                    if (!(table.html().contains("Key") && table.html().contains("Default")
+                          && table.html().contains("Description")
+                    )) {
                         continue;
                     }
 
@@ -118,24 +115,8 @@ public class SparkConfig extends CommonOptions implements Callable<Integer> {
         if (Strings.CI.equals("conf", format)) {
 
             noSectionList.forEach(c -> {
-                String keyOfKey = null;
-                String keyOfValue = null;
-
-                if (c.containsKey("Property Name")) {
-                    keyOfKey = "Property Name";
-                }
-
-                if (c.containsKey("System property")) {
-                    keyOfKey = "System property";
-                }
-
-                if (c.containsKey("Default Value")) {
-                    keyOfValue = "Default Value";
-                }
-
-                if (c.containsKey("Default")) {
-                    keyOfValue = "Default";
-                }
+                String keyOfKey = "Key";
+                String keyOfValue = "Default";
 
 
                 System.out.println(c.get(keyOfKey) + "=" + c.get(keyOfValue));
