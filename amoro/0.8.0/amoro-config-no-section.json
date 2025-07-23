@@ -1,0 +1,317 @@
+[
+  {
+    "Key": "self-optimizing.enabled",
+    "Default": "true",
+    "Description": "Enables Self-optimizing"
+  },
+  {
+    "Key": "self-optimizing.group",
+    "Default": "default",
+    "Description": "Optimizer group for Self-optimizing"
+  },
+  {
+    "Key": "self-optimizing.quota",
+    "Default": "0.1",
+    "Description": "Quota for Self-optimizing, indicating the CPU resource the table can take up"
+  },
+  {
+    "Key": "self-optimizing.execute.num-retries",
+    "Default": "5",
+    "Description": "Number of retries after failure of Self-optimizing"
+  },
+  {
+    "Key": "self-optimizing.target-size",
+    "Default": "134217728(128MB)",
+    "Description": "Target size for Self-optimizing"
+  },
+  {
+    "Key": "self-optimizing.max-file-count",
+    "Default": "10000",
+    "Description": "Maximum number of files processed by a Self-optimizing process"
+  },
+  {
+    "Key": "self-optimizing.max-task-size-bytes",
+    "Default": "134217728(128MB)",
+    "Description": "Maximum file size bytes in a single task for splitting tasks"
+  },
+  {
+    "Key": "self-optimizing.fragment-ratio",
+    "Default": "8",
+    "Description": "The fragment file size threshold. We could divide self-optimizing.target-size by this ratio to get the actual fragment file size"
+  },
+  {
+    "Key": "self-optimizing.min-target-size-ratio",
+    "Default": "0.75",
+    "Description": "The undersized segment file size threshold. Segment files under this threshold will be considered for rewriting"
+  },
+  {
+    "Key": "self-optimizing.minor.trigger.file-count",
+    "Default": "12",
+    "Description": "The minimum number of files to trigger minor optimizing is determined by the sum of fragment file count and equality delete file count"
+  },
+  {
+    "Key": "self-optimizing.minor.trigger.interval",
+    "Default": "3600000(1 hour)",
+    "Description": "The time interval in milliseconds to trigger minor optimizing"
+  },
+  {
+    "Key": "self-optimizing.major.trigger.duplicate-ratio",
+    "Default": "0.1",
+    "Description": "The ratio of duplicate data of segment files to trigger major optimizing"
+  },
+  {
+    "Key": "self-optimizing.full.trigger.interval",
+    "Default": "-1(closed)",
+    "Description": "The time interval in milliseconds to trigger full optimizing"
+  },
+  {
+    "Key": "self-optimizing.full.rewrite-all-files",
+    "Default": "true",
+    "Description": "Whether full optimizing rewrites all files or skips files that do not need to be optimized"
+  },
+  {
+    "Key": "self-optimizing.min-plan-interval",
+    "Default": "60000",
+    "Description": "The minimum time interval between two self-optimizing planning action"
+  },
+  {
+    "Key": "self-optimizing.filter",
+    "Default": "NULL",
+    "Description": "Filter conditions for self-optimizing, using SQL conditional expressions, without supporting any functions. For the timestamp column condition, the ISO date-time formatter must be used. For example: op_time \u003e ‘2007-12-03T10:15:30’."
+  },
+  {
+    "Key": "table-expire.enabled",
+    "Default": "true",
+    "Description": "Enables periodically expire table"
+  },
+  {
+    "Key": "change.data.ttl.minutes",
+    "Default": "10080(7 days)",
+    "Description": "Time to live in minutes for data of ChangeStore"
+  },
+  {
+    "Key": "snapshot.keep.duration",
+    "Default": "720min(12 hours)",
+    "Description": "Table-Expiration keeps the latest snapshots within a specified duration"
+  },
+  {
+    "Key": "snapshot.keep.min-count",
+    "Default": "1",
+    "Description": "Minimum number of snapshots retained for table expiration"
+  },
+  {
+    "Key": "clean-orphan-file.enabled",
+    "Default": "false",
+    "Description": "Enables periodically clean orphan files"
+  },
+  {
+    "Key": "clean-orphan-file.min-existing-time-minutes",
+    "Default": "2880(2 days)",
+    "Description": "Cleaning orphan files keeps the files modified within a specified time in minutes"
+  },
+  {
+    "Key": "clean-dangling-delete-files.enabled",
+    "Default": "true",
+    "Description": "Whether to enable cleaning of dangling delete files"
+  },
+  {
+    "Key": "data-expire.enabled",
+    "Default": "false",
+    "Description": "Whether to enable data expiration"
+  },
+  {
+    "Key": "data-expire.level",
+    "Default": "partition",
+    "Description": "Level of data expiration. Including partition and file"
+  },
+  {
+    "Key": "data-expire.field",
+    "Default": "NULL",
+    "Description": "Field used to determine data expiration, supporting timestamp/timestampz/long type and string type field in date format"
+  },
+  {
+    "Key": "data-expire.datetime-string-pattern",
+    "Default": "yyyy-MM-dd",
+    "Description": "Pattern used for matching string datetime"
+  },
+  {
+    "Key": "data-expire.datetime-number-format",
+    "Default": "TIMESTAMP_MS",
+    "Description": "Timestamp unit for long field. Including TIMESTAMP_MS and TIMESTAMP_S"
+  },
+  {
+    "Key": "data-expire.retention-time",
+    "Default": "NULL",
+    "Description": "Retention period for data expiration. For example, 1d means retaining data for 1 day. Other supported units include h (hour), min (minute), s (second), ms (millisecond), etc."
+  },
+  {
+    "Key": "data-expire.base-on-rule",
+    "Default": "LAST_COMMIT_TIME",
+    "Description": "A rule to indicate how to start expire data. Including LAST_COMMIT_TIME and CURRENT_TIME. LAST_COMMIT_TIME uses the timestamp of latest commit snapshot which is not optimized as the start of the expiration, which ensures that the table has retention-time data"
+  },
+  {
+    "Key": "tag.auto-create.enabled",
+    "Default": "false",
+    "Description": "Enables automatically creating tags"
+  },
+  {
+    "Key": "tag.auto-create.trigger.period",
+    "Default": "daily",
+    "Description": "Period of creating tags, support daily,hourly now"
+  },
+  {
+    "Key": "tag.auto-create.trigger.offset.minutes",
+    "Default": "0",
+    "Description": "The minutes by which the tag is created after midnight (00:00)"
+  },
+  {
+    "Key": "tag.auto-create.trigger.max-delay.minutes",
+    "Default": "60",
+    "Description": "The maximum delay time for creating a tag"
+  },
+  {
+    "Key": "tag.auto-create.tag-format",
+    "Default": "’tag-‘yyyyMMdd for daily and ’tag-‘yyyyMMddHH for hourly periods",
+    "Description": "The format of the name for tag. Modifying this configuration will not take effect on old tags"
+  },
+  {
+    "Key": "tag.auto-create.max-age-ms",
+    "Default": "-1",
+    "Description": "Time of automatically created Tag to retain, -1 means keep it forever. Modifying this configuration will not take effect on old tags"
+  },
+  {
+    "Key": "read.split.open-file-cost",
+    "Default": "4194304(4MB)",
+    "Description": "The estimated cost to open a file"
+  },
+  {
+    "Key": "read.split.planning-lookback",
+    "Default": "10",
+    "Description": "Number of bins to consider when combining input splits"
+  },
+  {
+    "Key": "read.split.target-size",
+    "Default": "134217728(128MB)",
+    "Description": "Target size when combining data input splits"
+  },
+  {
+    "Key": "read.split.delete-ratio",
+    "Default": "0.05",
+    "Description": "When the ratio of delete files is below this threshold, the read task will be split into more tasks to improve query speed"
+  },
+  {
+    "Key": "base.write.format",
+    "Default": "parquet",
+    "Description": "File format for the table for BaseStore, applicable to KeyedTable"
+  },
+  {
+    "Key": "change.write.format",
+    "Default": "parquet",
+    "Description": "File format for the table for ChangeStore, applicable to KeyedTable"
+  },
+  {
+    "Key": "write.format.default",
+    "Default": "parquet",
+    "Description": "Default file format for the table, applicable to UnkeyedTable"
+  },
+  {
+    "Key": "base.file-index.hash-bucket",
+    "Default": "4",
+    "Description": "Initial number of buckets for BaseStore auto-bucket"
+  },
+  {
+    "Key": "change.file-index.hash-bucket",
+    "Default": "4",
+    "Description": "Initial number of buckets for ChangeStore auto-bucket"
+  },
+  {
+    "Key": "write.target-file-size-bytes",
+    "Default": "134217728(128MB)",
+    "Description": "Target size when writing"
+  },
+  {
+    "Key": "write.upsert.enabled",
+    "Default": "false",
+    "Description": "Enable upsert mode, multiple insert data with the same primary key will be merged if enabled"
+  },
+  {
+    "Key": "write.distribution-mode",
+    "Default": "hash",
+    "Description": "Shuffle rules for writing. UnkeyedTable can choose between none and hash, while KeyedTable can only choose hash"
+  },
+  {
+    "Key": "write.distribution.hash-mode",
+    "Default": "auto",
+    "Description": "Auto-bucket mode, which supports primary-key, partition-key, primary-partition-key, and auto"
+  },
+  {
+    "Key": "base.refresh-interval",
+    "Default": "-1 (Closed)",
+    "Description": "The interval for refreshing the BaseStore"
+  },
+  {
+    "Key": "log-store.enabled",
+    "Default": "false",
+    "Description": "Enables LogStore"
+  },
+  {
+    "Key": "log-store.type",
+    "Default": "kafka",
+    "Description": "Type of LogStore, which supports ‘kafka’ and ‘pulsar’"
+  },
+  {
+    "Key": "log-store.address",
+    "Default": "NULL",
+    "Description": "Address of LogStore, required when LogStore enabled. For Kafka, this is the Kafka bootstrap servers. For Pulsar, this is the Pulsar Service URL, such as ‘pulsar://localhost:6650’"
+  },
+  {
+    "Key": "log-store.topic",
+    "Default": "NULL",
+    "Description": "Topic of LogStore, required when LogStore enabled"
+  },
+  {
+    "Key": "properties.pulsar.admin.adminUrl",
+    "Default": "NULL",
+    "Description": "HTTP URL of Pulsar admin, such as ‘http://my-broker.example.com:8080’. Only required when log-store.type\u003dpulsar"
+  },
+  {
+    "Key": "properties.XXX",
+    "Default": "NULL",
+    "Description": "Other configurations of LogStore. For Kafka, all the configurations supported by Kafka Consumer/Producer can be set by prefixing them with properties.， such as \u0027properties.batch.size\u0027\u003d\u002716384\u0027， refer to Kafka Consumer Configurations, Kafka Producer Configurations for more details. For Pulsar，all the configurations supported by Pulsar can be set by prefixing them with properties., such as \u0027properties.pulsar.client.requestTimeoutMs\u0027\u003d\u002760000\u0027， refer to Flink-Pulsar-Connector for more details"
+  },
+  {
+    "Key": "table.event-time-field",
+    "Default": "_ingest_time",
+    "Description": "The event time field for calculating the watermark. The default _ingest_time indicates calculating with the time when the data was written"
+  },
+  {
+    "Key": "table.watermark-allowed-lateness-second",
+    "Default": "0",
+    "Description": "The allowed lateness time in seconds when calculating watermark"
+  },
+  {
+    "Key": "table.event-time-field.datetime-string-format",
+    "Default": "yyyy-MM-dd HH:mm:ss",
+    "Description": "The format of event time when it is in string format"
+  },
+  {
+    "Key": "table.event-time-field.datetime-number-format",
+    "Default": "TIMESTAMP_MS",
+    "Description": "The format of event time when it is in numeric format, which supports TIMESTAMP_MS (timestamp in milliseconds) and TIMESTAMP_S (timestamp in seconds)"
+  },
+  {
+    "Key": "base.hive.auto-sync-schema-change",
+    "Default": "true",
+    "Description": "Whether synchronize schema changes of Hive Table from HMS"
+  },
+  {
+    "Key": "base.hive.auto-sync-data-write",
+    "Default": "false",
+    "Description": "Whether synchronize data changes of Hive Table from HMS, this should be true when writing to Hive"
+  },
+  {
+    "Key": "base.hive.consistent-write.enabled",
+    "Default": "true",
+    "Description": "To avoid writing dirty data, the files written to the Hive directory will be hidden files and renamed to visible files upon commit."
+  }
+]

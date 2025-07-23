@@ -4,6 +4,7 @@ import com.dyrnq.kyuubi.command.FlinkConfig;
 import com.dyrnq.kyuubi.command.KafkaConfig;
 import com.dyrnq.kyuubi.command.KyuubiConfig;
 import com.dyrnq.kyuubi.command.SparkConfig;
+import com.dyrnq.kyuubi.command.AmoroConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.noear.solon.Solon;
 import picocli.CommandLine;
@@ -13,7 +14,8 @@ import picocli.CommandLine;
                 KyuubiConfig.class,
                 SparkConfig.class,
                 FlinkConfig.class,
-                KafkaConfig.class
+                KafkaConfig.class,
+                AmoroConfig.class
         },
         mixinStandardHelpOptions = true,
         showDefaultValues = true

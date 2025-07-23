@@ -30,5 +30,11 @@ java -jar target/kyuubi-config.jar kafka -ver $kv --format json --no-section  > 
 java -jar target/kyuubi-config.jar kafka -ver $kv --format conf               > kafka/$kv/kafka-config.conf
 done
 
+for kv in "0.8.0" "latest"; do
+echo "version=$kv"
+mkdir -p amoro/$kv
+java -jar target/kyuubi-config.jar amoro -ver $kv --format json --no-section  > amoro/$kv/amoro-config-no-section.json
+java -jar target/kyuubi-config.jar amoro -ver $kv --format conf               > amoro/$kv/amoro-config.conf
+done
 
 
