@@ -22,5 +22,13 @@ java -jar target/kyuubi-config.jar flink -ver $kv --format json               > 
 java -jar target/kyuubi-config.jar flink -ver $kv --format conf               > flink/$kv/flink-config.conf
 done
 
+for kv in "36" "37" "38" "39" "master"; do
+echo "version=$kv"
+mkdir -p kafka/$kv
+java -jar target/kyuubi-config.jar kafka -ver $kv --format json               > kafka/$kv/kafka-config.json
+java -jar target/kyuubi-config.jar kafka -ver $kv --format json --no-section  > kafka/$kv/kafka-config-no-section.json
+java -jar target/kyuubi-config.jar kafka -ver $kv --format conf               > kafka/$kv/kafka-config.conf
+done
+
 
 
