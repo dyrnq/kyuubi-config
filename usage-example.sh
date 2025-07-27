@@ -38,3 +38,11 @@ java -jar target/kyuubi-config.jar amoro -ver $kv --format conf               > 
 done
 
 
+for kv in "4.16.7" "next"; do
+echo "version=$kv"
+mkdir -p bookkeeper/$kv
+java -jar target/kyuubi-config.jar bookkeeper -ver $kv --format json --no-section  > bookkeeper/$kv/bookkeeper-config-no-section.json
+java -jar target/kyuubi-config.jar bookkeeper -ver $kv --format conf               > bookkeeper/$kv/bookkeeper-config.conf
+done
+
+

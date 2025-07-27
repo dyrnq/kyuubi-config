@@ -1,10 +1,6 @@
 package com.dyrnq.kyuubi;
 
-import com.dyrnq.kyuubi.command.FlinkConfig;
-import com.dyrnq.kyuubi.command.KafkaConfig;
-import com.dyrnq.kyuubi.command.KyuubiConfig;
-import com.dyrnq.kyuubi.command.SparkConfig;
-import com.dyrnq.kyuubi.command.AmoroConfig;
+import com.dyrnq.kyuubi.command.*;
 import lombok.extern.slf4j.Slf4j;
 import org.noear.solon.Solon;
 import picocli.CommandLine;
@@ -15,7 +11,8 @@ import picocli.CommandLine;
                 SparkConfig.class,
                 FlinkConfig.class,
                 KafkaConfig.class,
-                AmoroConfig.class
+                AmoroConfig.class,
+                BookKeeperConfig.class
         },
         mixinStandardHelpOptions = true,
         showDefaultValues = true

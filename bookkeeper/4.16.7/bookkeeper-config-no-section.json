@@ -1,0 +1,942 @@
+[
+  {
+    "Parameter": "bookiePort",
+    "Description": "The port that the bookie server listens on.",
+    "Default": "3181"
+  },
+  {
+    "Parameter": "allowMultipleDirsUnderSameDiskPartition",
+    "Description": "Configure the bookie to allow/disallow multiple ledger/index/journal directories in the same filesystem disk partition.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "listeningInterface",
+    "Description": "The network interface that the bookie should listen on. If not set, the bookie will listen on all interfaces.",
+    "Default": "eth0"
+  },
+  {
+    "Parameter": "advertisedAddress",
+    "Description": "Configure a specific hostname or IP address that the bookie should use to advertise itself to clients. If not set, bookie will advertised its own IP address or hostname, depending on the listeningInterface and useHostNameAsBookieID settings.",
+    "Default": "eth0"
+  },
+  {
+    "Parameter": "allowLoopback",
+    "Description": "Whether the bookie is allowed to use a loopback interface as its primary interface (the interface it uses to establish its identity). By default, loopback interfaces are not allowed as the primary interface. Using a loopback interface as the primary interface usually indicates a configuration error. It\u0027s fairly common in some VPS setups, for example, to not configure a hostname or to have the hostname resolve to 127.0.0.1. If this is the case, then all bookies in the cluster will establish their identities as 127.0.0.1:3181, and only one will be able to join the cluster. For VPSs configured like this, you should explicitly set the listening interface.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "useHostNameAsBookieID",
+    "Description": "Whether the bookie should use its hostname to register with the ZooKeeper coordination service. When false, the bookie will use its IP address for the registration.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "useShortHostName",
+    "Description": "Whether the bookie should use short hostname or FQDN hostname for registration and ledger metadata when useHostNameAsBookieID is enabled.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "allowEphemeralPorts",
+    "Description": "Whether the bookie is allowed to use an ephemeral port (port 0) as its server port. By default, an ephemeral port is not allowed. Using an ephemeral port as the service port usually indicates a configuration error. However, in unit tests, using an ephemeral port will address port conflict problems and allow running tests in parallel.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "enableLocalTransport",
+    "Description": "Whether allow the bookie to listen for BookKeeper clients executed on the local JVM.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "disableServerSocketBind",
+    "Description": "Whether allow the bookie to disable bind on network interfaces, this bookie will be available only to BookKeeper clients executed on the local JVM.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "bookieDeathWatchInterval",
+    "Description": "Interval to watch whether bookie is dead or not, in milliseconds.",
+    "Default": "1000"
+  },
+  {
+    "Parameter": "extraServerComponents",
+    "Description": "Configure a list of extra server components to enable and load on a bookie server. This provides a plugin mechanism to run extra server components along with a bookie server.",
+    "Default": ""
+  },
+  {
+    "Parameter": "ignoreExtraServerComponentsStartupFailures",
+    "Description": "Whether the bookie should ignore startup failures on loading server components specified by extraServerComponents.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "numAddWorkerThreads",
+    "Description": "The number of threads that handle write requests. if zero, writes are handled by Netty threads directly.",
+    "Default": "1"
+  },
+  {
+    "Parameter": "numReadWorkerThreads",
+    "Description": "The number of threads that handle read requests. If zero, reads are handled by Netty threads directly.",
+    "Default": "8"
+  },
+  {
+    "Parameter": "numLongPollWorkerThreads",
+    "Description": "The number of threads that handle long poll requests. If zero, long poll requests are handled by Netty threads directly.",
+    "Default": ""
+  },
+  {
+    "Parameter": "numJournalCallbackThreads",
+    "Description": "The number of threads that handle journal callbacks. If zero, journal callbacks are executed directly on force write threads.",
+    "Default": "1"
+  },
+  {
+    "Parameter": "numHighPriorityWorkerThreads",
+    "Description": "The number of threads that should be used for high priority requests (i.e. recovery reads and adds, and fencing). If zero, reads are handled by Netty threads directly.",
+    "Default": "8"
+  },
+  {
+    "Parameter": "maxPendingAddRequestsPerThread",
+    "Description": "If read worker threads are enabled, limit the number of pending requests, to avoid the executor queue to grow indefinitely. If zero or negative, the number of pending requests is unlimited.",
+    "Default": "10000"
+  },
+  {
+    "Parameter": "maxPendingReadRequestsPerThread",
+    "Description": "If add worker threads are enabled, limit the number of pending requests, to avoid the executor queue to grow indefinitely. If zero or negative, the number of pending requests is unlimited.",
+    "Default": "10000"
+  },
+  {
+    "Parameter": "enableBusyWait",
+    "Description": "Option to enable busy-wait settings. Default is false. WARNING: This option will enable spin-waiting on executors and IO threads in order to reduce latency during context switches. The spinning will consume 100% CPU even when bookie is not doing any work. It is recommended to reduce the number of threads in the main workers pool and Netty event loop to only have few CPU cores busy.",
+    "Default": ""
+  },
+  {
+    "Parameter": "requestTimerTickDurationMs",
+    "Description": "The tick duration for long poll request timer, in milliseconds. See HashedWheelTimer for more details.",
+    "Default": "10"
+  },
+  {
+    "Parameter": "requestTimerNumTicks",
+    "Description": "The number of ticks per wheel for long poll request timer. See HashedWheelTimer for more details.",
+    "Default": "1024"
+  },
+  {
+    "Parameter": "readOnlyModeEnabled",
+    "Description": "If all ledger directories configured are full, then support only read requests for clients. If \"readOnlyModeEnabled\u003dtrue\" then on all ledger disks full, bookie will be converted to read-only mode and serve only read requests. Otherwise the bookie will be shutdown. By default, this will be enabled.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "forceReadOnlyBookie",
+    "Description": "Whether the bookie is force started in read only mode or not.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "persistBookieStatusEnabled",
+    "Description": "Persist the bookie status locally on the disks. So the bookies can keep their status upon restarts.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "readOnlyModeOnAnyDiskFullEnabled",
+    "Description": "If any ledger directories configured are full, then support only read requests for clients. If \"readOnlyModeOnAnyDiskFullEnabled\u003dtrue\" then on any ledger disks full, bookie will be converted to read-only mode and serve only read requests. When all disks recovered, the bookie will be converted to read-write mode.Otherwise it will obey the readOnlyModeEnabled behavior. By default, this will be disabled.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "serverTcpNoDelay",
+    "Description": "This settings is used to enabled/disabled Nagle\u0027s algorithm, which is a means of improving the efficiency of TCP/IP networks by reducing the number of packets that need to be sent over the network. If you are sending many small messages, such that more than one can fit in a single IP packet, setting server.tcpnodelay to false to enable Nagle algorithm can provide better performance.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "serverSockKeepalive",
+    "Description": "This setting is used to send keep-alive messages on connection-oriented sockets.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "serverTcpLinger",
+    "Description": "The socket linger timeout on close. When enabled, a close or shutdown will not return until all queued messages for the socket have been successfully sent or the linger timeout has been reached. Otherwise, the call returns immediately and the closing is done in the background.",
+    "Default": ""
+  },
+  {
+    "Parameter": "byteBufAllocatorSizeInitial",
+    "Description": "The Recv ByteBuf allocator initial buf size.",
+    "Default": "65536"
+  },
+  {
+    "Parameter": "byteBufAllocatorSizeMin",
+    "Description": "The Recv ByteBuf allocator min buf size.",
+    "Default": "65536"
+  },
+  {
+    "Parameter": "byteBufAllocatorSizeMax",
+    "Description": "The Recv ByteBuf allocator max buf size.",
+    "Default": "1048576"
+  },
+  {
+    "Parameter": "nettyMaxFrameSizeBytes",
+    "Description": "The maximum netty frame size in bytes. Any message received larger than this will be rejected, so when the client-side attempt to send more than the default size bytes, it should set up the corresponding parameter setNettyMaxFrameSizeBytes(int maxSize), pay attention to the parameter should be less than the value of server-side.",
+    "Default": "5242880"
+  },
+  {
+    "Parameter": "httpServerEnabled",
+    "Description": "The flag enables/disables starting the admin http server.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "httpServerPort",
+    "Description": "The http server port to listen on if httpServerEnabled is set to true.",
+    "Default": "8080"
+  },
+  {
+    "Parameter": "httpServerHost",
+    "Description": "The http server host to listen on if httpServerEnabled is set to true.",
+    "Default": "0.0.0.0"
+  },
+  {
+    "Parameter": "bookieAuthProviderFactoryClass",
+    "Description": "The bookie authentication provider factory class name. If this is null, no authentication will take place.",
+    "Default": ""
+  },
+  {
+    "Parameter": "permittedStartupUsers",
+    "Description": "The list of users are permitted to run the bookie process. Any users can run the bookie process if it is not set. Example settings - \"permittedStartupUsers\u003duser1,user2,user3\"",
+    "Default": ""
+  },
+  {
+    "Parameter": "tlsProvider",
+    "Description": "TLS Provider (JDK or OpenSSL)",
+    "Default": "OpenSSL"
+  },
+  {
+    "Parameter": "tlsProviderFactoryClass",
+    "Description": "The path to the class that provides security.",
+    "Default": "org.apache.bookkeeper.tls.TLSContextFactory"
+  },
+  {
+    "Parameter": "tlsClientAuthentication",
+    "Description": "Type of security used by server.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "tlsKeyStoreType",
+    "Description": "Bookie Keystore type.",
+    "Default": "JKS"
+  },
+  {
+    "Parameter": "tlsKeyStore",
+    "Description": "Bookie Keystore location (path).",
+    "Default": ""
+  },
+  {
+    "Parameter": "tlsKeyStore",
+    "Description": "Bookie Keystore location (path).",
+    "Default": ""
+  },
+  {
+    "Parameter": "tlsKeyStorePasswordPath",
+    "Description": "Bookie Keystore password path, if the keystore is protected by a password.",
+    "Default": ""
+  },
+  {
+    "Parameter": "tlsTrustStoreType",
+    "Description": "Bookie Truststore type.",
+    "Default": ""
+  },
+  {
+    "Parameter": "tlsTrustStore",
+    "Description": "Bookie Truststore location (path).",
+    "Default": ""
+  },
+  {
+    "Parameter": "tlsTrustStorePasswordPath",
+    "Description": "Bookie Truststore password path, if the truststore is protected by a password.",
+    "Default": ""
+  },
+  {
+    "Parameter": "tlsCertificatePath",
+    "Description": "Bookie TLS certificate path.",
+    "Default": ""
+  },
+  {
+    "Parameter": "journalDirectories",
+    "Description": "The directories to which Bookkeeper outputs its write-ahead log (WAL). Could define multi directories to store write head logs, separated by \u0027,\u0027. For example: journalDirectories\u003d/tmp/bk-journal1,/tmp/bk-journal2 If journalDirectories is set, bookies will skip journalDirectory and use this setting directory.",
+    "Default": "/tmp/bk-journal"
+  },
+  {
+    "Parameter": "journalDirectory",
+    "Description": "@Deprecated since 4.5.0, in favor of using journalDirectories. The directory to which Bookkeeper outputs its write-ahead log (WAL).",
+    "Default": "/tmp/bk-txn"
+  },
+  {
+    "Parameter": "journalFormatVersionToWrite",
+    "Description": "The journal format version to write. Available formats are 1-5: 1: no header 2: a header section was added 3: ledger key was introduced 4: fencing key was introduced 5: expanding header to 512 and padding writes to align sector size configured by journalAlignmentSize 6: persisting explicitLac is introduced By default, it is 6. If you\u0027d like to disable persisting ExplicitLac, you can set this config to \u003c 6 and also fileInfoFormatVersionToWrite should be set to 0. If there is mismatch then the serverconfig is considered invalid. You can disable padding-writes by setting journal version back to 4. This feature is available in 4.5.0 and onward versions.",
+    "Default": "6"
+  },
+  {
+    "Parameter": "journalMaxSizeMB",
+    "Description": "Max file size of journal file, in mega bytes. A new journal file will be created when the old one reaches the file size limitation.",
+    "Default": "2048"
+  },
+  {
+    "Parameter": "journalMaxBackups",
+    "Description": "Max number of old journal file to kept. Keep a number of old journal files would help data recovery in specia case.",
+    "Default": "5"
+  },
+  {
+    "Parameter": "journalPreAllocSizeMB",
+    "Description": "How much space should we pre-allocate at a time in the journal.",
+    "Default": "16"
+  },
+  {
+    "Parameter": "journalWriteBufferSizeKB",
+    "Description": "Size of the write buffers used for the journal.",
+    "Default": "64"
+  },
+  {
+    "Parameter": "journalRemoveFromPageCache",
+    "Description": "Should we remove pages from page cache after force write",
+    "Default": "true"
+  },
+  {
+    "Parameter": "journalSyncData",
+    "Description": "Should the data be fsynced on journal before acknowledgment. By default, data sync is enabled to guarantee durability of writes. Beware - when disabling data sync in the bookie journal might improve the bookie write performance, it will also introduce the possibility of data loss. With no fsync, the journal entries are written in the OS page cache but not flushed to disk. In case of power failure, the affected bookie might lose the unflushed data. If the ledger is replicated to multiple bookies, the chances of data loss are reduced though still present.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "journalAdaptiveGroupWrites",
+    "Description": "Should we group journal force writes, which optimize group commit for higher throughput.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "journalMaxGroupWaitMSec",
+    "Description": "Maximum latency to impose on a journal write to achieve grouping.",
+    "Default": "2"
+  },
+  {
+    "Parameter": "journalBufferedWritesThreshold",
+    "Description": "Maximum writes to buffer to achieve grouping.",
+    "Default": "524288"
+  },
+  {
+    "Parameter": "journalFlushWhenQueueEmpty",
+    "Description": "If we should flush the journal when journal queue is empty.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "journalAlignmentSize",
+    "Description": "All the journal writes and commits should be aligned to given size. If not, zeros will be padded to align to given size.",
+    "Default": "512"
+  },
+  {
+    "Parameter": "journalBufferedEntriesThreshold",
+    "Description": "Maximum entries to buffer to impose on a journal write to achieve grouping.",
+    "Default": ""
+  },
+  {
+    "Parameter": "journalFlushWhenQueueEmpty",
+    "Description": "If we should flush the journal when journal queue is empty.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "journalQueueSize",
+    "Description": "Set the size of the journal queue.",
+    "Default": "10000"
+  },
+  {
+    "Parameter": "ledgerStorageClass",
+    "Description": "Ledger storage implementation class Options: - org.apache.bookkeeper.bookie.InterleavedLedgerStorage - org.apache.bookkeeper.bookie.SortedLedgerStorage - org.apache.bookkeeper.bookie.storage.ldb.DbLedgerStorage",
+    "Default": "org.apache.bookkeeper.bookie.SortedLedgerStorage"
+  },
+  {
+    "Parameter": "sortedLedgerStorageEnabled",
+    "Description": "@Deprecated in favor of using ledgerStorageClass Whether sorted-ledger storage enabled (default true)",
+    "Default": "true"
+  },
+  {
+    "Parameter": "ledgerDirectories",
+    "Description": "The directory to which Bookkeeper outputs ledger snapshots. You can define multiple directories to store snapshots separated by a comma, for example /tmp/data-dir1,/tmp/data-dir2.",
+    "Default": "/tmp/bk-data"
+  },
+  {
+    "Parameter": "indexDirectories",
+    "Description": "The directories in which index files are stored. If not specified, the value of ledgerDirectories will be used.",
+    "Default": "/tmp/bk-data"
+  },
+  {
+    "Parameter": "minUsableSizeForIndexFileCreation",
+    "Description": "Minimum safe usable size to be available in index directory for bookie to create index file while replaying journal at the time of bookie start in readonly mode (in bytes)",
+    "Default": "1073741824"
+  },
+  {
+    "Parameter": "minUsableSizeForEntryLogCreation",
+    "Description": "Minimum safe usable size to be available in ledger directory for bookie to create entry log files (in bytes). This parameter allows creating entry log files when there are enough disk spaces, even when the bookie is running at readonly mode because of the disk usage is exceeding diskUsageThreshold. Because compaction, journal replays can still write data to disks when a bookie is readonly.",
+    "Default": "1.2 * logSizeLimit"
+  },
+  {
+    "Parameter": "minUsableSizeForHighPriorityWrites",
+    "Description": "Minimum safe usable size to be available in ledger directory for bookie to accept high priority writes even it is in readonly mode.",
+    "Default": "1.2 * logSizeLimit"
+  },
+  {
+    "Parameter": "flushInterval",
+    "Description": "When entryLogPerLedgerEnabled is enabled, checkpoint doesn\u0027t happens when a new active entrylog is created / previous one is rolled over. Instead SyncThread checkpoints periodically with \u0027flushInterval\u0027 delay (in milliseconds) in between executions. Checkpoint flushes both ledger entryLogs and ledger index pages to disk. Flushing entrylog and index files will introduce much random disk I/O. If separating journal dir and ledger dirs each on different devices, flushing would not affect performance. But if putting journal dir and ledger dirs on same device, performance degrade significantly on too frequent flushing. You can consider increment flush interval to get better performance, but you need to pay more time on bookie server restart after failure. This config is used only when entryLogPerLedgerEnabled is enabled.",
+    "Default": "10000"
+  },
+  {
+    "Parameter": "allowStorageExpansion",
+    "Description": "Allow the expansion of bookie storage capacity. Newly added ledger and index directories must be empty.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "logSizeLimit",
+    "Description": "Max file size of entry logger, in bytes. A new entry log file will be created when the old one reaches the file size limitation.",
+    "Default": "2147483648"
+  },
+  {
+    "Parameter": "entryLogFilePreallocationEnabled",
+    "Description": "Enable/Disable entry logger preallocation",
+    "Default": "true"
+  },
+  {
+    "Parameter": "flushEntrylogBytes",
+    "Description": "Entry log flush interval, in bytes. Setting this to 0 or less disables this feature and makes flush happen on log rotation. Flushing in smaller chunks but more frequently reduces spikes in disk I/O. Flushing too frequently may negatively affect performance.",
+    "Default": ""
+  },
+  {
+    "Parameter": "readBufferSizeBytes",
+    "Description": "The capacity allocated for BufferedReadChannels, in bytes.",
+    "Default": "512"
+  },
+  {
+    "Parameter": "writeBufferSizeBytes",
+    "Description": "The number of bytes used as capacity for the write buffer.",
+    "Default": "65536"
+  },
+  {
+    "Parameter": "entryLogPerLedgerEnabled",
+    "Description": "Specifies if entryLog per ledger is enabled/disabled. If it is enabled, then there would be a active entrylog for each ledger. It would be ideal to enable this feature if the underlying storage device has multiple DiskPartitions or SSD and if in a given moment, entries of fewer number of active ledgers are written to the bookie.",
+    "Default": ""
+  },
+  {
+    "Parameter": "entrylogMapAccessExpiryTimeInSeconds",
+    "Description": "config specifying if the entrylog per ledger is enabled, then the amount of time EntryLogManagerForEntryLogPerLedger should wait for closing the entrylog file after the last addEntry call for that ledger, if explicit writeclose for that ledger is not received.",
+    "Default": "300"
+  },
+  {
+    "Parameter": "maximumNumberOfActiveEntryLogs",
+    "Description": "in entryLogPerLedger feature, this specifies the maximum number of entrylogs that can be active at a given point in time. If there are more number of active entryLogs then the maximumNumberOfActiveEntryLogs then the entrylog will be evicted from the cache.",
+    "Default": "500"
+  },
+  {
+    "Parameter": "entryLogPerLedgerCounterLimitsMultFactor",
+    "Description": "in EntryLogManagerForEntryLogPerLedger, this config value specifies the metrics cache size limits in multiples of entrylogMap cache size limits.",
+    "Default": "10"
+  },
+  {
+    "Parameter": "dbStorage_directIOEntryLogger",
+    "Description": "Enable/Disable directIO entry logger.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "dbStorage_directIOEntryLoggerTotalWriteBufferSizeMB",
+    "Description": "Total write buffer size in megabytes for all the entry directories. The write buffer size of each entry directory needs to be divided by the number of entry directories.",
+    "Default": "1/8 of max direct memory"
+  },
+  {
+    "Parameter": "dbStorage_directIOEntryLoggerTotalReadBufferSizeMB",
+    "Description": "Total read buffer size in megabytes for all the entry directories. The read buffer size of each entry directory needs to be divided by the number of entry directories.",
+    "Default": "1/8 of max direct memory"
+  },
+  {
+    "Parameter": "dbStorage_directIOEntryLoggerReadBufferSizeMB",
+    "Description": "The buffer size, in megabytes, for each direct reader to read data from the entry log file. An entry log file will have only one direct reader.",
+    "Default": "8"
+  },
+  {
+    "Parameter": "dbStorage_directIOEntryLoggerMaxFdCacheTimeSeconds",
+    "Description": "Maximum cache time after a direct reader is accessed.",
+    "Default": "300"
+  },
+  {
+    "Parameter": "logSizeLimit",
+    "Description": "Max file size of entry logger, in bytes. A new entry log file will be created when the old one reaches the file size limitation.",
+    "Default": "2147483648"
+  },
+  {
+    "Parameter": "isThrottleByBytes",
+    "Description": "Throttle compaction by bytes or by entries.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "compactionRate",
+    "Description": "The rate at which compaction will read entries. The unit is adds per second.",
+    "Default": "1000"
+  },
+  {
+    "Parameter": "compactionRateByEntries",
+    "Description": "Set the rate at which compaction will read entries. The unit is adds per second.",
+    "Default": "1000"
+  },
+  {
+    "Parameter": "compactionRateByBytes",
+    "Description": "Set the rate at which compaction will read entries. The unit is bytes added per second.",
+    "Default": "1000000"
+  },
+  {
+    "Parameter": "compactionMaxOutstandingRequests",
+    "Description": "Set the maximum number of entries which can be compacted without flushing. When compacting, the entries are written to the entrylog and the new offsets are cached in memory. Once the entrylog is flushed the index is updated with the new offsets. This parameter controls the number of entries added to the entrylog before a flush is forced. A higher value for this parameter means more memory will be used for offsets. Each offset consists of 3 longs. This parameter should not be modified unless you know what you\u0027re doing.",
+    "Default": "100000"
+  },
+  {
+    "Parameter": "minorCompactionThreshold",
+    "Description": "Threshold of minor compaction. For those entry log files whose remaining size percentage reaches below this threshold will be compacted in a minor compaction. If it is set to less than zero, the minor compaction is disabled.",
+    "Default": "0.2"
+  },
+  {
+    "Parameter": "majorCompactionThreshold",
+    "Description": "Threshold of major compaction. For those entry log files whose remaining size percentage reaches below this threshold will be compacted in a major compaction. Those entry log files whose remaining size percentage is still higher than the threshold will never be compacted. If it is set to less than zero, the minor compaction is disabled.",
+    "Default": "0.8"
+  },
+  {
+    "Parameter": "minorCompactionInterval",
+    "Description": "Interval to run minor compaction, in seconds. If it is set to less than zero, the minor compaction is disabled.",
+    "Default": "3600"
+  },
+  {
+    "Parameter": "majorCompactionInterval",
+    "Description": "Interval to run major compaction, in seconds. If it is set to less than zero, the major compaction is disabled.",
+    "Default": "86400"
+  },
+  {
+    "Parameter": "minorCompactionMaxTimeMillis",
+    "Description": "Maximum milliseconds to run minor Compaction.",
+    "Default": "-1 to run indefinitely."
+  },
+  {
+    "Parameter": "majorCompactionMaxTimeMillis",
+    "Description": "Maximum milliseconds to run major Compaction.",
+    "Default": "-1 to run indefinitely."
+  },
+  {
+    "Parameter": "useTransactionalCompaction",
+    "Description": "Flag to enable/disable transactional compaction. If it is set to true, it will use transactional compaction, which uses new entry log files to store entries after compaction; otherwise, it will use normal compaction, which shares same entry log file with normal add operations.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "gcWaitTime",
+    "Description": "How long the interval to trigger next garbage collection, in milliseconds. Since garbage collection is running in background, too frequent gc will heart performance. It is better to give a higher number of gc interval if there is enough disk capacity.",
+    "Default": "1000"
+  },
+  {
+    "Parameter": "gcOverreplicatedLedgerWaitTime",
+    "Description": "How long the interval to trigger next garbage collection of overreplicated ledgers, in milliseconds. This should not be run very frequently since we read the metadata for all the ledgers on the bookie from zk.",
+    "Default": "86400000"
+  },
+  {
+    "Parameter": "gcOverreplicatedLedgerMaxConcurrentRequests",
+    "Description": "Max number of concurrent requests in garbage collection of overreplicated ledgers.",
+    "Default": "1000"
+  },
+  {
+    "Parameter": "isForceGCAllowWhenNoSpace",
+    "Description": "Whether force compaction is allowed when the disk is full or almost full. Forcing GC may get some space back, but may also fill up disk space more quickly. This is because new log files are created before GC, while old garbage log files are deleted after GC.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "verifyMetadataOnGC",
+    "Description": "Whether the bookie should double check if a ledger exists in metadata service prior to gc.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "diskUsageThreshold",
+    "Description": "For each ledger dir, maximum disk space which can be used. Default is 0.95f. i.e. 95% of disk can be used at most after which nothing will be written to that partition. If all ledger dir partitions are full, then bookie will turn to readonly mode if \u0027readOnlyModeEnabled\u003dtrue\u0027 is set, else it will shutdown. Valid values should be in between 0 and 1 (exclusive).",
+    "Default": "0.95"
+  },
+  {
+    "Parameter": "diskUsageWarnThreshold",
+    "Description": "The disk free space low water mark threshold. Disk is considered full when usage threshold is exceeded. Disk returns back to non-full state when usage is below low water mark threshold. This prevents it from going back and forth between these states frequently when concurrent writes and compaction are happening. This also prevent bookie from switching frequently between read-only and read-writes states in the same cases.",
+    "Default": "0.95"
+  },
+  {
+    "Parameter": "diskUsageLwmThreshold",
+    "Description": "Set the disk free space low water mark threshold. Disk is considered full when usage threshold is exceeded. Disk returns back to non-full state when usage is below low water mark threshold. This prevents it from going back and forth between these states frequently when concurrent writes and compaction are happening. This also prevent bookie from switching frequently between read-only and read-writes states in the same cases.",
+    "Default": "0.9"
+  },
+  {
+    "Parameter": "diskCheckInterval",
+    "Description": "Disk check interval in milliseconds. Interval to check the ledger dirs usage.",
+    "Default": "10000"
+  },
+  {
+    "Parameter": "skipListSizeLimit",
+    "Description": "The skip list data size limitation (default 64MB) in EntryMemTable",
+    "Default": "67108864"
+  },
+  {
+    "Parameter": "skipListArenaChunkSize",
+    "Description": "The number of bytes we should use as chunk allocation for org.apache.bookkeeper.bookie.SkipListArena",
+    "Default": "4194304"
+  },
+  {
+    "Parameter": "skipListArenaMaxAllocSize",
+    "Description": "The max size we should allocate from the skiplist arena. Allocations larger than this should be allocated directly by the VM to avoid fragmentation.",
+    "Default": "131072"
+  },
+  {
+    "Parameter": "openFileLimit",
+    "Description": "Max number of ledger index files could be opened in bookie server. If number of ledger index files reaches this limitation, bookie server started to swap some ledgers from memory to disk. Too frequent swap will affect performance. You can tune this number to gain performance according your requirements.",
+    "Default": "20000"
+  },
+  {
+    "Parameter": "fileInfoCacheInitialCapacity",
+    "Description": "The minimum total size of the internal file info cache table. Providing a large enough estimate at construction time avoids the need for expensive resizing operations later, but setting this value unnecessarily high wastes memory. The default value is 1/4 of openFileLimit if openFileLimit is positive, otherwise it is 64.",
+    "Default": ""
+  },
+  {
+    "Parameter": "fileInfoMaxIdleTime",
+    "Description": "The max idle time allowed for an open file info existed in the file info cache. If the file info is idle for a long time, exceed the given time period. The file info will be evicted and closed. If the value is zero or negative, the file info is evicted only when opened files reached openFileLimit.",
+    "Default": ""
+  },
+  {
+    "Parameter": "fileInfoFormatVersionToWrite",
+    "Description": "The fileinfo format version to write. Available formats are 0-1: 0: Initial version 1: persisting explicitLac is introduced By default, it is 1. If you\u0027d like to disable persisting ExplicitLac, you can set this config to 0 and also journalFormatVersionToWrite should be set to \u003c 6. If there is mismatch then the serverconfig is considered invalid.",
+    "Default": "1"
+  },
+  {
+    "Parameter": "pageSize",
+    "Description": "Size of a index page in ledger cache, in bytes. A larger index page can improve performance writing page to disk, which is efficient when you have small number of ledgers and these ledgers have similar number of entries. If you have large number of ledgers and each ledger has fewer entries, smaller index page would improve memory usage.",
+    "Default": "8192"
+  },
+  {
+    "Parameter": "pageLimit",
+    "Description": "How many index pages provided in ledger cache. If number of index pages reaches this limitation, bookie server starts to swap some ledgers from memory to disk. You can increment this value when you found swap became more frequent. But make sure pageLimit*pageSize should not more than JVM max memory limitation, otherwise you would got OutOfMemoryException. In general, incrementing pageLimit, using smaller index page would gain better performance in lager number of ledgers with fewer entries case. If pageLimit is -1, bookie server will use 1/3 of JVM memory to compute the limitation of number of index pages.",
+    "Default": "-1"
+  },
+  {
+    "Parameter": "numOfMemtableFlushThreads",
+    "Description": "When entryLogPerLedger is enabled SortedLedgerStorage flushes entries from memTable using OrderedExecutor having numOfMemtableFlushThreads number of threads.",
+    "Default": "8"
+  },
+  {
+    "Parameter": "dbStorage_writeCacheMaxSizeMb",
+    "Description": "Size of write cache. Memory is allocated from JVM direct memory. Write cache is used for buffer entries before flushing into the entry log. For good performance, it should be big enough to hold a substantial amount of entries in the flush interval.",
+    "Default": "25% of the available direct memory"
+  },
+  {
+    "Parameter": "dbStorage_readAheadCacheMaxSizeMb",
+    "Description": "Size of read cache. Memory is allocated from JVM direct memory. The read cache is pre-filled doing read-ahead whenever a cache miss happens.",
+    "Default": "25% of the available direct memory"
+  },
+  {
+    "Parameter": "dbStorage_readAheadCacheBatchSize",
+    "Description": "How many entries to pre-fill in cache after a read cache miss",
+    "Default": "100"
+  },
+  {
+    "Parameter": "dbStorage_rocksDB_blockSize",
+    "Description": "Size of RocksDB block-cache. RocksDB is used for storing ledger indexes. For best performance, this cache should be big enough to hold a significant portion of the index database which can reach ~2GB in some cases.",
+    "Default": "268435456"
+  },
+  {
+    "Parameter": "dbStorage_rocksDB_writeBufferSizeMB",
+    "Description": "Size of RocksDB write buffer. RocksDB is used for storing ledger indexes.",
+    "Default": "64"
+  },
+  {
+    "Parameter": "dbStorage_rocksDB_sstSizeInMB",
+    "Description": "Size of RocksDB sst file size in MB. RocksDB is used for storing ledger indexes.",
+    "Default": "64"
+  },
+  {
+    "Parameter": "dbStorage_rocksDB_blockSize",
+    "Description": "",
+    "Default": "65536"
+  },
+  {
+    "Parameter": "dbStorage_rocksDB_bloomFilterBitsPerKey",
+    "Description": "",
+    "Default": "10"
+  },
+  {
+    "Parameter": "dbStorage_rocksDB_numLevels",
+    "Description": "",
+    "Default": "-1"
+  },
+  {
+    "Parameter": "dbStorage_rocksDB_numFilesInLevel0",
+    "Description": "",
+    "Default": "10"
+  },
+  {
+    "Parameter": "dbStorage_rocksDB_maxSizeInLevel1MB",
+    "Description": "",
+    "Default": "256"
+  },
+  {
+    "Parameter": "metadataServiceUri",
+    "Description": "metadata service uri that bookkeeper is used for loading corresponding metadata driver and resolving its metadata service location.",
+    "Default": "zk+hierarchical://localhost:2181/ledgers"
+  },
+  {
+    "Parameter": "ledgerManagerFactoryClass",
+    "Description": "@Deprecated in favor of using metadataServiceUri The ledger manager factory class, which defines how ledgers are stored, managed, and garbage collected. See the Ledger Manager guide for more details.",
+    "Default": "hierarchical"
+  },
+  {
+    "Parameter": "allowShadedLedgerManagerFactoryClass",
+    "Description": "Sometimes the bookkeeper server classes are shaded. The ledger manager factory classes might be relocated to be under other packages. This would fail the clients using shaded factory classes since the factory classes are stored in cookies and used for verification. Users can enable this flag to allow using shaded ledger manager factory classes to connect to a bookkeeper cluster.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "shadedLedgerManagerFactoryClassPrefix",
+    "Description": "The shaded ledger manager factory prefix. This is used when allowShadedLedgerManagerFactoryClass is set to true.",
+    "Default": "dlshade."
+  },
+  {
+    "Parameter": "zkLedgersRootPath",
+    "Description": "@Deprecated in favor of using metadataServiceUri Root Zookeeper path to store ledger metadata. This parameter is used by zookeeper-based ledger manager as a root znode to store all ledgers.",
+    "Default": "/ledgers"
+  },
+  {
+    "Parameter": "zkServers",
+    "Description": "@Deprecated in favor of using metadataServiceUri A list of one of more servers on which Zookeeper is running. The server list can be comma separated values, for example zkServers\u003dzk1:2181,zk2:2181,zk3:2181.",
+    "Default": "localhost:2181"
+  },
+  {
+    "Parameter": "zkTimeout",
+    "Description": "ZooKeeper client session timeout in milliseconds. Bookie server will exit if it received SESSION_EXPIRED because it was partitioned off from ZooKeeper for more than the session timeout JVM garbage collection, disk I/O will cause SESSION_EXPIRED. Increment this value could help avoiding this issue.",
+    "Default": "10000"
+  },
+  {
+    "Parameter": "zkRetryBackoffStartMs",
+    "Description": "The Zookeeper client backoff retry start time in millis.",
+    "Default": "1000"
+  },
+  {
+    "Parameter": "zkRetryBackoffMaxMs",
+    "Description": "The Zookeeper client backoff retry max time in millis.",
+    "Default": "10000"
+  },
+  {
+    "Parameter": "zkRequestRateLimit",
+    "Description": "The Zookeeper request limit. It is only enabled when setting a positive value.",
+    "Default": ""
+  },
+  {
+    "Parameter": "zkEnableSecurity",
+    "Description": "Set ACLs on every node written on ZooKeeper, this way only allowed users will be able to read and write BookKeeper metadata stored on ZooKeeper. In order to make ACLs work you need to setup ZooKeeper JAAS authentication all the bookies and Client need to share the same user, and this is usually done using Kerberos authentication. See ZooKeeper documentation",
+    "Default": "false"
+  },
+  {
+    "Parameter": "enableStatistics",
+    "Description": "Whether statistics are enabled for the bookie.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "statsProviderClass",
+    "Description": "Stats provider class. Options: - Prometheus : org.apache.bookkeeper.stats.prometheus.PrometheusMetricsProvider - Codahale : org.apache.bookkeeper.stats.codahale.CodahaleMetricsProvider",
+    "Default": "org.apache.bookkeeper.stats.prometheus.PrometheusMetricsProvider"
+  },
+  {
+    "Parameter": "limitStatsLogging",
+    "Description": "option to limit stats logging",
+    "Default": "false"
+  },
+  {
+    "Parameter": "prometheusStatsHttpAddress",
+    "Description": "default bind address for Prometheus metrics exporter",
+    "Default": "0.0.0.0"
+  },
+  {
+    "Parameter": "prometheusStatsHttpPort",
+    "Description": "default port for prometheus metrics exporter",
+    "Default": "8000"
+  },
+  {
+    "Parameter": "prometheusStatsLatencyRolloverSeconds",
+    "Description": "latency stats rollover interval, in seconds",
+    "Default": "60"
+  },
+  {
+    "Parameter": "codahaleStatsPrefix",
+    "Description": "metric name prefix, default is empty.",
+    "Default": ""
+  },
+  {
+    "Parameter": "codahaleStatsOutputFrequencySeconds",
+    "Description": "the frequency that stats reporters report stats, in seconds.",
+    "Default": "60"
+  },
+  {
+    "Parameter": "codahaleStatsGraphiteEndpoint",
+    "Description": "the graphite endpoint for reporting stats. see graphite reporter for more details.",
+    "Default": "null"
+  },
+  {
+    "Parameter": "codahaleStatsCSVEndpoint",
+    "Description": "the directory for reporting stats in csv format. see csv reporter for more details.",
+    "Default": "null"
+  },
+  {
+    "Parameter": "codahaleStatsSlf4jEndpoint",
+    "Description": "the slf4j endpoint for reporting stats. see slf4j reporter for more details.",
+    "Default": "null"
+  },
+  {
+    "Parameter": "codahaleStatsJmxEndpoint",
+    "Description": "the jmx endpoint for reporting stats. see jmx reporter for more details.",
+    "Default": ""
+  },
+  {
+    "Parameter": "autoRecoveryDaemonEnabled",
+    "Description": "Whether the bookie itself can start auto-recovery service also or not.",
+    "Default": ""
+  },
+  {
+    "Parameter": "digestType",
+    "Description": "The default digest type used for opening ledgers.",
+    "Default": "CRC32"
+  },
+  {
+    "Parameter": "passwd",
+    "Description": "The default password used for opening ledgers. Default value is empty string.",
+    "Default": ""
+  },
+  {
+    "Parameter": "enableDigestTypeAutodetection",
+    "Description": "The flag to enable/disable digest type auto-detection. If it is enabled, the bookkeeper client will ignore the provided digest type provided at digestType and the provided passwd provided at passwd.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "ensemblePlacementPolicy",
+    "Description": "The ensemble placement policy used for finding bookie for re-replicating entries. Options: - org.apache.bookkeeper.client.RackawareEnsemblePlacementPolicy - org.apache.bookkeeper.client.RegionAwareEnsemblePlacementPolicy",
+    "Default": "org.apache.bookkeeper.client.RackawareEnsemblePlacementPolicy"
+  },
+  {
+    "Parameter": "reppDnsResolverClass",
+    "Description": "The DNS resolver class used for resolving network locations for bookies. The setting is used when using either RackawareEnsemblePlacementPolicy and RegionAwareEnsemblePlacementPolicy.",
+    "Default": "org.apache.bookkeeper.net.ScriptBasedMapping"
+  },
+  {
+    "Parameter": "networkTopologyScriptFileName",
+    "Description": "The bash script used by ScriptBasedMapping DNS resolver for resolving bookies\u0027 network locations.",
+    "Default": ""
+  },
+  {
+    "Parameter": "networkTopologyScriptNumberArgs",
+    "Description": "The max number of args used in the script provided at networkTopologyScriptFileName.",
+    "Default": ""
+  },
+  {
+    "Parameter": "minNumRacksPerWriteQuorum",
+    "Description": "minimum number of racks per write quorum. RackawareEnsemblePlacementPolicy will try to get bookies from atleast \u0027minNumRacksPerWriteQuorum\u0027 racks for a writeQuorum.",
+    "Default": ""
+  },
+  {
+    "Parameter": "enforceMinNumRacksPerWriteQuorum",
+    "Description": "\u0027enforceMinNumRacksPerWriteQuorum\u0027 enforces RackawareEnsemblePlacementPolicy to pick bookies from \u0027minNumRacksPerWriteQuorum\u0027 racks for a writeQuorum. If it cann\u0027t find bookie then it would throw BKNotEnoughBookiesException instead of picking random one.",
+    "Default": ""
+  },
+  {
+    "Parameter": "ignoreLocalNodeInPlacementPolicy",
+    "Description": "\u0027ignoreLocalNodeInPlacementPolicy\u0027 specifies whether to ignore localnode in the internal logic of placement policy. If it is not possible or useful to use Bookkeeper client node\u0027s (or AutoReplicator) rack/region info. for placement policy then it is better to ignore localnode instead of false alarming with log lines and metrics.",
+    "Default": ""
+  },
+  {
+    "Parameter": "enforceMinNumFaultDomainsForWrite",
+    "Description": "\u0027enforceMinNumFaultDomainsForWrite\u0027 enforces EnsemblePlacementPolicy to check if a write has made it to bookies in \u0027minNumRacksPerWriteQuorum\u0027 number of fault domains, before acknowledging the write back.",
+    "Default": ""
+  },
+  {
+    "Parameter": "minNumZonesPerWriteQuorum",
+    "Description": "minimum number of zones per write quorum in ZoneawareEnsemblePlacementPolicy. ZoneawareEnsemblePlacementPolicy would get bookies from atleast \u0027minNumZonesPerWriteQuorum\u0027 racks for a writeQuorum.",
+    "Default": "2"
+  },
+  {
+    "Parameter": "desiredNumZonesPerWriteQuorum",
+    "Description": "desired number of zones per write quorum in ZoneawareEnsemblePlacementPolicy. ZoneawareEnsemblePlacementPolicy will try to get bookies from \u0027desiredNumZonesPerWriteQuorum\u0027 zones for a writeQuorum.",
+    "Default": "3"
+  },
+  {
+    "Parameter": "enforceStrictZoneawarePlacement",
+    "Description": "in ZoneawareEnsemblePlacementPolicy if strict placement is enabled then minZones/desiredZones in writeQuorum would be maintained otherwise it will pick nodes randomly.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "auditorPeriodicBookieCheckInterval",
+    "Description": "The time interval between auditor bookie checks, in seconds. The auditor bookie check checks ledger metadata to see which bookies should contain entries for each ledger. If a bookie that should contain entries is unavailable, then the ledger containing that entry is marked for recovery. Setting this to 0 disables the periodic check. Bookie checks will still run when a bookie fails. The default is once per day.",
+    "Default": "86400"
+  },
+  {
+    "Parameter": "auditorPeriodicCheckInterval",
+    "Description": "The time interval, in seconds, at which the auditor will check all ledgers in the cluster. By default this runs once a week. Set this to 0 to disable the periodic check completely. Note that periodic checking will put extra load on the cluster, so it should not be run more frequently than once a day.",
+    "Default": "604800"
+  },
+  {
+    "Parameter": "auditorPeriodicPlacementPolicyCheckInterval",
+    "Description": "The time interval between auditor placement policy checks, in seconds. The auditor placement policy check validates if the ensemble of segments of all the closed ledgers is adhering to the placement policy. It is just monitoring scrutiny but doesn\u0027t take any corrective measure other than logging error and reporting metrics. By default, it is disabled.",
+    "Default": "0"
+  },
+  {
+    "Parameter": "repairedPlacementPolicyNotAdheringBookieEnabled",
+    "Description": "In Auditor, it combines with auditorPeriodicPlacementPolicyCheckInterval, to control is marked ledger id to under replication managed when found a ledger ensemble not adhere to placement policy. In ReplicationWorker, to control is to repair the ledger which the ensemble does not adhere to the placement policy. By default, it is disabled. If you want to enable this feature, consider two factors. 1:Must config RackawareEnsemblePlacementPolicy. 2:There maybe lots of ledger will be mark underreplicated. The replicationWorker will replicate lots of ledger, it will increase read request and write request in bookie server. You should set a suitable rereplicationEntryBatchSize to avoid bookie server pressure.",
+    "Default": "false"
+  },
+  {
+    "Parameter": "auditorLedgerVerificationPercentage",
+    "Description": "The percentage of a ledger (fragment)\u0027s entries will be verified before claiming a fragment as missing. If it is 0, it only verifies the first and last entries of a given fragment.",
+    "Default": ""
+  },
+  {
+    "Parameter": "lostBookieRecoveryDelay",
+    "Description": "How long to wait, in seconds, before starting autorecovery of a lost bookie.",
+    "Default": ""
+  },
+  {
+    "Parameter": "storeSystemTimeAsLedgerUnderreplicatedMarkTime",
+    "Description": "Enable the Auditor to use system time as underreplicated ledger mark time. If this is enabled, Auditor will write a ctime field into the underreplicated ledger znode.",
+    "Default": "true"
+  },
+  {
+    "Parameter": "underreplicatedLedgerRecoveryGracePeriod",
+    "Description": "The grace period (in seconds) for underreplicated ledgers recovery. If ledger is marked underreplicated for more than this period then it will be reported by placementPolicyCheck in Auditor. Setting this to 0 will disable this check.",
+    "Default": ""
+  },
+  {
+    "Parameter": "auditorReplicasCheckInterval",
+    "Description": "Sets the regularity/interval at which the auditor will run a replicas check of all ledgers, which are closed. This should not be run very often since it validates availability of replicas of all ledgers by querying bookies. Setting this to 0 will completely disable the periodic replicas check. By default it is disabled.",
+    "Default": ""
+  },
+  {
+    "Parameter": "rereplicationEntryBatchSize",
+    "Description": "The number of entries that a replication will rereplicate in parallel.",
+    "Default": "10"
+  },
+  {
+    "Parameter": "openLedgerRereplicationGracePeriod",
+    "Description": "The grace period, in milliseconds, that the replication worker waits before fencing and replicating a ledger fragment that\u0027s still being written to upon bookie failure.",
+    "Default": "30000"
+  },
+  {
+    "Parameter": "lockReleaseOfFailedLedgerGracePeriod",
+    "Description": "Set the grace period, in milliseconds, which the replication worker has to wait before releasing the lock after it failed to replicate a ledger. For the first ReplicationWorker.NUM_OF_EXPONENTIAL_BACKOFF_RETRIALS failures it will do exponential backoff then it will bound at lockReleaseOfFailedLedgerGracePeriod.",
+    "Default": "300000"
+  },
+  {
+    "Parameter": "rwRereplicateBackoffMs",
+    "Description": "The time to backoff when replication worker encounters exceptions on replicating a ledger, in milliseconds.",
+    "Default": "5000"
+  },
+  {
+    "Parameter": "allocatorPoolingPolicy",
+    "Description": "Define the memory pooling policy. Available options are: - PooledDirect: Use Direct memory for all buffers and pool the memory. Direct memory will avoid the overhead of JVM GC and most memory copies when reading and writing to socket channel. Pooling will add memory space overhead due to the fact that there will be fragmentation in the allocator and that threads will keep a portion of memory as thread-local to avoid contention when possible. - UnpooledHeap: Allocate memory from JVM heap without any pooling. This option has the least overhead in terms of memory usage since the memory will be automatically reclaimed by the JVM GC but might impose a performance penalty at high throughput.",
+    "Default": "PooledDirect"
+  },
+  {
+    "Parameter": "allocatorPoolingConcurrency",
+    "Description": "Controls the amount of concurrency for the memory pool. Default is to have a number of allocator arenas equals to 2 * CPUS. Decreasing this number will reduce the amount of memory overhead, at the expense of increased allocation contention.",
+    "Default": "2 * CPUS"
+  },
+  {
+    "Parameter": "allocatorOutOfMemoryPolicy",
+    "Description": "Define the memory allocator out of memory policy. Available options are: - FallbackToHeap: If it\u0027s not possible to allocate a buffer from direct memory, fallback to allocate an unpooled buffer from JVM heap. This will help absorb memory allocation spikes because the heap allocations will naturally slow down the process and will result if full GC cleanup if the Heap itself is full. - ThrowException: Throw regular OOM exception without taking addition actions.",
+    "Default": "FallbackToHeap"
+  },
+  {
+    "Parameter": "allocatorLeakDetectionPolicy",
+    "Description": "Define the memory allocator leak detection policy. Available options are: - Disabled: No leak detection and no overhead. - Simple: Instruments 1% of the allocated buffer to track for leaks. - Advanced: Instruments 1% of the allocated buffer to track for leaks, reporting stack traces of places where the buffer was used. - Paranoid: Instruments 100% of the allocated buffer to track for leaks, reporting stack traces of places where the buffer was used. Introduce very significant overhead.",
+    "Default": "Disabled"
+  }
+]
