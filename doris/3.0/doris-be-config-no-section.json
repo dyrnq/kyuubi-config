@@ -1,0 +1,838 @@
+[
+  {
+    "Key": "deploy_mode",
+    "Default": "\"\""
+  },
+  {
+    "Key": "be_port",
+    "Default": "9060"
+  },
+  {
+    "Key": "heartbeat_service_port",
+    "Default": "9050"
+  },
+  {
+    "Key": "webserver_port",
+    "Default": "8040"
+  },
+  {
+    "Key": "brpc_port",
+    "Default": "8060"
+  },
+  {
+    "Key": "arrow_flight_sql_port",
+    "Default": "-1"
+  },
+  {
+    "Key": "enable_https",
+    "Default": "false"
+  },
+  {
+    "Key": "priority_networks",
+    "Default": "blank"
+  },
+  {
+    "Key": "storage_root_path",
+    "Default": "${DORIS_HOME}/storage"
+  },
+  {
+    "Key": "heartbeat_service_thread_count",
+    "Default": "1"
+  },
+  {
+    "Key": "ignore_broken_disk",
+    "Default": "false"
+  },
+  {
+    "Key": "mem_limit",
+    "Default": "90%"
+  },
+  {
+    "Key": "cluster_id",
+    "Default": "-1"
+  },
+  {
+    "Key": "custom_config_dir",
+    "Default": "blank"
+  },
+  {
+    "Key": "trash_file_expire_time_sec",
+    "Default": "86400"
+  },
+  {
+    "Key": "es_http_timeout_ms",
+    "Default": "5000 (ms)"
+  },
+  {
+    "Key": "es_scroll_keepalive",
+    "Default": "5 (m)"
+  },
+  {
+    "Key": "external_table_connect_timeout_sec",
+    "Default": "5 seconds"
+  },
+  {
+    "Key": "pipeline_status_report_interval",
+    "Default": "5 seconds"
+  },
+  {
+    "Key": "brpc_max_body_size",
+    "Default": "100MB"
+  },
+  {
+    "Key": "brpc_socket_max_unwritten_bytes",
+    "Default": "100MB"
+  },
+  {
+    "Key": "transfer_large_data_by_brpc",
+    "Default": "true"
+  },
+  {
+    "Key": "brpc_num_threads",
+    "Default": "-1"
+  },
+  {
+    "Key": "thrift_rpc_timeout_ms",
+    "Default": "60000"
+  },
+  {
+    "Key": "thrift_client_retry_interval_ms",
+    "Default": "1000"
+  },
+  {
+    "Key": "thrift_connect_timeout_seconds",
+    "Default": "3 (s)"
+  },
+  {
+    "Key": "thrift_server_type_of_fe",
+    "Default": "100MB"
+  },
+  {
+    "Key": "thrift_max_message_size",
+    "Default": "100MB"
+  },
+  {
+    "Key": "txn_commit_rpc_timeout_ms",
+    "Default": "60,000 (ms)"
+  },
+  {
+    "Key": "txn_map_shard_size",
+    "Default": "128"
+  },
+  {
+    "Key": "txn_shard_size",
+    "Default": "1024"
+  },
+  {
+    "Key": "unused_rowset_monitor_interval",
+    "Default": "30 (s)"
+  },
+  {
+    "Key": "max_client_cache_size_per_host",
+    "Default": "10"
+  },
+  {
+    "Key": "string_type_length_soft_limit_bytes",
+    "Default": "1,048,576"
+  },
+  {
+    "Key": "big_column_size_buffer",
+    "Default": "65535"
+  },
+  {
+    "Key": "small_column_size_buffer",
+    "Default": "100"
+  },
+  {
+    "Key": "fragment_mgr_asynic_work_pool_queue_size",
+    "Default": "4096"
+  },
+  {
+    "Key": "fragment_mgr_asynic_work_pool_thread_num_min",
+    "Default": "16"
+  },
+  {
+    "Key": "fragment_mgr_asynic_work_pool_thread_num_max",
+    "Default": "512"
+  },
+  {
+    "Key": "doris_scanner_row_num",
+    "Default": "16384"
+  },
+  {
+    "Key": "doris_scanner_row_bytes",
+    "Default": "10485760"
+  },
+  {
+    "Key": "doris_scanner_thread_pool_queue_size",
+    "Default": "102400"
+  },
+  {
+    "Key": "doris_scanner_thread_pool_thread_num",
+    "Default": "Depending on cpu cores. Equal to max(48, 2 * num_of_cpu_cores)"
+  },
+  {
+    "Key": "doris_max_remote_scanner_thread_pool_thread_num",
+    "Default": "512"
+  },
+  {
+    "Key": "exchg_node_buffer_size_bytes",
+    "Default": "10485760"
+  },
+  {
+    "Key": "doris_scan_range_max_mb",
+    "Default": "1024"
+  },
+  {
+    "Key": "disable_auto_compaction",
+    "Default": "false"
+  },
+  {
+    "Key": "enable_vertical_compaction",
+    "Default": "true"
+  },
+  {
+    "Key": "vertical_compaction_num_columns_per_group",
+    "Default": "5"
+  },
+  {
+    "Key": "vertical_compaction_max_row_source_memory_mb",
+    "Default": "200"
+  },
+  {
+    "Key": "vertical_compaction_max_segment_size",
+    "Default": "268435456"
+  },
+  {
+    "Key": "enable_ordered_data_compaction",
+    "Default": "true"
+  },
+  {
+    "Key": "ordered_data_compaction_min_segment_size",
+    "Default": "10485760"
+  },
+  {
+    "Key": "max_base_compaction_threads",
+    "Default": "4"
+  },
+  {
+    "Key": "generate_compaction_tasks_interval_ms",
+    "Default": "10 (ms)"
+  },
+  {
+    "Key": "base_compaction_min_rowset_num",
+    "Default": "5"
+  },
+  {
+    "Key": "base_compaction_min_data_ratio",
+    "Default": "0.3 (30%)"
+  },
+  {
+    "Key": "total_permits_for_compaction_score",
+    "Default": "10000"
+  },
+  {
+    "Key": "compaction_promotion_size_mbytes",
+    "Default": "1024"
+  },
+  {
+    "Key": "compaction_promotion_ratio",
+    "Default": "0.05"
+  },
+  {
+    "Key": "compaction_promotion_min_size_mbytes",
+    "Default": "128"
+  },
+  {
+    "Key": "compaction_min_size_mbytes",
+    "Default": "64"
+  },
+  {
+    "Key": "default_rowset_type",
+    "Default": "BETA"
+  },
+  {
+    "Key": "cumulative_compaction_min_deltas",
+    "Default": "5"
+  },
+  {
+    "Key": "cumulative_compaction_max_deltas",
+    "Default": "1000"
+  },
+  {
+    "Key": "base_compaction_trace_threshold",
+    "Default": "10"
+  },
+  {
+    "Key": "cumulative_compaction_trace_threshold",
+    "Default": "2"
+  },
+  {
+    "Key": "compaction_task_num_per_disk",
+    "Default": "4"
+  },
+  {
+    "Key": "compaction_task_num_per_fast_disk",
+    "Default": "8"
+  },
+  {
+    "Key": "cumulative_compaction_rounds_for_each_base_compaction_round",
+    "Default": "9"
+  },
+  {
+    "Key": "max_cumu_compaction_threads",
+    "Default": "-1"
+  },
+  {
+    "Key": "enable_segcompaction",
+    "Default": "true"
+  },
+  {
+    "Key": "segcompaction_batch_size",
+    "Default": "10"
+  },
+  {
+    "Key": "segcompaction_candidate_max_rows",
+    "Default": "1048576"
+  },
+  {
+    "Key": "segcompaction_candidate_max_bytes",
+    "Default": "104857600"
+  },
+  {
+    "Key": "segcompaction_task_max_rows",
+    "Default": "1572864"
+  },
+  {
+    "Key": "segcompaction_task_max_bytes",
+    "Default": "157286400"
+  },
+  {
+    "Key": "segcompaction_num_threads",
+    "Default": "5"
+  },
+  {
+    "Key": "disable_compaction_trace_log",
+    "Default": "true"
+  },
+  {
+    "Key": "pick_rowset_to_compact_interval_sec",
+    "Default": "86400"
+  },
+  {
+    "Key": "max_single_replica_compaction_threads",
+    "Default": "-1"
+  },
+  {
+    "Key": "update_replica_infos_interval_seconds",
+    "Default": "60 (s)"
+  },
+  {
+    "Key": "enable_stream_load_record",
+    "Default": "false"
+  },
+  {
+    "Key": "load_data_reserve_hours",
+    "Default": "4 (h)"
+  },
+  {
+    "Key": "push_worker_count_high_priority",
+    "Default": "3"
+  },
+  {
+    "Key": "push_worker_count_normal_priority",
+    "Default": "3"
+  },
+  {
+    "Key": "enable_single_replica_load",
+    "Default": "true"
+  },
+  {
+    "Key": "load_error_log_reserve_hours",
+    "Default": "48 (h)"
+  },
+  {
+    "Key": "load_error_log_limit_bytes",
+    "Default": "209715200 (byte)"
+  },
+  {
+    "Key": "load_process_max_memory_limit_percent",
+    "Default": "50 (%)"
+  },
+  {
+    "Key": "load_process_soft_mem_limit_percent",
+    "Default": "50 (%)"
+  },
+  {
+    "Key": "slave_replica_writer_rpc_timeout_sec",
+    "Default": "60"
+  },
+  {
+    "Key": "max_segment_num_per_rowset",
+    "Default": "200"
+  },
+  {
+    "Key": "high_priority_flush_thread_num_per_store",
+    "Default": "1"
+  },
+  {
+    "Key": "routine_load_consumer_pool_size",
+    "Default": "10"
+  },
+  {
+    "Key": "multi_table_batch_plan_threshold",
+    "Default": "200"
+  },
+  {
+    "Key": "multi_table_max_wait_tables",
+    "Default": "5"
+  },
+  {
+    "Key": "single_replica_load_download_num_workers",
+    "Default": "64"
+  },
+  {
+    "Key": "load_task_high_priority_threshold_second",
+    "Default": "120"
+  },
+  {
+    "Key": "min_load_rpc_timeout_ms",
+    "Default": "20"
+  },
+  {
+    "Key": "kafka_api_version_request",
+    "Default": "true"
+  },
+  {
+    "Key": "kafka_broker_version_fallback",
+    "Default": "0.10.0"
+  },
+  {
+    "Key": "max_consumer_num_per_group",
+    "Default": "3"
+  },
+  {
+    "Key": "streaming_load_max_mb",
+    "Default": "10240 (MB)"
+  },
+  {
+    "Key": "streaming_load_json_max_mb",
+    "Default": "100"
+  },
+  {
+    "Key": "olap_table_sink_send_interval_microseconds",
+    "Default": "1000"
+  },
+  {
+    "Key": "olap_table_sink_send_interval_auto_partition_factor",
+    "Default": "0.001"
+  },
+  {
+    "Key": "delete_worker_count",
+    "Default": "3"
+  },
+  {
+    "Key": "clear_transaction_task_worker_count",
+    "Default": "1"
+  },
+  {
+    "Key": "clone_worker_count",
+    "Default": "3"
+  },
+  {
+    "Key": "be_service_threads",
+    "Default": "64"
+  },
+  {
+    "Key": "download_worker_count",
+    "Default": "1"
+  },
+  {
+    "Key": "drop_tablet_worker_count",
+    "Default": "3"
+  },
+  {
+    "Key": "flush_thread_num_per_store",
+    "Default": "2"
+  },
+  {
+    "Key": "publish_version_worker_count",
+    "Default": "8"
+  },
+  {
+    "Key": "upload_worker_count",
+    "Default": "1"
+  },
+  {
+    "Key": "webserver_num_workers",
+    "Default": "48"
+  },
+  {
+    "Key": "send_batch_thread_pool_thread_num",
+    "Default": "64"
+  },
+  {
+    "Key": "send_batch_thread_pool_queue_size",
+    "Default": "102400"
+  },
+  {
+    "Key": "make_snapshot_worker_count",
+    "Default": "5"
+  },
+  {
+    "Key": "release_snapshot_worker_count",
+    "Default": "5"
+  },
+  {
+    "Key": "madvise_huge_pages",
+    "Default": "false"
+  },
+  {
+    "Key": "max_memory_sink_batch_count",
+    "Default": "20"
+  },
+  {
+    "Key": "memory_max_alignment",
+    "Default": "16"
+  },
+  {
+    "Key": "mmap_buffers",
+    "Default": "false"
+  },
+  {
+    "Key": "memtable_mem_tracker_refresh_interval_ms",
+    "Default": "100"
+  },
+  {
+    "Key": "zone_map_row_num_threshold",
+    "Default": "20"
+  },
+  {
+    "Key": "memory_mode",
+    "Default": "performance"
+  },
+  {
+    "Key": "max_sys_mem_available_low_water_mark_bytes",
+    "Default": "1717986918"
+  },
+  {
+    "Key": "memory_limitation_per_thread_for_schema_change_bytes",
+    "Default": "2147483648 (2GB)"
+  },
+  {
+    "Key": "mem_tracker_consume_min_size_bytes",
+    "Default": "1,048,576"
+  },
+  {
+    "Key": "min_buffer_size",
+    "Default": "1024 (byte)"
+  },
+  {
+    "Key": "write_buffer_size",
+    "Default": "104,857,600"
+  },
+  {
+    "Key": "remote_storage_read_buffer_mb",
+    "Default": "16 (MB)"
+  },
+  {
+    "Key": "file_cache_type",
+    "Default": "\"\""
+  },
+  {
+    "Key": "path_gc_check",
+    "Default": "true"
+  },
+  {
+    "Key": "path_gc_check_interval_second",
+    "Default": "86400 (s)"
+  },
+  {
+    "Key": "path_gc_check_step",
+    "Default": "1000"
+  },
+  {
+    "Key": "path_gc_check_step_interval_ms",
+    "Default": "10 (ms)"
+  },
+  {
+    "Key": "scan_context_gc_interval_min",
+    "Default": "5"
+  },
+  {
+    "Key": "default_num_rows_per_column_file_block",
+    "Default": "1024"
+  },
+  {
+    "Key": "disable_storage_page_cache",
+    "Default": "false"
+  },
+  {
+    "Key": "disk_stat_monitor_interval",
+    "Default": "5 (s)"
+  },
+  {
+    "Key": "max_free_io_buffers",
+    "Default": "128"
+  },
+  {
+    "Key": "max_garbage_sweep_interval",
+    "Default": "3600 (s)"
+  },
+  {
+    "Key": "max_percentage_of_error_disk",
+    "Default": "0"
+  },
+  {
+    "Key": "min_garbage_sweep_interval",
+    "Default": "180 (s)"
+  },
+  {
+    "Key": "pprof_profile_dir",
+    "Default": "${DORIS_HOME}/log"
+  },
+  {
+    "Key": "small_file_dir",
+    "Default": "${DORIS_HOME}/lib/small_file/"
+  },
+  {
+    "Key": "user_function_dir",
+    "Default": "${DORIS_HOME}/lib/udf"
+  },
+  {
+    "Key": "storage_flood_stage_left_capacity_bytes",
+    "Default": "1073741824"
+  },
+  {
+    "Key": "storage_flood_stage_usage_percent",
+    "Default": "90 (90%)"
+  },
+  {
+    "Key": "storage_medium_migrate_count",
+    "Default": "1"
+  },
+  {
+    "Key": "storage_page_cache_limit",
+    "Default": "20%"
+  },
+  {
+    "Key": "storage_page_cache_shard_size",
+    "Default": "16"
+  },
+  {
+    "Key": "index_page_cache_percentage",
+    "Default": "10"
+  },
+  {
+    "Key": "segment_cache_capacity",
+    "Default": "-1"
+  },
+  {
+    "Key": "storage_strict_check_incompatible_old_format",
+    "Default": "true"
+  },
+  {
+    "Key": "sync_tablet_meta",
+    "Default": "true"
+  },
+  {
+    "Key": "pending_data_expire_time_sec",
+    "Default": "1800 (s)"
+  },
+  {
+    "Key": "ignore_rowset_stale_unconsistent_delete",
+    "Default": "false"
+  },
+  {
+    "Key": "create_tablet_worker_count",
+    "Default": "3"
+  },
+  {
+    "Key": "check_consistency_worker_count",
+    "Default": "1"
+  },
+  {
+    "Key": "max_tablet_version_num",
+    "Default": "2000"
+  },
+  {
+    "Key": "tablet_map_shard_size",
+    "Default": "4"
+  },
+  {
+    "Key": "tablet_meta_checkpoint_min_interval_secs",
+    "Default": "600 (s)"
+  },
+  {
+    "Key": "tablet_meta_checkpoint_min_new_rowsets_num",
+    "Default": "10"
+  },
+  {
+    "Key": "tablet_rowset_stale_sweep_time_sec",
+    "Default": "300"
+  },
+  {
+    "Key": "tablet_writer_open_rpc_timeout_sec",
+    "Default": "60"
+  },
+  {
+    "Key": "tablet_writer_ignore_eovercrowded",
+    "Default": "false"
+  },
+  {
+    "Key": "streaming_load_rpc_max_alive_time_sec",
+    "Default": "1200"
+  },
+  {
+    "Key": "alter_tablet_worker_count",
+    "Default": "3"
+  },
+  {
+    "Key": "alter_index_worker_count",
+    "Default": "3"
+  },
+  {
+    "Key": "ignore_load_tablet_failure",
+    "Default": "false"
+  },
+  {
+    "Key": "report_disk_state_interval_seconds",
+    "Default": "60 (s)"
+  },
+  {
+    "Key": "result_buffer_cancelled_interval_time",
+    "Default": "300 (s)"
+  },
+  {
+    "Key": "snapshot_expire_time_sec",
+    "Default": "172800 (48 hours)"
+  },
+  {
+    "Key": "sys_log_dir",
+    "Default": "${DORIS_HOME}/log"
+  },
+  {
+    "Key": "sys_log_level",
+    "Default": "INFO"
+  },
+  {
+    "Key": "sys_log_roll_mode",
+    "Default": "SIZE-MB-1024"
+  },
+  {
+    "Key": "sys_log_roll_num",
+    "Default": "10"
+  },
+  {
+    "Key": "sys_log_verbose_level",
+    "Default": "10"
+  },
+  {
+    "Key": "sys_log_verbose_modules",
+    "Default": "empty"
+  },
+  {
+    "Key": "aws_log_level",
+    "Default": "3"
+  },
+  {
+    "Key": "log_buffer_level",
+    "Default": "empty"
+  },
+  {
+    "Key": "report_tablet_interval_seconds",
+    "Default": "60 (s)"
+  },
+  {
+    "Key": "report_task_interval_seconds",
+    "Default": "10 (s)"
+  },
+  {
+    "Key": "periodic_counter_update_period_ms",
+    "Default": "500 (ms)"
+  },
+  {
+    "Key": "enable_metric_calculator",
+    "Default": "true"
+  },
+  {
+    "Key": "enable_system_metrics",
+    "Default": "true"
+  },
+  {
+    "Key": "enable_token_check",
+    "Default": "true"
+  },
+  {
+    "Key": "max_runnings_transactions_per_txn_map",
+    "Default": "2000"
+  },
+  {
+    "Key": "max_download_speed_kbps",
+    "Default": "50000 (kb/s)"
+  },
+  {
+    "Key": "download_low_speed_time",
+    "Default": "300 (s)"
+  },
+  {
+    "Key": "download_low_speed_limit_kbps",
+    "Default": "50 (KB/s)"
+  },
+  {
+    "Key": "enable_batch_download",
+    "Default": "\"\""
+  },
+  {
+    "Key": "priority_queue_remaining_tasks_increased_frequency",
+    "Default": "512"
+  },
+  {
+    "Key": "jdbc_drivers_dir",
+    "Default": "${DORIS_HOME}/jdbc_drivers"
+  },
+  {
+    "Key": "enable_simdjson_reader",
+    "Default": "true"
+  },
+  {
+    "Key": "enable_query_memory_overcommit",
+    "Default": "true"
+  },
+  {
+    "Key": "user_files_secure_path",
+    "Default": "${DORIS_HOME}"
+  },
+  {
+    "Key": "brpc_streaming_client_batch_bytes",
+    "Default": "262144"
+  },
+  {
+    "Key": "grace_shutdown_wait_seconds",
+    "Default": "120"
+  },
+  {
+    "Key": "enable_java_support",
+    "Default": "true"
+  },
+  {
+    "Key": "group_commit_wal_path",
+    "Default": "A directory named wal is created under each directory of the storage_root_path. Configuration examples: group_commit_wal_path\u003d/data1/storage/wal;/data2/storage/wal;/data3/storage/wal"
+  },
+  {
+    "Key": "deploy_mode",
+    "Default": "\"\""
+  },
+  {
+    "Key": "meta_service_endpoint",
+    "Default": "\"\""
+  },
+  {
+    "Key": "enable_file_cache",
+    "Default": "true for cloud mode, false for non-cloud mode."
+  },
+  {
+    "Key": "file_cache_path",
+    "Default": "[{\"path\":\"${DORIS_HOME}/file_cache\"}]"
+  }
+]

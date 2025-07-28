@@ -1,0 +1,1154 @@
+[
+  {
+    "Key": "meta_dir",
+    "Default": "DORIS_HOME_DIR + \"/doris-meta\""
+  },
+  {
+    "Key": "catalog_try_lock_timeout_ms",
+    "Default": "5000 （ms）"
+  },
+  {
+    "Key": "enable_bdbje_debug_mode",
+    "Default": "false"
+  },
+  {
+    "Key": "max_bdbje_clock_delta_ms",
+    "Default": "5000 （5s）"
+  },
+  {
+    "Key": "metadata_failure_recovery",
+    "Default": "false"
+  },
+  {
+    "Key": "txn_rollback_limit",
+    "Default": "100"
+  },
+  {
+    "Key": "grpc_threadmgr_threads_nums",
+    "Default": "4096"
+  },
+  {
+    "Key": "bdbje_replica_ack_timeout_second",
+    "Default": "10 (s)"
+  },
+  {
+    "Key": "bdbje_lock_timeout_second",
+    "Default": "5"
+  },
+  {
+    "Key": "bdbje_heartbeat_timeout_second",
+    "Default": "30"
+  },
+  {
+    "Key": "replica_ack_policy",
+    "Default": "SIMPLE_MAJORITY"
+  },
+  {
+    "Key": "replica_sync_policy",
+    "Default": "SYNC"
+  },
+  {
+    "Key": "master_sync_policy",
+    "Default": "SYNC"
+  },
+  {
+    "Key": "bdbje_reserved_disk_bytes",
+    "Default": "1073741824"
+  },
+  {
+    "Key": "ignore_meta_check",
+    "Default": "false"
+  },
+  {
+    "Key": "meta_delay_toleration_second",
+    "Default": "300 (5 min)"
+  },
+  {
+    "Key": "edit_log_port",
+    "Default": "9010"
+  },
+  {
+    "Key": "edit_log_type",
+    "Default": "BDB"
+  },
+  {
+    "Key": "edit_log_roll_num",
+    "Default": "50000"
+  },
+  {
+    "Key": "force_do_metadata_checkpoint",
+    "Default": "false"
+  },
+  {
+    "Key": "metadata_checkpoint_memory_threshold",
+    "Default": "60 （60%）"
+  },
+  {
+    "Key": "max_same_name_catalog_trash_num",
+    "Default": "3"
+  },
+  {
+    "Key": "cluster_id",
+    "Default": "-1"
+  },
+  {
+    "Key": "heartbeat_mgr_blocking_queue_size",
+    "Default": "1024"
+  },
+  {
+    "Key": "heartbeat_mgr_threads_num",
+    "Default": "8"
+  },
+  {
+    "Key": "disable_cluster_feature",
+    "Default": "true"
+  },
+  {
+    "Key": "enable_fqdn_mode",
+    "Default": "false"
+  },
+  {
+    "Key": "enable_token_check",
+    "Default": "true"
+  },
+  {
+    "Key": "enable_multi_tags",
+    "Default": "false"
+  },
+  {
+    "Key": "initial_root_password",
+    "Default": "empty string"
+  },
+  {
+    "Key": "query_port",
+    "Default": "9030"
+  },
+  {
+    "Key": "arrow_flight_sql_port",
+    "Default": "-1"
+  },
+  {
+    "Key": "frontend_address",
+    "Default": "0.0.0.0"
+  },
+  {
+    "Key": "priority_networks",
+    "Default": "none"
+  },
+  {
+    "Key": "http_port",
+    "Default": "8030"
+  },
+  {
+    "Key": "https_port",
+    "Default": "8050"
+  },
+  {
+    "Key": "enable_https",
+    "Default": "false"
+  },
+  {
+    "Key": "enable_ssl",
+    "Default": "true"
+  },
+  {
+    "Key": "qe_max_connection",
+    "Default": "1024"
+  },
+  {
+    "Key": "check_java_version",
+    "Default": "true"
+  },
+  {
+    "Key": "rpc_port",
+    "Default": "9020"
+  },
+  {
+    "Key": "thrift_server_type",
+    "Default": "4096"
+  },
+  {
+    "Key": "thrift_server_max_worker_threads",
+    "Default": "4096"
+  },
+  {
+    "Key": "thrift_backlog_num",
+    "Default": "1024"
+  },
+  {
+    "Key": "thrift_client_timeout_ms",
+    "Default": "0"
+  },
+  {
+    "Key": "thrift_max_message_size",
+    "Default": "100MB"
+  },
+  {
+    "Key": "use_compact_thrift_rpc",
+    "Default": "true"
+  },
+  {
+    "Key": "grpc_max_message_size_bytes",
+    "Default": "1G"
+  },
+  {
+    "Key": "max_mysql_service_task_threads_num",
+    "Default": "4096"
+  },
+  {
+    "Key": "mysql_service_io_threads_num",
+    "Default": "4"
+  },
+  {
+    "Key": "mysql_nio_backlog_num",
+    "Default": "1024"
+  },
+  {
+    "Key": "broker_timeout_ms",
+    "Default": "10000 （10s）"
+  },
+  {
+    "Key": "backend_rpc_timeout_ms",
+    "Default": "60000"
+  },
+  {
+    "Key": "drop_backend_after_decommission",
+    "Default": "false"
+  },
+  {
+    "Key": "max_backend_down_time_second",
+    "Default": "3600 (1 hour)"
+  },
+  {
+    "Key": "disable_backend_black_list",
+    "Default": "false"
+  },
+  {
+    "Key": "max_backend_heartbeat_failure_tolerance_count",
+    "Default": "1"
+  },
+  {
+    "Key": "enable_access_file_without_broker",
+    "Default": "false"
+  },
+  {
+    "Key": "agent_task_resend_wait_time_ms",
+    "Default": "5000"
+  },
+  {
+    "Key": "max_agent_task_threads_num",
+    "Default": "4096"
+  },
+  {
+    "Key": "remote_fragment_exec_timeout_ms",
+    "Default": "30000 （ms）"
+  },
+  {
+    "Key": "auth_token",
+    "Default": "empty"
+  },
+  {
+    "Key": "enable_http_server_v2",
+    "Default": "The default is true after the official 0.14.0 version is released, and the default is false before"
+  },
+  {
+    "Key": "http_api_extra_base_path",
+    "Default": "2"
+  },
+  {
+    "Key": "jetty_server_acceptors",
+    "Default": "2"
+  },
+  {
+    "Key": "jetty_server_selectors",
+    "Default": "4"
+  },
+  {
+    "Key": "jetty_server_workers",
+    "Default": "0"
+  },
+  {
+    "Key": "jetty_server_max_http_post_size",
+    "Default": "100 * 1024 * 1024 （100MB）"
+  },
+  {
+    "Key": "jetty_server_max_http_header_size",
+    "Default": "1048576 （1M）"
+  },
+  {
+    "Key": "http_sql_submitter_max_worker_threads",
+    "Default": "2"
+  },
+  {
+    "Key": "http_load_submitter_max_worker_threads",
+    "Default": "2"
+  },
+  {
+    "Key": "default_max_query_instances",
+    "Default": "3"
+  },
+  {
+    "Key": "max_query_retry_time",
+    "Default": "3"
+  },
+  {
+    "Key": "max_dynamic_partition_num",
+    "Default": "500"
+  },
+  {
+    "Key": "dynamic_partition_enable",
+    "Default": "true"
+  },
+  {
+    "Key": "dynamic_partition_check_interval_seconds",
+    "Default": "600 （s）"
+  },
+  {
+    "Key": "max_multi_partition_num",
+    "Default": "4096"
+  },
+  {
+    "Key": "multi_partition_name_prefix",
+    "Default": "p_"
+  },
+  {
+    "Key": "partition_in_memory_update_interval_secs",
+    "Default": "300 (s)"
+  },
+  {
+    "Key": "enable_concurrent_update",
+    "Default": "false"
+  },
+  {
+    "Key": "lower_case_table_names",
+    "Default": "0"
+  },
+  {
+    "Key": "table_name_length_limit",
+    "Default": "64"
+  },
+  {
+    "Key": "cache_enable_sql_mode",
+    "Default": "true"
+  },
+  {
+    "Key": "cache_enable_partition_mode",
+    "Default": "true"
+  },
+  {
+    "Key": "cache_result_max_row_count",
+    "Default": "3000"
+  },
+  {
+    "Key": "cache_result_max_data_size",
+    "Default": "31457280"
+  },
+  {
+    "Key": "cache_last_version_interval_second",
+    "Default": "900"
+  },
+  {
+    "Key": "enable_batch_delete_by_default",
+    "Default": "false"
+  },
+  {
+    "Key": "max_allowed_in_element_num_of_delete",
+    "Default": "1024"
+  },
+  {
+    "Key": "max_running_rollup_job_num_per_table",
+    "Default": "1"
+  },
+  {
+    "Key": "max_distribution_pruner_recursion_depth",
+    "Default": "100"
+  },
+  {
+    "Key": "enable_local_replica_selection",
+    "Default": "false"
+  },
+  {
+    "Key": "enable_local_replica_selection_fallback",
+    "Default": "false"
+  },
+  {
+    "Key": "expr_depth_limit",
+    "Default": "3000"
+  },
+  {
+    "Key": "expr_children_limit",
+    "Default": "10000"
+  },
+  {
+    "Key": "be_exec_version",
+    "Default": "100"
+  },
+  {
+    "Key": "max_be_exec_version",
+    "Default": "100"
+  },
+  {
+    "Key": "min_be_exec_version",
+    "Default": "100"
+  },
+  {
+    "Key": "max_query_profile_num",
+    "Default": "100"
+  },
+  {
+    "Key": "publish_version_interval_ms",
+    "Default": "10 （ms）"
+  },
+  {
+    "Key": "publish_version_timeout_second",
+    "Default": "30 （s）"
+  },
+  {
+    "Key": "query_colocate_join_memory_limit_penalty_factor",
+    "Default": "1"
+  },
+  {
+    "Key": "rewrite_count_distinct_to_bitmap_hll",
+    "Default": "true"
+  },
+  {
+    "Key": "enable_pipeline_load",
+    "Default": "false"
+  },
+  {
+    "Key": "enable_vectorized_load",
+    "Default": "true"
+  },
+  {
+    "Key": "enable_new_load_scan_node",
+    "Default": "true"
+  },
+  {
+    "Key": "default_max_filter_ratio",
+    "Default": "0"
+  },
+  {
+    "Key": "max_running_txn_num_per_db",
+    "Default": "1000"
+  },
+  {
+    "Key": "using_old_load_usage_pattern",
+    "Default": "false"
+  },
+  {
+    "Key": "disable_load_job",
+    "Default": "false"
+  },
+  {
+    "Key": "commit_timeout_second",
+    "Default": "30"
+  },
+  {
+    "Key": "max_unfinished_load_job",
+    "Default": "1000"
+  },
+  {
+    "Key": "db_used_data_quota_update_interval_secs",
+    "Default": "300 (s)"
+  },
+  {
+    "Key": "disable_show_stream_load",
+    "Default": "false"
+  },
+  {
+    "Key": "max_stream_load_record_size",
+    "Default": "5000"
+  },
+  {
+    "Key": "fetch_stream_load_record_interval_second",
+    "Default": "120"
+  },
+  {
+    "Key": "max_bytes_per_broker_scanner",
+    "Default": "500 * 1024 * 1024 * 1024L （500G）"
+  },
+  {
+    "Key": "default_load_parallelism",
+    "Default": "1"
+  },
+  {
+    "Key": "max_broker_concurrency",
+    "Default": "10"
+  },
+  {
+    "Key": "min_bytes_per_broker_scanner",
+    "Default": "67108864L (64M)"
+  },
+  {
+    "Key": "period_of_auto_resume_min",
+    "Default": "5 （s）"
+  },
+  {
+    "Key": "max_tolerable_backend_down_num",
+    "Default": "0"
+  },
+  {
+    "Key": "max_routine_load_task_num_per_be",
+    "Default": "1024"
+  },
+  {
+    "Key": "max_routine_load_task_concurrent_num",
+    "Default": "256"
+  },
+  {
+    "Key": "max_routine_load_job_num",
+    "Default": "100"
+  },
+  {
+    "Key": "desired_max_waiting_jobs",
+    "Default": "100"
+  },
+  {
+    "Key": "disable_hadoop_load",
+    "Default": "false"
+  },
+  {
+    "Key": "enable_spark_load",
+    "Default": "false"
+  },
+  {
+    "Key": "spark_load_checker_interval_second",
+    "Default": "60"
+  },
+  {
+    "Key": "async_loading_load_task_pool_size",
+    "Default": "10"
+  },
+  {
+    "Key": "async_pending_load_task_pool_size",
+    "Default": "10"
+  },
+  {
+    "Key": "async_load_task_pool_size",
+    "Default": "10"
+  },
+  {
+    "Key": "enable_single_replica_load",
+    "Default": "false"
+  },
+  {
+    "Key": "min_load_timeout_second",
+    "Default": "1 （1s）"
+  },
+  {
+    "Key": "max_stream_load_timeout_second",
+    "Default": "259200 (3 day)"
+  },
+  {
+    "Key": "max_load_timeout_second",
+    "Default": "259200 (3 day)"
+  },
+  {
+    "Key": "stream_load_default_timeout_second",
+    "Default": "86400 * 3 (3 day)"
+  },
+  {
+    "Key": "stream_load_default_precommit_timeout_second",
+    "Default": "3600（s）"
+  },
+  {
+    "Key": "insert_load_default_timeout_second",
+    "Default": "3600 (1 hour)"
+  },
+  {
+    "Key": "mini_load_default_timeout_second",
+    "Default": "3600 (1 hour)"
+  },
+  {
+    "Key": "broker_load_default_timeout_second",
+    "Default": "14400 (4 hour)"
+  },
+  {
+    "Key": "spark_load_default_timeout_second",
+    "Default": "86400 (1 day)"
+  },
+  {
+    "Key": "hadoop_load_default_timeout_second",
+    "Default": "86400 * 3 (3 day)"
+  },
+  {
+    "Key": "load_running_job_num_limit",
+    "Default": "0"
+  },
+  {
+    "Key": "load_input_size_limit_gb",
+    "Default": "0"
+  },
+  {
+    "Key": "load_etl_thread_num_normal_priority",
+    "Default": "10"
+  },
+  {
+    "Key": "load_etl_thread_num_high_priority",
+    "Default": "3"
+  },
+  {
+    "Key": "load_pending_thread_num_normal_priority",
+    "Default": "10"
+  },
+  {
+    "Key": "load_pending_thread_num_high_priority",
+    "Default": "3"
+  },
+  {
+    "Key": "load_checker_interval_second",
+    "Default": "5 （s）"
+  },
+  {
+    "Key": "label_keep_max_second",
+    "Default": "3 * 24 * 3600 (3 day)"
+  },
+  {
+    "Key": "streaming_label_keep_max_second",
+    "Default": "43200 (12 hour)"
+  },
+  {
+    "Key": "label_clean_interval_second",
+    "Default": "1 * 3600 (1 hour)"
+  },
+  {
+    "Key": "label_regex_length",
+    "Default": "30"
+  },
+  {
+    "Key": "transaction_clean_interval_second",
+    "Default": "30"
+  },
+  {
+    "Key": "sync_commit_interval_second",
+    "Default": "10 (seconds)"
+  },
+  {
+    "Key": "sync_checker_interval_second",
+    "Default": "10 (s)"
+  },
+  {
+    "Key": "max_sync_task_threads_num",
+    "Default": "10000"
+  },
+  {
+    "Key": "min_sync_commit_size",
+    "Default": "10000"
+  },
+  {
+    "Key": "min_bytes_sync_commit",
+    "Default": "15*1024*1024 (15M)"
+  },
+  {
+    "Key": "max_bytes_sync_commit",
+    "Default": "10"
+  },
+  {
+    "Key": "enable_outfile_to_local",
+    "Default": "false"
+  },
+  {
+    "Key": "export_tablet_num_per_task",
+    "Default": "5"
+  },
+  {
+    "Key": "export_task_default_timeout_second",
+    "Default": "2 * 3600 (2 hour)"
+  },
+  {
+    "Key": "export_running_job_num_limit",
+    "Default": "5"
+  },
+  {
+    "Key": "export_checker_interval_second",
+    "Default": "5"
+  },
+  {
+    "Key": "log_roll_size_mb",
+    "Default": "1024 （1G）"
+  },
+  {
+    "Key": "sys_log_dir",
+    "Default": "DorisFE.DORIS_HOME_DIR + \"/log\""
+  },
+  {
+    "Key": "sys_log_level",
+    "Default": "INFO"
+  },
+  {
+    "Key": "sys_log_roll_num",
+    "Default": "10"
+  },
+  {
+    "Key": "sys_log_verbose_modules",
+    "Default": "{}"
+  },
+  {
+    "Key": "sys_log_roll_interval",
+    "Default": "DAY"
+  },
+  {
+    "Key": "sys_log_delete_age",
+    "Default": "7d"
+  },
+  {
+    "Key": "sys_log_roll_mode",
+    "Default": "SIZE-MB-1024"
+  },
+  {
+    "Key": "sys_log_enable_compress",
+    "Default": "false"
+  },
+  {
+    "Key": "audit_log_dir",
+    "Default": "DORIS_HOME_DIR + \"/log\""
+  },
+  {
+    "Key": "audit_log_roll_num",
+    "Default": "90"
+  },
+  {
+    "Key": "audit_log_modules",
+    "Default": "{\"slow_query\", \"query\", \"load\", \"stream_load\"}"
+  },
+  {
+    "Key": "qe_slow_log_ms",
+    "Default": "5000 (5 seconds)"
+  },
+  {
+    "Key": "audit_log_roll_interval",
+    "Default": "DAY"
+  },
+  {
+    "Key": "audit_log_delete_age",
+    "Default": "30d"
+  },
+  {
+    "Key": "audit_log_enable_compress",
+    "Default": "false"
+  },
+  {
+    "Key": "min_replication_num_per_tablet",
+    "Default": "1"
+  },
+  {
+    "Key": "max_replication_num_per_tablet",
+    "Default": "32767"
+  },
+  {
+    "Key": "default_db_data_quota_bytes",
+    "Default": "1PB"
+  },
+  {
+    "Key": "default_db_replica_quota_size",
+    "Default": "1073741824"
+  },
+  {
+    "Key": "recover_with_empty_tablet",
+    "Default": "false"
+  },
+  {
+    "Key": "min_clone_task_timeout_sec",
+    "Default": "Minimum 3 minutes, maximum two hours"
+  },
+  {
+    "Key": "max_clone_task_timeout_sec",
+    "Default": "Minimum 3 minutes, maximum two hours"
+  },
+  {
+    "Key": "disable_storage_medium_check",
+    "Default": "false"
+  },
+  {
+    "Key": "decommission_tablet_check_threshold",
+    "Default": "5000"
+  },
+  {
+    "Key": "partition_rebalance_max_moves_num_per_selection",
+    "Default": "10"
+  },
+  {
+    "Key": "partition_rebalance_move_expire_after_access",
+    "Default": "600 (s)"
+  },
+  {
+    "Key": "tablet_rebalancer_type",
+    "Default": "BeLoad"
+  },
+  {
+    "Key": "max_balancing_tablets",
+    "Default": "100"
+  },
+  {
+    "Key": "max_scheduling_tablets",
+    "Default": "2000"
+  },
+  {
+    "Key": "disable_balance",
+    "Default": "false"
+  },
+  {
+    "Key": "disable_disk_balance",
+    "Default": "true"
+  },
+  {
+    "Key": "balance_load_score_threshold",
+    "Default": "0.1 (10%)"
+  },
+  {
+    "Key": "capacity_used_percent_high_water",
+    "Default": "0.75 (75%)"
+  },
+  {
+    "Key": "clone_distribution_balance_threshold",
+    "Default": "0.2"
+  },
+  {
+    "Key": "clone_capacity_balance_threshold",
+    "Default": "0.2"
+  },
+  {
+    "Key": "disable_colocate_balance",
+    "Default": "false"
+  },
+  {
+    "Key": "balance_slot_num_per_path",
+    "Default": "1"
+  },
+  {
+    "Key": "disable_tablet_scheduler",
+    "Default": "false"
+  },
+  {
+    "Key": "enable_force_drop_redundant_replica",
+    "Default": "false"
+  },
+  {
+    "Key": "colocate_group_relocate_delay_second",
+    "Default": "1800"
+  },
+  {
+    "Key": "allow_replica_on_same_host",
+    "Default": "false"
+  },
+  {
+    "Key": "repair_slow_replica",
+    "Default": "false"
+  },
+  {
+    "Key": "min_version_count_indicate_replica_compaction_too_slow",
+    "Default": "200"
+  },
+  {
+    "Key": "skip_compaction_slower_replica",
+    "Default": "true"
+  },
+  {
+    "Key": "valid_version_count_delta_ratio_between_replicas",
+    "Default": "0.5"
+  },
+  {
+    "Key": "min_bytes_indicate_replica_too_large",
+    "Default": "2 * 1024 * 1024 * 1024 (2G)"
+  },
+  {
+    "Key": "schedule_slot_num_per_path",
+    "Default": "2"
+  },
+  {
+    "Key": "tablet_repair_delay_factor_second",
+    "Default": "60 （s）"
+  },
+  {
+    "Key": "tablet_stat_update_interval_second",
+    "Default": "300（5min）"
+  },
+  {
+    "Key": "storage_flood_stage_usage_percent",
+    "Default": "95 （95%）"
+  },
+  {
+    "Key": "storage_high_watermark_usage_percent",
+    "Default": "85 (85%)"
+  },
+  {
+    "Key": "storage_min_left_capacity_bytes",
+    "Default": "2 * 1024 * 1024 * 1024 (2GB)"
+  },
+  {
+    "Key": "catalog_trash_expire_second",
+    "Default": "86400L (1 day)"
+  },
+  {
+    "Key": "storage_cooldown_second",
+    "Default": "30 * 24 * 3600L （30 day）"
+  },
+  {
+    "Key": "default_storage_medium",
+    "Default": "HDD"
+  },
+  {
+    "Key": "enable_storage_policy",
+    "Default": "600 (10 minutes)"
+  },
+  {
+    "Key": "check_consistency_default_timeout_second",
+    "Default": "600 (10 minutes)"
+  },
+  {
+    "Key": "consistency_check_start_time",
+    "Default": "23"
+  },
+  {
+    "Key": "consistency_check_end_time",
+    "Default": "23"
+  },
+  {
+    "Key": "replica_delay_recovery_second",
+    "Default": "0"
+  },
+  {
+    "Key": "tablet_create_timeout_second",
+    "Default": "1（s）"
+  },
+  {
+    "Key": "tablet_delete_timeout_second",
+    "Default": "2"
+  },
+  {
+    "Key": "alter_table_timeout_second",
+    "Default": "86400 * 30 (1 month)"
+  },
+  {
+    "Key": "max_replica_count_when_schema_change",
+    "Default": "100000"
+  },
+  {
+    "Key": "history_job_keep_max_second",
+    "Default": "7 * 24 * 3600 （7 day）"
+  },
+  {
+    "Key": "max_create_table_timeout_second",
+    "Default": "60 （s）"
+  },
+  {
+    "Key": "file_scan_node_split_num",
+    "Default": "128"
+  },
+  {
+    "Key": "file_scan_node_split_size",
+    "Default": "256 1024 1024"
+  },
+  {
+    "Key": "enable_odbc_table",
+    "Default": "false"
+  },
+  {
+    "Key": "disable_iceberg_hudi_table",
+    "Default": "true"
+  },
+  {
+    "Key": "iceberg_table_creation_interval_second",
+    "Default": "10 (s)"
+  },
+  {
+    "Key": "iceberg_table_creation_strict_mode",
+    "Default": "true"
+  },
+  {
+    "Key": "max_iceberg_table_creation_record_size",
+    "Default": "2000"
+  },
+  {
+    "Key": "max_hive_partition_cache_num",
+    "Default": "100000"
+  },
+  {
+    "Key": "hive_metastore_client_timeout_second",
+    "Default": "10"
+  },
+  {
+    "Key": "max_external_cache_loader_thread_pool_size",
+    "Default": "10"
+  },
+  {
+    "Key": "max_external_file_cache_num",
+    "Default": "100000"
+  },
+  {
+    "Key": "max_external_schema_cache_num",
+    "Default": "10000"
+  },
+  {
+    "Key": "external_cache_expire_time_minutes_after_access",
+    "Default": "1440"
+  },
+  {
+    "Key": "es_state_sync_interval_second",
+    "Default": "10"
+  },
+  {
+    "Key": "dpp_hadoop_client_path",
+    "Default": "/lib/hadoop-client/hadoop/bin/hadoop"
+  },
+  {
+    "Key": "dpp_bytes_per_reduce",
+    "Default": "100 * 1024 * 1024L (100M)"
+  },
+  {
+    "Key": "dpp_default_cluster",
+    "Default": "palo-dpp"
+  },
+  {
+    "Key": "dpp_default_config_str",
+    "Default": "{ hadoop_configs : \u0027mapred.job.priority\u003dNORMAL;mapred.job.map.capacity\u003d50;mapred.job.reduce.capacity\u003d50;mapred.hce.replace.streaming\u003dfalse;abaci.long.stored.job\u003dtrue;dce.shuffle.enable\u003dfalse;dfs.client.authserver.force_stop\u003dtrue;dfs.client.auth.method\u003d0\u0027 }"
+  },
+  {
+    "Key": "dpp_config_str",
+    "Default": "{ palo-dpp : { hadoop_palo_path : \u0027/dir\u0027, hadoop_configs : \u0027fs.default.name\u003dhdfs://host:port;mapred.job.tracker\u003dhost:port;hadoop.job.ugi\u003duser,password\u0027 } }"
+  },
+  {
+    "Key": "yarn_config_dir",
+    "Default": "DorisFE.DORIS_HOME_DIR + \"/lib/yarn-config\""
+  },
+  {
+    "Key": "yarn_client_path",
+    "Default": "DORIS_HOME_DIR + \"/lib/yarn-client/hadoop/bin/yarn\""
+  },
+  {
+    "Key": "spark_launcher_log_dir",
+    "Default": "sys_log_dir + \"/spark_launcher_log\""
+  },
+  {
+    "Key": "spark_resource_path",
+    "Default": "none"
+  },
+  {
+    "Key": "spark_home_default_dir",
+    "Default": "DORIS_HOME_DIR + \"/lib/spark2x\""
+  },
+  {
+    "Key": "spark_dpp_version",
+    "Default": "1.0.0"
+  },
+  {
+    "Key": "tmp_dir",
+    "Default": "DorisFE.DORIS_HOME_DIR + \"/temp_dir\""
+  },
+  {
+    "Key": "custom_config_dir",
+    "Default": "DorisFE.DORIS_HOME_DIR + \"/conf\""
+  },
+  {
+    "Key": "plugin_dir",
+    "Default": "DORIS_HOME + \"/plugins\""
+  },
+  {
+    "Key": "plugin_enable",
+    "Default": "true"
+  },
+  {
+    "Key": "small_file_dir",
+    "Default": "DORIS_HOME_DIR/small_files"
+  },
+  {
+    "Key": "max_small_file_size_bytes",
+    "Default": "1M"
+  },
+  {
+    "Key": "max_small_file_number",
+    "Default": "100"
+  },
+  {
+    "Key": "enable_metric_calculator",
+    "Default": "true"
+  },
+  {
+    "Key": "report_queue_size",
+    "Default": "100"
+  },
+  {
+    "Key": "backup_job_default_timeout_ms",
+    "Default": "86400 * 1000 (1 day)"
+  },
+  {
+    "Key": "max_backup_restore_job_num_per_db",
+    "Default": "10"
+  },
+  {
+    "Key": "max_backup_tablets_per_job",
+    "Default": "300000"
+  },
+  {
+    "Key": "enable_quantile_state_type",
+    "Default": "false"
+  },
+  {
+    "Key": "enable_date_conversion",
+    "Default": "true"
+  },
+  {
+    "Key": "enable_decimal_conversion",
+    "Default": "true"
+  },
+  {
+    "Key": "proxy_auth_magic_prefix",
+    "Default": "x@8"
+  },
+  {
+    "Key": "proxy_auth_enable",
+    "Default": "false"
+  },
+  {
+    "Key": "enable_func_pushdown",
+    "Default": "true"
+  },
+  {
+    "Key": "jdbc_drivers_dir",
+    "Default": "${DORIS_HOME}/jdbc_drivers"
+  },
+  {
+    "Key": "max_error_tablet_of_broker_load",
+    "Default": "3"
+  },
+  {
+    "Key": "default_db_max_running_txn_num",
+    "Default": "-1"
+  },
+  {
+    "Key": "prefer_compute_node_for_external_table",
+    "Default": "false"
+  },
+  {
+    "Key": "min_backend_num_for_external_table",
+    "Default": "3"
+  },
+  {
+    "Key": "infodb_support_ext_catalog",
+    "Default": "false"
+  },
+  {
+    "Key": "enable_query_hit_stats",
+    "Default": "false"
+  },
+  {
+    "Key": "div_precision_increment",
+    "Default": "4"
+  },
+  {
+    "Key": "enable_convert_light_weight_schema_change",
+    "Default": "true"
+  },
+  {
+    "Key": "disable_local_deploy_manager_drop_node",
+    "Default": "true"
+  },
+  {
+    "Key": "mysqldb_replace_name",
+    "Default": "mysql"
+  },
+  {
+    "Key": "max_auto_partition_num",
+    "Default": "2000"
+  }
+]

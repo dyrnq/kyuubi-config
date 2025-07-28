@@ -45,4 +45,11 @@ java -jar target/kyuubi-config.jar bookkeeper -ver $kv --format json --no-sectio
 java -jar target/kyuubi-config.jar bookkeeper -ver $kv --format conf               > bookkeeper/$kv/bookkeeper-config.conf
 done
 
-
+for kv in "2.0" "3.0" "latest"; do
+  echo "version=$kv";
+  mkdir -p doris/$kv;
+  java -jar target/kyuubi-config.jar doris -ver $kv --format json --type fe --no-section  > doris/$kv/doris-fe-config-no-section.json;
+  java -jar target/kyuubi-config.jar doris -ver $kv --format conf --type fe               > doris/$kv/doris-fe-config.conf;
+  java -jar target/kyuubi-config.jar doris -ver $kv --format json --type be --no-section  > doris/$kv/doris-be-config-no-section.json;
+  java -jar target/kyuubi-config.jar doris -ver $kv --format conf --type be               > doris/$kv/doris-be-config.conf;
+done

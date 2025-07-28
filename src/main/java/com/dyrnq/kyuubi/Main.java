@@ -12,7 +12,8 @@ import picocli.CommandLine;
                 FlinkConfig.class,
                 KafkaConfig.class,
                 AmoroConfig.class,
-                BookKeeperConfig.class
+                BookKeeperConfig.class,
+                DorisConfig.class
         },
         mixinStandardHelpOptions = true,
         showDefaultValues = true
