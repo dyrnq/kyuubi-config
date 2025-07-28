@@ -67,25 +67,40 @@ public class DorisConfig extends CommonOptions implements Callable<Integer> {
 
                     {
                         Element next = c.nextElementSibling();
-                        String nextText = next.text();
-                        String tagName = next.tagName();
-                        if ("ul".equalsIgnoreCase(tagName)) {
-                            Elements lis = next.select("li");
-                            for (Element x : lis) {
-                                String liText = x.text();
-                                if (
-                                        liText.startsWith("Default:") || liText.startsWith("Default：") || liText.startsWith("Default value:") || liText.startsWith("Default value：")
-                                ) {
-                                    defaultElement = x;
-                                    break;
+                        int count = 0;
+                        while (next != null && count <= 1) {
+                            String nextText = next.text();
+                            String tagName = next.tagName();
+                            if ("ul".equalsIgnoreCase(tagName)) {
+                                Elements lis = next.select("li");
+                                for (Element x : lis) {
+                                    String liText = x.text().trim();
+                                    if (
+                                            liText.startsWith("Default:") || liText.startsWith("Default：") || liText.startsWith("Default value:") || liText.startsWith("Default value：")
+                                    ) {
+                                        defaultElement = x;
+                                        break;
+                                    }
                                 }
                             }
+
+                            // 如果找到了默认元素，直接跳出循环
+                            if (defaultElement != null) {
+                                break;
+                            }
+
+                            // 无论是否是 ul 标签，都递增计数器
+                            next = next.nextElementSibling();
+                            count++;
+
+                            log.info("count={}", count);
                         }
                     }
                     if (defaultElement == null) {
+                        int count = 0;
                         Element next = c.nextElementSibling();
-                        while (next != null) {
-                            String nextText = next.text();
+                        while (next != null && count <= 5) {
+                            String nextText = next.text().trim();
                             String tagName = next.tagName();
                             if (("p".equalsIgnoreCase(tagName)) && (
                                     nextText.startsWith("Default:") || nextText.startsWith("Default：") || nextText.startsWith("Default value:") || nextText.startsWith("Default value：")
@@ -94,6 +109,7 @@ public class DorisConfig extends CommonOptions implements Callable<Integer> {
                                 break;
                             }
                             next = next.nextElementSibling();
+                            count++;
                         }
                     }
 
