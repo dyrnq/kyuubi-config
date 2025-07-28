@@ -73,11 +73,11 @@
   },
   {
     "Key": "brpc_max_body_size",
-    "Default": "100MB"
+    "Default": "None"
   },
   {
     "Key": "brpc_socket_max_unwritten_bytes",
-    "Default": "100MB"
+    "Default": "None"
   },
   {
     "Key": "transfer_large_data_by_brpc",
@@ -229,7 +229,7 @@
   },
   {
     "Key": "max_base_compaction_threads",
-    "Default": "None"
+    "Default": "4"
   },
   {
     "Key": "generate_compaction_tasks_interval_ms",
@@ -885,7 +885,7 @@
   },
   {
     "Key": "enable_batch_download",
-    "Default": "None"
+    "Default": "false"
   },
   {
     "Key": "doris_cgroups",
@@ -897,11 +897,11 @@
   },
   {
     "Key": "jdbc_drivers_dir",
-    "Default": "None"
+    "Default": "${DORIS_HOME}/jdbc_drivers"
   },
   {
     "Key": "enable_simdjson_reader",
-    "Default": "None"
+    "Default": "true"
   },
   {
     "Key": "enable_query_memory_overcommit",

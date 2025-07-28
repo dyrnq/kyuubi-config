@@ -77,11 +77,11 @@
   },
   {
     "Key": "brpc_max_body_size",
-    "Default": "100MB"
+    "Default": "None"
   },
   {
     "Key": "brpc_socket_max_unwritten_bytes",
-    "Default": "100MB"
+    "Default": "None"
   },
   {
     "Key": "transfer_large_data_by_brpc",
@@ -781,7 +781,7 @@
   },
   {
     "Key": "enable_batch_download",
-    "Default": "\"\""
+    "Default": "false"
   },
   {
     "Key": "priority_queue_remaining_tasks_increased_frequency",
