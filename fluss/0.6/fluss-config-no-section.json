@@ -1,0 +1,494 @@
+[
+  {
+    "Option": "default.bucket.number",
+    "Type": "Integer",
+    "Default": "1",
+    "Description": "The default number of buckets for a table in Fluss cluster. It\u0027s a cluster-level parameter and all the tables without specifying bucket number in the cluster will use the value as the bucket number."
+  },
+  {
+    "Option": "default.replication.factor",
+    "Type": "Integer",
+    "Default": "1",
+    "Description": "The default replication factor for the log of a table in Fluss cluster. It\u0027s a cluster-level parameter, and all the tables without specifying replication factor in the cluster will use the value as replication factor."
+  },
+  {
+    "Option": "remote.data.dir",
+    "Type": "String",
+    "Default": "(none)",
+    "Description": "The directory used for storing the kv snapshot data files and remote log for log tiered storage in a Fluss supported filesystem."
+  },
+  {
+    "Option": "remote.fs.write-buffer-size",
+    "Type": "MemorySize",
+    "Default": "4kb",
+    "Description": "The default size of the write buffer for writing the local files to remote file systems."
+  },
+  {
+    "Option": "plugin.classloader.parent-first-patterns.default",
+    "Type": "String",
+    "Default": "java., com.alibaba.fluss., javax.annotation., org.slf4j, org.apache.log4j, org.apache.logging, org.apache.commons.logging, ch.qos.logback",
+    "Description": "A (semicolon-separated) list of patterns that specifies which classes should always be resolved through the plugin parent ClassLoader first. A pattern is a simple prefix that is checked against the fully qualified class name. This setting should generally not be modified."
+  },
+  {
+    "Option": "auto-partition.check.interval",
+    "Type": "Duration",
+    "Default": "10min",
+    "Description": "The interval of auto partition check. The default value is 10 minutes."
+  },
+  {
+    "Option": "coordinator.host",
+    "Type": "String",
+    "Default": "(None)",
+    "Description": "The config parameter defining the network address to connect to for communication with the coordinator server. If the coordinator server is used as a bootstrap server (discover all the servers in the cluster), the value of this config option should be a static hostname or address."
+  },
+  {
+    "Option": "coordinator.port",
+    "Type": "String",
+    "Default": "9123",
+    "Description": "The config parameter defining the network port to connect to for communication with the coordinator server. Like \u0027coordinator.host\u0027, if the coordinator server is used as a bootstrap server (discover all the servers in the cluster), the value of this config option should be a static port. Otherwise, the value can be set to \"0\" for a dynamic service name resolution. The value accepts a list of ports (“50100,50101”), ranges (“50100-50200”) or a combination of both."
+  },
+  {
+    "Option": "coordinator.io-pool.size",
+    "Type": "Integer",
+    "Default": "1",
+    "Description": "The size of the IO thread pool to run blocking operations for coordinator server. This includes discard unnecessary snapshot files. Increase this value if you experience slow unnecessary snapshot files clean. The default value is 1."
+  },
+  {
+    "Option": "tablet-server.host",
+    "Type": "String",
+    "Default": "(None)",
+    "Description": "The external address of the network interface where the TabletServer is exposed. Because different TabletServer need different values for this option, usually it is specified in an additional non-shared TabletServer-specific config file."
+  },
+  {
+    "Option": "tablet-server.port",
+    "Type": "String",
+    "Default": "0",
+    "Description": "The external RPC port where the TabletServer is exposed."
+  },
+  {
+    "Option": "tablet-server.id",
+    "Type": "Integer",
+    "Default": "(None)",
+    "Description": "The id for the tablet server."
+  },
+  {
+    "Option": "data.dir",
+    "Type": "String",
+    "Default": "/tmp/fluss-data",
+    "Description": "This configuration controls the directory where fluss will store its data. The default value is /tmp/fluss-data"
+  },
+  {
+    "Option": "server.writer-id.expiration-time",
+    "Type": "Duration",
+    "Default": "7d",
+    "Description": "The time that the tablet server will wait without receiving any write request from a client before expiring the related status. The default value is 7 days."
+  },
+  {
+    "Option": "server.writer-id.expiration-check-interval",
+    "Type": "Duration",
+    "Default": "10min",
+    "Description": "The interval at which to remove writer ids that have expired due to \u0027server.writer-id.expiration-time passing. The default value is 10 minutes."
+  },
+  {
+    "Option": "server.background.threads",
+    "Type": "Integer",
+    "Default": "10",
+    "Description": "The number of threads to use for various background processing tasks. The default value is 10."
+  },
+  {
+    "Option": "server.buffer.memory-size",
+    "Type": "MemorySize",
+    "Default": "256mb",
+    "Description": "The total bytes of memory the server can use, e.g, buffer write-ahead-log rows."
+  },
+  {
+    "Option": "server.buffer.page-size",
+    "Type": "MemorySize",
+    "Default": "128kb",
+    "Description": "Size of every page in memory buffers (\u0027server.buffer.memory-size\u0027)."
+  },
+  {
+    "Option": "server.buffer.per-request-memory-size",
+    "Type": "MemorySize",
+    "Default": "16mb",
+    "Description": "The minimum number of bytes that will be allocated by the writer rounded down to the closest multiple of server.buffer.page-size. It must be greater than or equal to server.buffer.page-size. This option allows to allocate memory in batches to have better CPU-cached friendliness due to contiguous segments."
+  },
+  {
+    "Option": "server.buffer.wait-timeout",
+    "Type": "Duration",
+    "Default": "2^(63)-1ns",
+    "Description": "Defines how long the buffer pool will block when waiting for segments."
+  },
+  {
+    "Option": "zookeeper.address",
+    "Type": "String",
+    "Default": "(None)",
+    "Description": "The ZooKeeper address to use, when running Fluss with ZooKeeper."
+  },
+  {
+    "Option": "zookeeper.path.root",
+    "Type": "String",
+    "Default": "/fluss",
+    "Description": "The root path under which Fluss stores its entries in ZooKeeper."
+  },
+  {
+    "Option": "zookeeper.client.session-timeout",
+    "Type": "Duration",
+    "Default": "60s",
+    "Description": "Defines the session timeout for the ZooKeeper session in ms."
+  },
+  {
+    "Option": "zookeeper.client.connection-timeout",
+    "Type": "Duration",
+    "Default": "15s",
+    "Description": "Defines the connection timeout for ZooKeeper in ms."
+  },
+  {
+    "Option": "zookeeper.client.retry-wait",
+    "Type": "Duration",
+    "Default": "5s",
+    "Description": "Defines the pause between consecutive retries in ms."
+  },
+  {
+    "Option": "zookeeper.client.max-retry-attempts",
+    "Type": "Integer",
+    "Default": "3",
+    "Description": "Defines the number of connection retries before the client gives up."
+  },
+  {
+    "Option": "zookeeper.client.tolerate-suspended-connections",
+    "Type": "Boolean",
+    "Default": "false",
+    "Description": "Defines whether a suspended ZooKeeper connection will be treated as an error that causes the leader information to be invalidated or not. In case you set this option to %s, Fluss will wait until a ZooKeeper connection is marked as lost before it revokes the leadership of components. This has the effect that Fluss is more resilient against temporary connection instabilities at the cost of running more likely into timing issues with ZooKeeper."
+  },
+  {
+    "Option": "zookeeper.client.ensemble-tracker",
+    "Type": "Boolean",
+    "Default": "true",
+    "Description": "Defines whether Curator should enable ensemble tracker. This can be useful in certain scenarios in which CuratorFramework is accessing to ZK clusters via load balancer or Virtual IPs. Default Curator EnsembleTracking logic watches CuratorEventType.GET_CONFIG events and changes ZooKeeper connection string. It is not desired behaviour when ZooKeeper is running under the Virtual IPs. Under certain configurations EnsembleTracking can lead to setting of ZooKeeper connection string with unresolvable hostnames."
+  },
+  {
+    "Option": "netty.server.num-network-threads",
+    "Type": "Integer",
+    "Default": "3",
+    "Description": "The number of threads that the server uses for receiving requests from the network and sending responses to the network."
+  },
+  {
+    "Option": "netty.server.num-worker-threads",
+    "Type": "Integer",
+    "Default": "8",
+    "Description": "The number of threads that the server uses for processing requests, which may include disk and remote I/O."
+  },
+  {
+    "Option": "netty.server.max-queued-requests",
+    "Type": "Integer",
+    "Default": "500",
+    "Description": "The number of queued requests allowed for worker threads, before blocking the I/O threads."
+  },
+  {
+    "Option": "netty.connection.max-idle-time",
+    "Type": "Duration",
+    "Default": "10min",
+    "Description": "Close idle connections after the number of milliseconds specified by this config."
+  },
+  {
+    "Option": "netty.client.num-network-threads",
+    "Type": "Integer",
+    "Default": "1",
+    "Description": "The number of threads that the client uses for sending requests to the network and receiving responses from network. The default value is 1"
+  },
+  {
+    "Option": "log.segment.file-size",
+    "Type": "MemorySize",
+    "Default": "1024m",
+    "Description": "This configuration controls the segment file size for the log. Retention and cleaning is always done a file at a time so a larger segment size means fewer files but less granular control over retention."
+  },
+  {
+    "Option": "log.index.file-size",
+    "Type": "MemorySize",
+    "Default": "10m",
+    "Description": "This configuration controls the size of the index that maps offsets to file positions. We preallocate this index file and shrink it only after log rolls. You generally should not need to change this setting."
+  },
+  {
+    "Option": "log.index.interval-size",
+    "Type": "MemorySize",
+    "Default": "4k",
+    "Description": "This setting controls how frequently fluss adds an index entry to its offset index. The default setting ensures that we index a message roughly every 4096 bytes. More indexing allows reads to jump closer to the exact position in the log but makes the index larger. You probably don\u0027t need to change this."
+  },
+  {
+    "Option": "log.file-preallocate",
+    "Type": "Boolean",
+    "Default": "false",
+    "Description": "True if we should preallocate the file on disk when creating a new log segment."
+  },
+  {
+    "Option": "log.flush.interval-messages",
+    "Type": "Long",
+    "Default": "Long.MAX_VALUE",
+    "Description": "This setting allows specifying an interval at which we will force a fsync of data written to the log. For example if this was set to 1, we would fsync after every message; if it were 5 we would fsync after every five messages."
+  },
+  {
+    "Option": "log.replica.high-watermark.checkpoint-interval",
+    "Type": "Duration",
+    "Default": "5s",
+    "Description": "The frequency with which the high watermark is saved out to disk. The default setting is 5 seconds."
+  },
+  {
+    "Option": "log.replica.max-lag-time",
+    "Type": "Duration",
+    "Default": "30s",
+    "Description": "If a follower replica hasn\u0027t sent any fetch log requests or hasn\u0027t consumed up the leaders log end offset for at least this time, the leader will remove the follower replica form isr"
+  },
+  {
+    "Option": "log.replica.write-operation-purge-number",
+    "Type": "Integer",
+    "Default": "1000",
+    "Description": "The purge number (in number of requests) of the write operation manager, the default value is 1000."
+  },
+  {
+    "Option": "log.replica.fetch-operation-purge-number",
+    "Type": "Integer",
+    "Default": "1000",
+    "Description": "The purge number (in number of requests) of the fetch log operation manager, the default value is 1000."
+  },
+  {
+    "Option": "log.replica.fetcher-number",
+    "Type": "Integer",
+    "Default": "1",
+    "Description": "Number of fetcher threads used to replicate log records from each source tablet server. The total number of fetchers on each tablet server is bound by this parameter multiplied by the number of tablet servers in the cluster. Increasing this value can increase the degree of I/O parallelism in the follower and leader tablet server at the cost of higher CPU and memory utilization."
+  },
+  {
+    "Option": "log.replica.fetch.backoff-interval",
+    "Type": "Duration",
+    "Default": "1s",
+    "Description": "The amount of time to sleep when fetch bucket error occurs."
+  },
+  {
+    "Option": "log.replica.fetch.max-bytes",
+    "Type": "MemorySize",
+    "Default": "16mb",
+    "Description": "The maximum amount of data the server should return for a fetch request from follower. Records are fetched in batches, and if the first record batch in the first non-empty bucket of the fetch is larger than this value, the record batch will still be returned to ensure that the fetch can make progress. As such, this is not a absolute maximum. Note that the fetcher performs multiple fetches in parallel."
+  },
+  {
+    "Option": "log.replica.fetch.max-bytes-for-bucket",
+    "Type": "MemorySize",
+    "Default": "1mb",
+    "Description": "The maximum amount of data the server should return for a table bucket in fetch request fom follower. Records are fetched in batches, and the max bytes size is config by this option."
+  },
+  {
+    "Option": "log.replica.fetch.min-bytes",
+    "Type": "MemorySize",
+    "Default": "1b",
+    "Description": "The minimum bytes expected for each fetch log request from the follower to response. If not enough bytes, wait up to log.replica.fetch-wait-max-time time to return."
+  },
+  {
+    "Option": "log.replica.fetch.wait-max-time",
+    "Type": "Duration",
+    "Default": "500ms",
+    "Description": "The maximum time to wait for enough bytes to be available for a fetch log request from the follower to response. This value should always be less than the \u0027log.replica.max-lag-time\u0027 at all times to prevent frequent shrinking of ISR for low throughput tables"
+  },
+  {
+    "Option": "log.replica.min-in-sync-replicas-number",
+    "Type": "Integer",
+    "Default": "1",
+    "Description": "When a producer set acks to all (-1), this configuration specifies the minimum number of replicas that must acknowledge a write for the write to be considered successful. If this minimum cannot be met, then the producer will raise an exception(NotEnoughReplicas). when used together, this config and \u0027acks\u0027 allow you to enforce greater durability guarantees. A typical scenario would be to create a table with a replication factor of 3. set this conf to 2, and produce with acks \u003d -1. This will ensure that the producer raises an exception if a majority of replicas don\u0027t receive a write."
+  },
+  {
+    "Option": "remote.log.task-interval-duration",
+    "Type": "Duration",
+    "Default": "1min",
+    "Description": "Interval at which remote log manager runs the scheduled tasks like copy segments, clean up remote log segments, delete local log segments etc. If the value is set to 0s, it means that the remote log storage is disabled."
+  },
+  {
+    "Option": "remote.log.index-file-cache-size",
+    "Type": "MemorySize",
+    "Default": "1gb",
+    "Description": "The total size of the space allocated to store index files fetched from remote storage in the local storage."
+  },
+  {
+    "Option": "remote.log-manager.thread-pool-size",
+    "Type": "Integer",
+    "Default": "4",
+    "Description": "Size of the thread pool used in scheduling tasks to copy segments, fetch remote log indexes and clean up remote log segments."
+  },
+  {
+    "Option": "remote.log.data-transfer-thread-num",
+    "Type": "Integer",
+    "Default": "4",
+    "Description": "The number of threads the server uses to transfer (download and upload) remote log file can be data file, index file and remote log metadata file."
+  },
+  {
+    "Option": "kv.snapshot.interval",
+    "Type": "Duration",
+    "Default": "10min",
+    "Description": "The interval to perform periodic snapshot for kv data. The default setting is 10 minutes."
+  },
+  {
+    "Option": "kv.snapshot.scheduler-thread-num",
+    "Type": "Integer",
+    "Default": "1",
+    "Description": "The number of threads that the server uses to schedule snapshot kv data for all the replicas in the server."
+  },
+  {
+    "Option": "kv.snapshot.transfer-thread-num",
+    "Type": "Integer",
+    "Default": "4",
+    "Description": "The number of threads the server uses to transfer (download and upload) kv snapshot files."
+  },
+  {
+    "Option": "kv.snapshot.num-retained",
+    "Type": "Integer",
+    "Default": "1",
+    "Description": "The maximum number of completed snapshots to retain."
+  },
+  {
+    "Option": "kv.rocksdb.thread.num",
+    "Type": "Integer",
+    "Default": "2",
+    "Description": "The maximum number of concurrent background flush and compaction jobs (per bucket of table). The default value is \u00272\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.files.open",
+    "Type": "Integer",
+    "Default": "-1",
+    "Description": "The maximum number of open files (per bucket of table) that can be used by the DB, \u0027-1\u0027 means no limit. The default value is \u0027-1\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.log.max-file-size",
+    "Type": "MemorySize",
+    "Default": "25mb",
+    "Description": "The maximum size of RocksDB\u0027s file used for information logging. If the log files becomes larger than this, a new file will be created. If 0, all logs will be written to one log file. The default maximum file size is \u002725MB\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.log.file-num",
+    "Type": "Integer",
+    "Default": "4",
+    "Description": "The maximum number of files RocksDB should keep for information logging (Default setting: 4)."
+  },
+  {
+    "Option": "kv.rocksdb.log.dir",
+    "Type": "String",
+    "Default": "(None)",
+    "Description": "The directory for RocksDB\u0027s information logging files. If empty (Fluss default setting), log files will be in the same directory as the Fluss log. If non-empty, this directory will be used and the data directory\u0027s absolute path will be used as the prefix of the log file name. If setting this option as a non-existing location, e.g \u0027/dev/null\u0027, RocksDB will then create the log under its own database folder as before."
+  },
+  {
+    "Option": "kv.rocksdb.log.level",
+    "Type": "Enum",
+    "Default": "INFO_LEVEL",
+    "Description": "The specified information logging level for RocksDB. Candidate log level is \u0027DEBUG_LEVEL\u0027, \u0027INFO_LEVEL\u0027, \u0027WARN_LEVEL\u0027, \u0027ERROR_LEVEL\u0027, \u0027FATAL_LEVEL\u0027, \u0027HEADER_LEVEL\u0027, NUM_INFO_LOG_LEVELS, . If unset, Fluss will use INFO_LEVEL. Note: RocksDB info logs will not be written to the Fluss\u0027s tablet server logs and there is no rolling strategy, unless you configure \u0027kv.rocksdb.log.dir\u0027, \u0027kv.rocksdb.log.max-file-size\u0027 and \u0027kv.rocksdb.log.file-num\u0027 accordingly. Without a rolling strategy, it may lead to uncontrolled disk space usage if configured with increased log levels! There is no need to modify the RocksDB log level, unless for troubleshooting RocksDB."
+  },
+  {
+    "Option": "kv.rocksdb.write-batch-size",
+    "Type": "MemorySize",
+    "Default": "2mb",
+    "Description": "The max size of the consumed memory for RocksDB batch write, will flush just based on item count if this config set to 0."
+  },
+  {
+    "Option": "kv.rocksdb.compaction.style",
+    "Type": "Enum",
+    "Default": "LEVEL",
+    "Description": "The specified compaction style for DB. Candidate compaction style is LEVEL, FIFO, UNIVERSAL, or NONE, and Fluss chooses \u0027LEVEL\u0027 as default style."
+  },
+  {
+    "Option": "kv.rocksdb.compaction.level.use-dynamic-size",
+    "Type": "Boolean",
+    "Default": "false",
+    "Description": "If true, RocksDB will pick target size of each level dynamically. From an empty DB, RocksDB would make last level the base level, which means merging L0 data into the last level, until it exceeds max_bytes_for_level_base. And then repeat this process for second last level and so on. The default value is \u0027false\u0027. For more information, please refer to %s https://github.com/facebook/rocksdb/wiki/Leveled-Compaction#level_compaction_dynamic_level_bytes-is-true RocksDB\u0027s doc."
+  },
+  {
+    "Option": "kv.rocksdb.compression.per.level",
+    "Type": "Enum",
+    "Default": "LZ4,LZ4,LZ4,LZ4,LZ4,ZSTD,ZSTD",
+    "Description": "A comma-separated list of Compression Type. Different levels can have different compression policies. In many cases, lower levels use fast compression algorithms, while higher levels with more data use slower but more effective compression algorithms. The N th element in the List corresponds to the compression type of the level N-1 When \u0027kv.rocksdb.compaction.level.use-dynamic-size\u0027 is true, compression_per_level[0] still determines L0, but other elements are based on the base level and may not match the level seen in the info log. Note: If the List size is smaller than the level number, the undefined lower level uses the last Compression Type in the List. The optional values include NO, SNAPPY, LZ4, ZSTD. For more information about compression type, please refer to doc https://github.com/facebook/rocksdb/wiki/Compression. The default value is ‘LZ4,LZ4,LZ4,LZ4,LZ4,ZSTD,ZSTD’, indicates there is lz4 compaction of level0 and level4, ZSTD compaction algorithm is used from level5 to level6. LZ4 is a lightweight compression algorithm so it usually strikes a good balance between space and CPU usage. ZSTD is more space save than LZ4, but it is more CPU-intensive. Different machines deploy compaction modes according to CPU and I/O resources. The default value is for the scenario that CPU resources are adequate. If you find the IO pressure of the system is not big when writing a lot of data, but CPU resources are inadequate, you can exchange I/O resources for CPU resources and change the compaction mode to \u0027NO,NO,NO,LZ4,LZ4,ZSTD,ZSTD\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.compaction.level.target-file-size-base",
+    "Type": "MemorySize",
+    "Default": "64mb",
+    "Description": "The target file size for compaction, which determines a level-1 file size. The default value is \u002764MB\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.compaction.level.max-size-level-base",
+    "Type": "MemorySize",
+    "Default": "256mb",
+    "Description": "The upper-bound of the total size of level base files in bytes. The default value is \u0027256MB\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.writebuffer.size",
+    "Type": "MemorySize",
+    "Default": "64mb",
+    "Description": "The amount of data built up in memory (backed by an unsorted log on disk) before converting to a sorted on-disk files. The default writebuffer size is \u002764MB\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.writebuffer.count",
+    "Type": "Integer",
+    "Default": "2",
+    "Description": "The maximum number of write buffers that are built up in memory. The default value is \u00272\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.writebuffer.number-to-merge",
+    "Type": "Integer",
+    "Default": "1",
+    "Description": "The minimum number of write buffers that will be merged together before writing to storage. The default value is \u00271\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.block.blocksize",
+    "Type": "MemorySize",
+    "Default": "4kb",
+    "Description": "The approximate size (in bytes) of user data packed per block. The default blocksize is \u00274KB\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.block.cache-size",
+    "Type": "MemorySize",
+    "Default": "8mb",
+    "Description": "The amount of the cache for data blocks in RocksDB. The default block-cache size is \u00278MB\u0027."
+  },
+  {
+    "Option": "kv.rocksdb.use-bloom-filter",
+    "Type": "Boolean",
+    "Default": "true",
+    "Description": "If true, every newly created SST file will contain a Bloom filter. It is enabled by default."
+  },
+  {
+    "Option": "kv.rocksdb.bloom-filter.bits-per-key",
+    "Type": "Double",
+    "Default": "10.0",
+    "Description": "Bits per key that bloom filter will use, this only take effect when bloom filter is used. The default value is 10.0."
+  },
+  {
+    "Option": "kv.rocksdb.bloom-filter.block-based-mode",
+    "Type": "Boolean",
+    "Default": "false",
+    "Description": "If true, RocksDB will use block-based filter instead of full filter, this only take effect when bloom filter is used. The default value is \u0027false\u0027."
+  },
+  {
+    "Option": "kv.recover.log-record-batch.max-size",
+    "Type": "MemorySize",
+    "Default": "16mb",
+    "Description": "The max fetch size for fetching log to apply to kv during recovering kv."
+  },
+  {
+    "Option": "metrics.reporters",
+    "Type": "List",
+    "Default": "(None)",
+    "Description": "An optional list of reporter names. If configured, only reporters whose name matches in the list will be started"
+  },
+  {
+    "Option": "metrics.reporter.prometheus.port",
+    "Type": "String",
+    "Default": "9249",
+    "Description": "The port the Prometheus reporter listens on. In order to be able to run several instances of the reporter on one host (e.g. when one TabletServer is colocated with the CoordinatorServer) it is advisable to use a port range like 9250-9260."
+  },
+  {
+    "Option": "metrics.reporter.jmx.port",
+    "Type": "String",
+    "Default": "(None)",
+    "Description": "The port for the JMXServer that JMX clients can connect to. If not set, the JMXServer won\u0027t start. In order to be able to run several instances of the reporter on one host (e.g. when one TabletServer is colocated with the CoordinatorServer) it is advisable to use a port range like 9990-9999."
+  },
+  {
+    "Option": "datalake.format",
+    "Type": "ENUM",
+    "Default": "(None)",
+    "Description": "The datalake format used by of Fluss to be as lakehouse storage, such as Paimon, Iceberg, Hudi. Now, only support Paimon."
+  }
+]

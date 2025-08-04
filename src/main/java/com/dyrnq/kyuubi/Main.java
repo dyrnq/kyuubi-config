@@ -13,7 +13,8 @@ import picocli.CommandLine;
                 KafkaConfig.class,
                 AmoroConfig.class,
                 BookKeeperConfig.class,
-                DorisConfig.class
+                DorisConfig.class,
+                FlussConfig.class
         },
         mixinStandardHelpOptions = true,
         showDefaultValues = true

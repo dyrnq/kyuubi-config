@@ -53,3 +53,10 @@ for kv in "2.0" "3.0" "latest"; do
   java -jar target/kyuubi-config.jar doris -ver $kv --format json --type be --no-section  > doris/$kv/doris-be-config-no-section.json;
   java -jar target/kyuubi-config.jar doris -ver $kv --format conf --type be               > doris/$kv/doris-be-config.conf;
 done
+
+for kv in "0.5" "0.6" "current" "next" ; do
+  echo "version=$kv";
+  mkdir -p fluss/$kv;
+  java -jar target/kyuubi-config.jar fluss -ver $kv --format json --no-section  > fluss/$kv/fluss-config-no-section.json;
+  java -jar target/kyuubi-config.jar fluss -ver $kv --format conf               > fluss/$kv/fluss-config.conf;
+done
