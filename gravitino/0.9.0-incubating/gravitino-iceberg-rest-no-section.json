@@ -1,0 +1,512 @@
+[
+  {
+    "Configuration item": "gravitino.iceberg-rest.enableCorsFilter",
+    "Description": "Enable cross-origin resource share filter.",
+    "Default value": "false",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.allowedOrigins",
+    "Description": "A comma separated list of allowed origins that access the resources. The default value is *, which means all origins.",
+    "Default value": "*",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.allowedTimingOrigins",
+    "Description": "A comma separated list of allowed origins that time the resource. The default value is the empty string, which means no origins.",
+    "Default value": "\u0027\u0027(empty string)",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.allowedMethods",
+    "Description": "A comma separated list of allowed HTTP methods used when accessing the resources. The default values are GET, POST, HEAD, and DELETE.",
+    "Default value": "GET,POST,HEAD,DELETE,PUT",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.allowedHeaders",
+    "Description": "A comma separated list of HTTP allowed headers specified when accessing the resources. The default value is X-Requested-With,Content-Type,Accept,Origin. If the value is a single *, it accepts all headers.",
+    "Default value": "X-Requested-With,Content-Type,Accept,Origin",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.preflightMaxAgeInSecs",
+    "Description": "The number of seconds to cache preflight requests by the client. The default value is 1800 seconds or 30 minutes.",
+    "Default value": "1800",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.allowCredentials",
+    "Description": "A boolean indicating if the resource allows requests with credentials. The default value is true.",
+    "Default value": "true",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.exposedHeaders",
+    "Description": "A comma separated list of allowed HTTP headers exposed on the client. The default value is the empty list.",
+    "Default value": "\u0027\u0027(empty string)",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.chainPreflight",
+    "Description": "If true chained preflight requests for normal handling (as an OPTION request). Otherwise, the filter responds to the preflight. The default is true.",
+    "Default value": "true",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.enableHttps",
+    "Description": "Enables HTTPS.",
+    "Default value": "false",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.httpsPort",
+    "Description": "The HTTPS port number of the Jetty web server.",
+    "Default value": "9433",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.keyStorePath",
+    "Description": "Path to the key store file.",
+    "Default value": "(none)",
+    "Required": "Yes if use HTTPS",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.keyStorePassword",
+    "Description": "Password to the key store.",
+    "Default value": "(none)",
+    "Required": "Yes if use HTTPS",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.keyStoreType",
+    "Description": "The type to the key store.",
+    "Default value": "JKS",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.managerPassword",
+    "Description": "Manager password to the key store.",
+    "Default value": "(none)",
+    "Required": "Yes if use HTTPS",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.tlsProtocol",
+    "Description": "TLS protocol to use. The JVM must support the TLS protocol to use.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.enableCipherAlgorithms",
+    "Description": "The collection of enabled cipher algorithms.",
+    "Default value": "\u0027\u0027 (empty string)",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.enableClientAuth",
+    "Description": "Enables the authentication of the client.",
+    "Default value": "false",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.trustStorePath",
+    "Description": "Path to the trust store file.",
+    "Default value": "(none)",
+    "Required": "Yes if use HTTPS and the authentication of client",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.trustStorePassword",
+    "Description": "Password to the trust store.",
+    "Default value": "(none)",
+    "Required": "Yes if use HTTPS and the authentication of client",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.trustStoreType",
+    "Description": "The type to the trust store.",
+    "Default value": "JKS",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.classpath",
+    "Description": "The classpath of the Gravitino Iceberg REST catalog service; includes the directory containing jars and configuration. It supports both absolute and relative paths, for example, iceberg-rest-server/libs, iceberg-rest-server/conf",
+    "Default value": "(none)",
+    "Required": "Yes",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.host",
+    "Description": "The host of the Gravitino Iceberg REST catalog service.",
+    "Default value": "0.0.0.0",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.httpPort",
+    "Description": "The port of the Gravitino Iceberg REST catalog service.",
+    "Default value": "9001",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.minThreads",
+    "Description": "The minimum number of threads in the thread pool used by the Jetty web server. minThreads is 8 if the value is less than 8.",
+    "Default value": "Math.max(Math.min(Runtime.getRuntime().availableProcessors() * 2, 100), 8)",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.maxThreads",
+    "Description": "The maximum number of threads in the thread pool used by the Jetty web server. maxThreads is 8 if the value is less than 8, and maxThreads must be greater than or equal to minThreads.",
+    "Default value": "Math.max(Runtime.getRuntime().availableProcessors() * 4, 400)",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.threadPoolWorkQueueSize",
+    "Description": "The size of the queue in the thread pool used by Gravitino Iceberg REST catalog service.",
+    "Default value": "100",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.stopTimeout",
+    "Description": "The amount of time in ms for the Gravitino Iceberg REST catalog service to stop gracefully. For more information, see org.eclipse.jetty.server.Server#setStopTimeout.",
+    "Default value": "30000",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.idleTimeout",
+    "Description": "The timeout in ms of idle connections.",
+    "Default value": "30000",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.requestHeaderSize",
+    "Description": "The maximum size of an HTTP request.",
+    "Default value": "131072",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.responseHeaderSize",
+    "Description": "The maximum size of an HTTP response.",
+    "Default value": "131072",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.customFilters",
+    "Description": "Comma-separated list of filter class names to apply to the APIs.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.authentication.type",
+    "Description": "The type of authentication for Iceberg rest catalog backend. This configuration only applicable for for Hive backend, and only supports Kerberos, simple currently. As for JDBC backend, only username/password authentication was supported now.",
+    "Default value": "simple",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.authentication.impersonation-enable",
+    "Description": "Whether to enable impersonation for the Iceberg catalog",
+    "Default value": "false",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.hive.metastore.sasl.enabled",
+    "Description": "Whether to enable SASL authentication protocol when connect to Kerberos Hive metastore.",
+    "Default value": "false",
+    "Required": "No, This value should be true in most case(Some will use SSL protocol, but it rather rare) if the value of gravitino.iceberg-rest.authentication.type is Kerberos.",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.authentication.kerberos.principal",
+    "Description": "The principal of the Kerberos authentication",
+    "Default value": "(none)",
+    "Required": "required if the value of gravitino.iceberg-rest.authentication.type is Kerberos.",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.authentication.kerberos.keytab-uri",
+    "Description": "The URI of The keytab for the Kerberos authentication.",
+    "Default value": "(none)",
+    "Required": "required if the value of gravitino.iceberg-rest.authentication.type is Kerberos.",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.authentication.kerberos.check-interval-sec",
+    "Description": "The check interval of Kerberos credential for Iceberg catalog.",
+    "Default value": "60",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.authentication.kerberos.keytab-fetch-timeout-sec",
+    "Description": "The fetch timeout of retrieving Kerberos keytab from authentication.kerberos.keytab-uri.",
+    "Default value": "60",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.io-impl",
+    "Description": "The IO implementation for FileIO in Iceberg, use org.apache.iceberg.aws.s3.S3FileIO for S3.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.6.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.s3-endpoint",
+    "Description": "An alternative endpoint of the S3 service, This could be used for S3FileIO with any s3-compatible object storage service that has a different endpoint, or access a private S3 endpoint in a virtual private cloud.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.6.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.s3-region",
+    "Description": "The region of the S3 service, like us-west-2.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.6.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.s3-path-style-access",
+    "Description": "Whether to use path style access for S3.",
+    "Default value": "false",
+    "Required": "No",
+    "Since Version": "0.9.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.io-impl",
+    "Description": "The IO implementation for FileIO in Iceberg, use org.apache.iceberg.aliyun.oss.OSSFileIO for OSS.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.6.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.oss-endpoint",
+    "Description": "The endpoint of Aliyun OSS service.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.oss-region",
+    "Description": "The region of the OSS service, like oss-cn-hangzhou, only used when credential-providers is oss-token.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.8.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.io-impl",
+    "Description": "The io implementation for FileIO in Iceberg, use org.apache.iceberg.gcp.gcs.GCSFileIO for GCS.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.6.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.io-impl",
+    "Description": "The IO implementation for FileIO in Iceberg, use org.apache.iceberg.azure.adlsv2.ADLSFileIO for ADLS.",
+    "Default value": "(none)",
+    "Required": "Yes",
+    "Since Version": "0.8.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.io-impl",
+    "Description": "The IO implementation for FileIO in Iceberg, please use the full qualified classname.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.6.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.catalog-backend",
+    "Description": "The Catalog backend of the Gravitino Iceberg REST catalog service. Use the value hive for a Hive catalog.",
+    "Default value": "memory",
+    "Required": "Yes",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.uri",
+    "Description": "The Hive metadata address, such as thrift://127.0.0.1:9083.",
+    "Default value": "(none)",
+    "Required": "Yes",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.warehouse",
+    "Description": "The warehouse directory of the Hive catalog, such as /user/hive/warehouse-hive/.",
+    "Default value": "(none)",
+    "Required": "Yes",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.catalog-backend-name",
+    "Description": "The catalog backend name passed to underlying Iceberg catalog backend. Catalog name in JDBC backend is used to isolate namespace and tables.",
+    "Default value": "hive for Hive backend, jdbc for JDBC backend, memory for memory backend",
+    "Required": "No",
+    "Since Version": "0.5.2"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.catalog-backend",
+    "Description": "The Catalog backend of the Gravitino Iceberg REST catalog service. Use the value jdbc for a JDBC catalog.",
+    "Default value": "memory",
+    "Required": "Yes",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.uri",
+    "Description": "The JDBC connection address, such as jdbc:postgresql://127.0.0.1:5432 for Postgres, or jdbc:mysql://127.0.0.1:3306/ for mysql.",
+    "Default value": "(none)",
+    "Required": "Yes",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.warehouse",
+    "Description": "The warehouse directory of JDBC catalog. Set the HDFS prefix if using HDFS, such as hdfs://127.0.0.1:9000/user/hive/warehouse-jdbc",
+    "Default value": "(none)",
+    "Required": "Yes",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.catalog-backend-name",
+    "Description": "The catalog name passed to underlying Iceberg catalog backend. Catalog name in JDBC backend is used to isolate namespace and tables.",
+    "Default value": "jdbc for JDBC backend",
+    "Required": "No",
+    "Since Version": "0.5.2"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.jdbc-user",
+    "Description": "The username of the JDBC connection.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.jdbc-password",
+    "Description": "The password of the JDBC connection.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.jdbc-initialize",
+    "Description": "Whether to initialize the meta tables when creating the JDBC catalog.",
+    "Default value": "true",
+    "Required": "No",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.jdbc-driver",
+    "Description": "com.mysql.jdbc.Driver or com.mysql.cj.jdbc.Driver for MySQL, org.postgresql.Driver for PostgreSQL.",
+    "Default value": "(none)",
+    "Required": "Yes",
+    "Since Version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.catalog-backend",
+    "Description": "The Catalog backend of the Gravitino Iceberg REST catalog service. Use the value custom for a Custom catalog.",
+    "Default value": "memory",
+    "Required": "Yes",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.catalog-backend-impl",
+    "Description": "The fully-qualified class name of a custom catalog implementation, only worked if catalog-backend is custom.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.jdbc.schema-version",
+    "Description": "The schema version of JDBC catalog backend, setting to V1 if supporting view operations.",
+    "Default value": "(none)",
+    "Required": "NO",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.catalog-config-provider",
+    "Description": "The className of catalog configuration provider, Gravitino provides build-in static-config-provider and dynamic-config-provider, you could also develop a custom class that implements apache.gravitino.iceberg.service.provider.IcebergConfigProvider and add the corresponding jar file to the Iceberg REST service classpath directory.",
+    "Default value": "static-config-provider",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.gravitino-uri",
+    "Description": "The uri of Gravitino server address, only worked if catalog-config-provider is dynamic-config-provider.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.gravitino-metalake",
+    "Description": "The metalake name that dynamic-config-provider used to request to Gravitino, only worked if catalog-config-provider is dynamic-config-provider.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.catalog-cache-eviction-interval-ms",
+    "Description": "Catalog cache eviction interval.",
+    "Default value": "3600000",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.clients",
+    "Description": "The client pool size of the catalog.",
+    "Default value": "2",
+    "Required": "No"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.metricsStore",
+    "Description": "The Iceberg metrics storage class name.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.metricsStoreRetainDays",
+    "Description": "The days to retain Iceberg metrics in store, the value not greater than 0 means retain forever.",
+    "Default value": "-1",
+    "Required": "No",
+    "Since Version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.metricsQueueCapacity",
+    "Description": "The size of queue to store metrics temporally before storing to the persistent storage. Metrics will be dropped when queue is full.",
+    "Default value": "1000",
+    "Required": "No",
+    "Since Version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.extension-packages",
+    "Description": "Comma-separated list of Iceberg REST API packages to expand.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since Version": "0.7.0-incubating"
+  }
+]

@@ -60,3 +60,17 @@ for kv in "0.5" "0.6" "current" "next" ; do
   java -jar target/kyuubi-config.jar fluss -ver $kv --format json --no-section  > fluss/$kv/fluss-config-no-section.json;
   java -jar target/kyuubi-config.jar fluss -ver $kv --format conf               > fluss/$kv/fluss-config.conf;
 done
+
+
+for kv in "0.9.0-incubating" "0.9.1" ; do
+  echo "version=$kv";
+  mkdir -p gravitino/$kv;
+  java -jar target/kyuubi-config.jar gravitino -ver $kv --format json --no-section  > gravitino/$kv/gravitino-config-no-section.json;
+  java -jar target/kyuubi-config.jar gravitino -ver $kv --format conf               > gravitino/$kv/gravitino-config.conf;
+
+  java -jar target/kyuubi-config.jar gravitino -ver $kv --format json --no-section iceberg-rest > gravitino/$kv/gravitino-iceberg-rest-no-section.json;
+  java -jar target/kyuubi-config.jar gravitino -ver $kv --format conf              iceberg-rest > gravitino/$kv/gravitino-iceberg-rest.conf;
+
+done
+
+

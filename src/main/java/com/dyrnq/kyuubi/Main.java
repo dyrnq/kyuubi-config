@@ -14,7 +14,8 @@ import picocli.CommandLine;
                 AmoroConfig.class,
                 BookKeeperConfig.class,
                 DorisConfig.class,
-                FlussConfig.class
+                FlussConfig.class,
+                GravitinoConfig.class
         },
         mixinStandardHelpOptions = true,
         showDefaultValues = true
