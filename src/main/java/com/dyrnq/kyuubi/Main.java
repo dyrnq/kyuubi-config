@@ -15,7 +15,8 @@ import picocli.CommandLine;
                 BookKeeperConfig.class,
                 DorisConfig.class,
                 FlussConfig.class,
-                GravitinoConfig.class
+                GravitinoConfig.class,
+                SpringBootConfig.class
         },
         mixinStandardHelpOptions = true,
         showDefaultValues = true

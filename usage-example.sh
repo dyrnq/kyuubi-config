@@ -73,4 +73,12 @@ for kv in "0.9.0-incubating" "0.9.1" ; do
 
 done
 
+for kv in "3.4" "current"; do
+  echo "version=$kv";
+  mkdir -p spring-boot/$kv;
+  java -jar target/kyuubi-config.jar spring-boot -ver $kv --format json               > spring-boot/$kv/spring-boot-config.json;
+  java -jar target/kyuubi-config.jar spring-boot -ver $kv --format json --no-section  > spring-boot/$kv/spring-boot-config-no-section.json;
+  java -jar target/kyuubi-config.jar spring-boot -ver $kv --format conf               > spring-boot/$kv/spring-boot-config.conf;
+done
+
 
