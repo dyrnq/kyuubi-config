@@ -16,7 +16,8 @@ import picocli.CommandLine;
                 DorisConfig.class,
                 FlussConfig.class,
                 GravitinoConfig.class,
-                SpringBootConfig.class
+                SpringBootConfig.class,
+                DebeziumConfig.class
         },
         mixinStandardHelpOptions = true,
         showDefaultValues = true

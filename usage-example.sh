@@ -82,3 +82,13 @@ for kv in "3.4" "current"; do
 done
 
 
+for kv in "3.3" "stable"; do
+  echo "version=$kv";
+  mkdir -p debezium/$kv;
+  java -jar target/kyuubi-config.jar debezium -ver $kv --format json --no-section  > debezium/$kv/debezium-mysql-no-section.json;
+  java -jar target/kyuubi-config.jar debezium -ver $kv --format conf               > debezium/$kv/debezium-mysql.conf;
+  java -jar target/kyuubi-config.jar debezium -ver $kv --format json --no-section -t jdbc  > debezium/$kv/debezium-jdbc-no-section.json;
+  java -jar target/kyuubi-config.jar debezium -ver $kv --format conf              -t jdbc  > debezium/$kv/debezium-jdbc.conf;
+  java -jar target/kyuubi-config.jar debezium -ver $kv --format json --no-section -t postgresql  > debezium/$kv/debezium-postgresql-no-section.json;
+  java -jar target/kyuubi-config.jar debezium -ver $kv --format conf              -t postgresql  > debezium/$kv/debezium-postgresql.conf;
+done
