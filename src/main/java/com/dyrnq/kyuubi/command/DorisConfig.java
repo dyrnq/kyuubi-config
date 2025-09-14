@@ -27,7 +27,7 @@ public class DorisConfig extends CommonOptions implements Callable<Integer> {
     @CommandLine.Option(names = {"-n", "--no-section"}, description = "")
     boolean noSection;
 
-    @CommandLine.Option(names = {"-ver", "-dv", "--doris-version"}, description = "doris version e.g. 3.0", defaultValue = "latest")
+    @CommandLine.Option(names = {"-ver", "-dv", "--doris-version"}, description = "doris version e.g. 3.0", defaultValue = "dev")
     String dorisVersion;
 
     @CommandLine.Option(names = {"-f", "--format"}, description = "format", defaultValue = "json")
@@ -44,18 +44,13 @@ public class DorisConfig extends CommonOptions implements Callable<Integer> {
         List<Map<String, String>> noSectionList = new LinkedList<>();
         for (String url :
                 new String[]{
-                        "https://doris.apache.org/docs/VERSION/admin-manual/config/%s-config",
+                        "https://doris.apache.org/docs/%s/admin-manual/config/%s-config",
 
                 }
         ) {
             try {
-                if (Strings.CI.equals("latest", dorisVersion)) {
-                    url = url.replaceFirst("/VERSION", "/");
-                } else {
-                    url = url.replaceFirst("/VERSION", "/" + dorisVersion);
-                }
-                url = String.format(url, type);
 
+                url = String.format(url, dorisVersion, type);
                 Connection connection = Jsoup.connect(url);
                 Document doc = connection.timeout(2 * 60 * 1000).get();
 
