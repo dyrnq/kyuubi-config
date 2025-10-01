@@ -1,0 +1,498 @@
+[
+  {
+    "Configuration item": "gravitino.server.webserver.host",
+    "Description": "The host of the Gravitino server.",
+    "Default value": "0.0.0.0",
+    "Required": "No",
+    "Since version": "0.1.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.httpPort",
+    "Description": "The port on which the Gravitino server listens for incoming connections.",
+    "Default value": "8090",
+    "Required": "No",
+    "Since version": "0.1.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.minThreads",
+    "Description": "The minimum number of threads in the thread pool used by the Jetty webserver. minThreads is 8 if the value is less than 8.",
+    "Default value": "Math.max(Math.min(Runtime.getRuntime().availableProcessors() * 2, 100), 8)",
+    "Required": "No",
+    "Since version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.maxThreads",
+    "Description": "The maximum number of threads in the thread pool used by the Jetty webserver. maxThreads is 8 if the value is less than 8, and maxThreads must be great or equal to minThreads.",
+    "Default value": "Math.max(Runtime.getRuntime().availableProcessors() * 4, 400)",
+    "Required": "No",
+    "Since version": "0.1.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.threadPoolWorkQueueSize",
+    "Description": "The size of the queue in the thread pool used by the Jetty webserver.",
+    "Default value": "100",
+    "Required": "No",
+    "Since version": "0.1.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.stopTimeout",
+    "Description": "Time in milliseconds to gracefully shut down the Jetty webserver, for more, please see org.eclipse.jetty.server.Server#setStopTimeout.",
+    "Default value": "30000",
+    "Required": "No",
+    "Since version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.idleTimeout",
+    "Description": "The timeout in milliseconds of idle connections.",
+    "Default value": "30000",
+    "Required": "No",
+    "Since version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.requestHeaderSize",
+    "Description": "Maximum size of HTTP requests.",
+    "Default value": "131072",
+    "Required": "No",
+    "Since version": "0.1.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.responseHeaderSize",
+    "Description": "Maximum size of HTTP responses.",
+    "Default value": "131072",
+    "Required": "No",
+    "Since version": "0.1.0"
+  },
+  {
+    "Configuration item": "gravitino.server.shutdown.timeout",
+    "Description": "Time in milliseconds to gracefully shut down of the Gravitino webserver.",
+    "Default value": "3000",
+    "Required": "No",
+    "Since version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.customFilters",
+    "Description": "Comma-separated list of filter class names to apply to the API.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.rest.extensionPackages",
+    "Description": "Comma-separated list of REST API packages to expand",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since version": "0.6.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.server.visibleConfigs",
+    "Description": "List of configs that are visible in the config servlet",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since version": "0.9.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.entity.store",
+    "Description": "Which entity storage implementation to use. Onlyrelational storage is currently supported.",
+    "Default value": "relational",
+    "Required": "No",
+    "Since version": "0.1.0"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.maxTransactionSkewTimeMs",
+    "Description": "The maximum skew time of transactions in milliseconds.",
+    "Default value": "2000",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.deleteAfterTimeMs",
+    "Description": "The maximum time in milliseconds that deleted and old-version data is kept. Set to at least 10 minutes and no longer than 30 days.",
+    "Default value": "604800000(7 days)",
+    "Required": "No",
+    "Since version": "0.5.0"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.versionRetentionCount",
+    "Description": "The Count of versions allowed to be retained, including the current version, used to delete old versions data. Set to at least 1 and no greater than 10.",
+    "Default value": "1",
+    "Required": "No",
+    "Since version": "0.5.0"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.relational",
+    "Description": "Detailed implementation of Relational storage. H2, MySQL and PostgreSQL is currently supported, and the implementation is JDBCBackend.",
+    "Default value": "JDBCBackend",
+    "Required": "No",
+    "Since version": "0.5.0"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.relational.jdbcUrl",
+    "Description": "The database url that the JDBCBackend needs to connect to. If you use MySQL or PostgreSQL, you should firstly initialize the database tables yourself by executing the ddl scripts in the ${GRAVITINO_HOME}/scripts/{DATABASE_TYPE}/ directory.",
+    "Default value": "jdbc:h2",
+    "Required": "No",
+    "Since version": "0.5.0"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.relational.jdbcDriver",
+    "Description": "The jdbc driver name that the JDBCBackend needs to use. You should place the driver Jar package in the ${GRAVITINO_HOME}/libs/ directory.",
+    "Default value": "org.h2.Driver",
+    "Required": "Yes if the jdbc connection url is not jdbc:h2",
+    "Since version": "0.5.0"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.relational.jdbcUser",
+    "Description": "The username that the JDBCBackend needs to use when connecting the database. It is required for MySQL.",
+    "Default value": "gravitino",
+    "Required": "Yes if the jdbc connection url is not jdbc:h2",
+    "Since version": "0.5.0"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.relational.jdbcPassword",
+    "Description": "The password that the JDBCBackend needs to use when connecting the database. It is required for MySQL.",
+    "Default value": "gravitino",
+    "Required": "Yes if the jdbc connection url is not jdbc:h2",
+    "Since version": "0.5.0"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.relational.storagePath",
+    "Description": "The storage path for embedded JDBC storage implementation. It supports both absolute and relative path, if the value is a relative path, the final path is ${GRAVITINO_HOME}/${PATH_YOU_HAVA_SET}, default value is ${GRAVITINO_HOME}/data/jdbc",
+    "Default value": "${GRAVITINO_HOME}/data/jdbc",
+    "Required": "No",
+    "Since version": "0.6.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.relational.maxConnections",
+    "Description": "The maximum number of connections for the JDBC Backend connection pool",
+    "Default value": "100",
+    "Required": "No",
+    "Since version": "0.9.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.entity.store.relational.maxWaitMillis",
+    "Description": "The maximum wait time in milliseconds for a connection from the JDBC Backend connection pool",
+    "Default value": "1000",
+    "Required": "No",
+    "Since version": "0.9.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.lock.maxNodes",
+    "Description": "The maximum number of tree lock nodes to keep in memory",
+    "Default value": "100000",
+    "Required": "No",
+    "Since Version": "0.5.0"
+  },
+  {
+    "Configuration item": "gravitino.lock.minNodes",
+    "Description": "The minimum number of tree lock nodes to keep in memory",
+    "Default value": "1000",
+    "Required": "No",
+    "Since Version": "0.5.0"
+  },
+  {
+    "Configuration item": "gravitino.lock.cleanIntervalInSecs",
+    "Description": "The interval in seconds to clean up the stale tree lock nodes",
+    "Default value": "60",
+    "Required": "No",
+    "Since Version": "0.5.0"
+  },
+  {
+    "Configuration item": "gravitino.catalog.cache.evictionIntervalMs",
+    "Description": "The interval in milliseconds to evict the catalog cache; default 3600000ms(1h).",
+    "Default value": "3600000",
+    "Required": "No",
+    "Since version": "0.1.0"
+  },
+  {
+    "Configuration item": "gravitino.catalog.classloader.isolated",
+    "Description": "Whether to use an isolated classloader for catalog. If true, an isolated classloader loads all catalog-related libraries and configurations, not the AppClassLoader. The default value is true.",
+    "Default value": "true",
+    "Required": "No",
+    "Since version": "0.1.0"
+  },
+  {
+    "Configuration item": "gravitino.auxService.names",
+    "Description": "The auxiliary service name of the Gravitino Iceberg REST server. Use iceberg-rest for the Gravitino Iceberg REST server.",
+    "Default value": "(none)",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator",
+    "Description": "It is deprecated since Gravitino 0.6.0. Please use gravitino.authenticators instead.",
+    "Default value": "simple",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticators",
+    "Description": "The authenticators which Gravitino uses, setting as simple,oauth or kerberos. Multiple authenticators are separated by commas. If a request is supported by multiple authenticators simultaneously, the first authenticator will be used by default.",
+    "Default value": "simple",
+    "Required": "No",
+    "Since version": "0.6.0-incubating"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.serviceAudience",
+    "Description": "The audience name when Gravitino uses OAuth as the authenticator.",
+    "Default value": "GravitinoServer",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.allowSkewSecs",
+    "Description": "The JWT allows skew seconds when Gravitino uses OAuth as the authenticator.",
+    "Default value": "0",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.defaultSignKey",
+    "Description": "The signing key of JWT when Gravitino uses OAuth as the authenticator.",
+    "Default value": "(none)",
+    "Required": "Yes if use oauth as the authenticator",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.signAlgorithmType",
+    "Description": "The signature algorithm when Gravitino uses OAuth as the authenticator.",
+    "Default value": "RS256",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.serverUri",
+    "Description": "The URI of the default OAuth server.",
+    "Default value": "(none)",
+    "Required": "Yes if use oauth as the authenticator",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.tokenPath",
+    "Description": "The path for token of the default OAuth server.",
+    "Default value": "(none)",
+    "Required": "Yes if use oauth as the authenticator",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.provider",
+    "Description": "OAuth provider type (default, oidc). Determines the Web UI authentication flow. Use \u0027oidc\u0027 for Web UI OIDC login, \u0027default\u0027 for legacy login or API-only authentication.",
+    "Default value": "default",
+    "Required": "No",
+    "Since version": "1.0.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.clientId",
+    "Description": "OAuth client ID for Web UI authentication.",
+    "Default value": "(none)",
+    "Required": "Yes if provider is oidc",
+    "Since version": "1.0.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.authority",
+    "Description": "OAuth authority/issuer URL for OIDC providers for web UI authentication. (e.g., Azure AD tenant URL).",
+    "Default value": "(none)",
+    "Required": "Yes if provider is oidc",
+    "Since version": "1.0.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.scope",
+    "Description": "OAuth scopes for Web UI authentication (space-separated).",
+    "Default value": "(none)",
+    "Required": "Yes if provider is oidc",
+    "Since version": "1.0.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.jwksUri",
+    "Description": "JWKS URI for server-side OAuth token validation. Required when using JWKS-based validation.",
+    "Default value": "(none)",
+    "Required": "Yes if tokenValidatorClass is org.apache.gravitino.server.authentication.JwksTokenValidator",
+    "Since version": "1.0.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.principalFields",
+    "Description": "JWT claim field(s) to use as principal identity. Comma-separated list for fallback in order (e.g., \u0027preferred_username,email,sub\u0027).",
+    "Default value": "sub",
+    "Required": "No",
+    "Since version": "1.0.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.oauth.tokenValidatorClass",
+    "Description": "Fully qualified class name of the OAuth token validator implementation. Use org.apache.gravitino.server.authentication.JwksTokenValidator for JWKS-based validation or org.apache.gravitino.server.authentication.StaticSignKeyValidator for static key validation.",
+    "Default value": "org.apache.gravitino.server.authentication.StaticSignKeyValidator",
+    "Required": "No",
+    "Since version": "1.0.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.kerberos.principal",
+    "Description": "Indicates the Kerberos principal to be used for HTTP endpoint. Principal should start with HTTP/.",
+    "Default value": "(none)",
+    "Required": "Yes if use kerberos as the authenticator",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.authenticator.kerberos.keytab",
+    "Description": "Location of the keytab file with the credentials for the principal.",
+    "Default value": "(none)",
+    "Required": "Yes if use kerberos as the authenticator",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.enableCorsFilter",
+    "Description": "Enable cross-origin resource share filter.",
+    "Default value": "false",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.allowedOrigins",
+    "Description": "A comma separated list of allowed origins to access the resources. The default value is *, which means all origins.",
+    "Default value": "*",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.allowedTimingOrigins",
+    "Description": "A comma separated list of allowed origins to time the resource. The default value is the empty string, which means no origins.",
+    "Default value": "\u0027\u0027(empty string)",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.allowedMethods",
+    "Description": "A comma separated list of allowed HTTP methods used when accessing the resources. The default values are GET, POST, HEAD, and DELETE.",
+    "Default value": "GET,POST,HEAD,DELETE,PUT",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.allowedHeaders",
+    "Description": "A comma separated list of allowed HTTP headers specified when accessing the resources. The default value is X-Requested-With,Content-Type,Accept,Origin. If the value is a single *, it accepts all headers.",
+    "Default value": "X-Requested-With,Content-Type,Accept,Origin",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.preflightMaxAgeInSecs",
+    "Description": "The number of seconds to cache preflight requests by the client. The default value is 1800 seconds or 30 minutes.",
+    "Default value": "1800",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.allowCredentials",
+    "Description": "A boolean indicating if the resource allows requests with credentials. The default value is true.",
+    "Default value": "true",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.exposedHeaders",
+    "Description": "A comma separated list of allowed HTTP headers exposed on the client. The default value is the empty list.",
+    "Default value": "\u0027\u0027(empty string)",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.chainPreflight",
+    "Description": "If true chained preflight requests for normal handling (as an OPTION request). Otherwise, the filter responds to the preflight. The default is true.",
+    "Default value": "true",
+    "Required": "No",
+    "Since version": "0.4.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.enableHttps",
+    "Description": "Enables HTTPS.",
+    "Default value": "false",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.httpsPort",
+    "Description": "The HTTPS port number of the Jetty web server.",
+    "Default value": "8433",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.keyStorePath",
+    "Description": "Path to the key store file.",
+    "Default value": "(none)",
+    "Required": "Yes if use HTTPS",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.keyStorePassword",
+    "Description": "Password to the key store.",
+    "Default value": "(none)",
+    "Required": "Yes if use HTTPS",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.keyStoreType",
+    "Description": "The type to the key store.",
+    "Default value": "JKS",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.managerPassword",
+    "Description": "Manager password to the key store.",
+    "Default value": "(none)",
+    "Required": "Yes if use HTTPS",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.tlsProtocol",
+    "Description": "TLS protocol to use. The JVM must support the TLS protocol to use.",
+    "Default value": "(none)",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.enableCipherAlgorithms",
+    "Description": "The collection of enabled cipher algorithms.",
+    "Default value": "\u0027\u0027 (empty string)",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.enableClientAuth",
+    "Description": "Enables the authentication of the client.",
+    "Default value": "false",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.trustStorePath",
+    "Description": "Path to the trust store file.",
+    "Default value": "(none)",
+    "Required": "Yes if use HTTPS and the authentication of client",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.trustStorePassword",
+    "Description": "Password to the trust store.",
+    "Default value": "(none)",
+    "Required": "Yes if use HTTPS and the authentication of client",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.server.webserver.trustStoreType",
+    "Description": "The type to the trust store.",
+    "Default value": "JKS",
+    "Required": "No",
+    "Since version": "0.3.0"
+  },
+  {
+    "Configuration item": "gravitino.auxService.names",
+    "Description": "The auxiliary service name of the Gravitino Iceberg REST catalog service. Use iceberg-rest.",
+    "Default value": "(none)",
+    "Required": "Yes",
+    "Since Version": "0.2.0"
+  },
+  {
+    "Configuration item": "gravitino.iceberg-rest.classpath",
+    "Description": "The classpath of the Gravitino Iceberg REST catalog service; includes the directory containing jars and configuration. It supports both absolute and relative paths, for example, iceberg-rest-server/libs, iceberg-rest-server/conf",
+    "Default value": "(none)",
+    "Required": "Yes",
+    "Since Version": "0.2.0"
+  }
+]
