@@ -905,11 +905,6 @@
     "Default Value": "true"
   },
   {
-    "Name": "management.health.influxdb.enabled",
-    "Description": "Whether to enable InfluxDB health check.",
-    "Default Value": "true"
-  },
-  {
     "Name": "management.health.jms.enabled",
     "Description": "Whether to enable JMS health check.",
     "Default Value": "true"
@@ -2882,7 +2877,7 @@
   {
     "Name": "spring.flyway.ignore-migration-patterns",
     "Description": "List of patterns that identify migrations to ignore when performing validation.",
-    "Default Value": ""
+    "Default Value": "*:future"
   },
   {
     "Name": "spring.flyway.init-sqls",
@@ -4692,7 +4687,7 @@
   {
     "Name": "spring.artemis.embedded.server-id",
     "Description": "Server ID. By default, an auto-incremented counter is used.",
-    "Default Value": "0"
+    "Default Value": ""
   },
   {
     "Name": "spring.artemis.embedded.topics",
@@ -5537,7 +5532,7 @@
   {
     "Name": "spring.kafka.retry.topic.backoff.multiplier",
     "Description": "Multiplier to use for generating the next backoff delay.",
-    "Default Value": "0"
+    "Default Value": ""
   },
   {
     "Name": "spring.kafka.retry.topic.backoff.random",
@@ -7767,7 +7762,7 @@
   {
     "Name": "server.tomcat.resource.cache-ttl",
     "Description": "Time-to-live of the static resource cache.",
-    "Default Value": ""
+    "Default Value": "5s"
   },
   {
     "Name": "server.tomcat.threads.max",
@@ -8265,14 +8260,79 @@
     "Default Value": "any"
   },
   {
+    "Name": "spring.test.jsontesters.enabled",
+    "Description": "Whether auto-configuration of JSON testers is enabled.",
+    "Default Value": "true"
+  },
+  {
+    "Name": "spring.test.mockmvc.add-filters",
+    "Description": "Whether to add servlet filters.",
+    "Default Value": "true"
+  },
+  {
     "Name": "spring.test.mockmvc.print",
     "Description": "MVC Print option.",
     "Default Value": "default"
   },
   {
+    "Name": "spring.test.mockmvc.print-only-on-failure",
+    "Description": "Whether to only print failed exchanges.",
+    "Default Value": "true"
+  },
+  {
+    "Name": "spring.test.mockmvc.webclient.enabled",
+    "Description": "Whether HTMLUnit\u0027s WebClient should be auto-configured when it\u0027s on the classpath.",
+    "Default Value": "true"
+  },
+  {
+    "Name": "spring.test.mockmvc.webdriver.enabled",
+    "Description": "Whether Selenium\u0027s WebDriver should be auto-configured when it\u0027s on the classpath.",
+    "Default Value": "true"
+  },
+  {
     "Name": "spring.test.observability.auto-configure",
     "Description": "Whether observability should be auto-configured in tests.",
     "Default Value": "false"
+  },
+  {
+    "Name": "spring.test.restdocs.uri-host",
+    "Description": "The URI host to use.",
+    "Default Value": ""
+  },
+  {
+    "Name": "spring.test.restdocs.uri-port",
+    "Description": "The URI port to use.",
+    "Default Value": ""
+  },
+  {
+    "Name": "spring.test.restdocs.uri-scheme",
+    "Description": "The URI scheme for to use (for example http).",
+    "Default Value": ""
+  },
+  {
+    "Name": "spring.test.webclient.mockrestserviceserver.enabled",
+    "Description": "Whether a MockRestServiceServer should be auto-configured.",
+    "Default Value": "true"
+  },
+  {
+    "Name": "spring.test.webclient.register-rest-template",
+    "Description": "Whether a RestTemplate bean should be registered.",
+    "Default Value": "false"
+  },
+  {
+    "Name": "spring.test.webservice.client.mockserver.enabled",
+    "Description": "Whether a MockWebServiceServer should be auto-configured.",
+    "Default Value": "true"
+  },
+  {
+    "Name": "spring.test.webservice.client.register-web-service-template",
+    "Description": "Whether a WebServiceTemplate bean should be registered.",
+    "Default Value": "false"
+  },
+  {
+    "Name": "spring.test.webtestclient.timeout",
+    "Description": "Maximum amount of time to wait for responses.",
+    "Default Value": "5s"
   },
   {
     "Name": "spring.jta.enabled",
