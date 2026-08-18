@@ -45,7 +45,7 @@ public class FlussConfig extends CommonOptions implements Callable<Integer> {
                 } else {
                     url = String.format(url, flussVersion);
                 }
-                Connection connection = Jsoup.connect(url);
+                Connection connection = applyProxy(Jsoup.connect(url));
                 Document doc = connection.timeout(10 * 1000).get();
                 Elements tables = doc.select("table");
 

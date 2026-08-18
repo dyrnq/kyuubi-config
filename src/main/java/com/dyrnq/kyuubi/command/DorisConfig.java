@@ -51,7 +51,7 @@ public class DorisConfig extends CommonOptions implements Callable<Integer> {
             try {
 
                 url = String.format(url, dorisVersion, type);
-                Connection connection = Jsoup.connect(url);
+                Connection connection = applyProxy(Jsoup.connect(url));
                 Document doc = connection.timeout(2 * 60 * 1000).get();
 
                 Elements title = doc.select("h4");

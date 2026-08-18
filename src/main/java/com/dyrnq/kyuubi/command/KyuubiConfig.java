@@ -33,7 +33,7 @@ public class KyuubiConfig extends CommonOptions implements Callable<Integer> {
         String url = String.format("https://kyuubi.readthedocs.io/en/%s/configuration/settings.html", kyuubiVersion);
         List<KyuubiConfigSection> result = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect(url).get();
+            Document doc = applyProxy(Jsoup.connect(url)).get();
             Element section = doc.selectFirst("section#kyuubi-configurations");
             if (section != null) {
                 Elements subSections = section.children().select("section");

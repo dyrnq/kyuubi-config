@@ -39,7 +39,7 @@ public class AmoroConfig extends CommonOptions implements Callable<Integer> {
 
                 }
         ) {
-            Connection connection = Jsoup.connect(String.format(url, amoroVersion));
+            Connection connection = applyProxy(Jsoup.connect(String.format(url, amoroVersion)));
             Document doc = connection.timeout(10 * 1000).get();
             Elements tables = doc.select("table");
 

@@ -50,7 +50,7 @@ public class SparkConfig extends CommonOptions implements Callable<Integer> {
                 if (!Strings.CI.equals("latest", sparkVersion)) {
                     url = Strings.CS.replace(url, "spark.apache.org", "archive.apache.org/dist/spark");
                 }
-                Connection connection = Jsoup.connect(String.format(url, sparkVersion));
+                Connection connection = applyProxy(Jsoup.connect(String.format(url, sparkVersion)));
                 Document doc = connection.timeout(10 * 1000).get();
                 Elements tables = doc.select("table");
 

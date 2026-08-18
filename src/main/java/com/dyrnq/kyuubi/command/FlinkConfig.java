@@ -45,7 +45,7 @@ public class FlinkConfig extends CommonOptions implements Callable<Integer> {
                 if (!Strings.CI.equals("master", flinkVersion)) {
                     url = Strings.CS.replace(url, "flink-docs-", "flink-docs-release-");
                 }
-                Connection connection = Jsoup.connect(String.format(url, flinkVersion));
+                Connection connection = applyProxy(Jsoup.connect(String.format(url, flinkVersion)));
                 Document doc = connection.timeout(10 * 1000).get();
                 Elements tables = doc.select("table");
 

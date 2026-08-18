@@ -51,7 +51,7 @@ public class GravitinoConfig extends CommonOptions implements Callable<Integer> 
                 } else {
                     url = String.format(url, gravitinoVersion);
                 }
-                Connection connection = Jsoup.connect(url).followRedirects(true);
+                Connection connection = applyProxy(Jsoup.connect(url)).followRedirects(true);
                 Document doc = connection.timeout(10 * 1000).get();
                 Elements tables = doc.select("table");
 

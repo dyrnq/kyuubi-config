@@ -48,7 +48,7 @@ public class SpringBootConfig extends CommonOptions implements Callable<Integer>
                 }
                 log.info("url={}", url);
 
-                Connection connection = Jsoup.connect(url);
+                Connection connection = applyProxy(Jsoup.connect(url));
                 Document doc = connection.timeout(2 * 60 * 1000).get();
 
 

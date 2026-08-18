@@ -48,7 +48,7 @@ public class DebeziumConfig extends CommonOptions implements Callable<Integer> {
         ) {
             try {
 
-                Connection connection = Jsoup.connect(String.format(url, debeziumVersion));
+                Connection connection = applyProxy(Jsoup.connect(String.format(url, debeziumVersion)));
                 Document doc = connection.timeout(60 * 1000).get();
                 Elements tables = doc.select("div.dlist");
 

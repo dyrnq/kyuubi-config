@@ -43,7 +43,7 @@ public class BookKeeperConfig extends CommonOptions implements Callable<Integer>
             try {
 
 
-                Connection connection = Jsoup.connect(String.format(url, bookKeeperVersion));
+                Connection connection = applyProxy(Jsoup.connect(String.format(url, bookKeeperVersion)));
                 Document doc = connection.timeout(2 * 60 * 1000).get();
 
                 Elements title = doc.select("h2");

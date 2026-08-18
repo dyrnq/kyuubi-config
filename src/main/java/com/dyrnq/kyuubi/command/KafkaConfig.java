@@ -51,7 +51,7 @@ public class KafkaConfig extends CommonOptions implements Callable<Integer> {
                 url = url + "#configuration";
 
 
-                Connection connection = Jsoup.connect(String.format(url, kafkaVersion));
+                Connection connection = applyProxy(Jsoup.connect(String.format(url, kafkaVersion)));
                 Document doc = connection.timeout(2 * 60 * 1000).get();
                 Element script = doc.selectFirst("script#configuration-template");
                 String scriptHtml = RegExUtils.replaceAll(script.html(), "\n|\r", "");
