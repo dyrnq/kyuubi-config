@@ -56,7 +56,7 @@
   },
   {
     "Key": "connection.provider",
-    "Default value": "org.hibernate.c3p0.internal.C3P0ConnectionProvider",
+    "Default value": "org.hibernate.agroal.internal.AgroalConnectionProvider",
     "Description": "The connection provider implementation to use."
   },
   {
@@ -83,11 +83,6 @@
     "Key": "connection.pool.max_size",
     "Default value": "32",
     "Description": "Specifies the maximum number of concurrent connections that the pool maintains."
-  },
-  {
-    "Key": "connection.pool.acquire_increment",
-    "Default value": "32",
-    "Description": "Specifies the number of connections that the connector attempts to acquire if the connection pool exceeds its maximum size."
   },
   {
     "Key": "connection.pool.timeout",
@@ -148,6 +143,11 @@
     "Key": "dialect.postgres.postgis.schema",
     "Default value": "public",
     "Description": "Specifies the schema name where the PostgreSQL PostGIS extension is installed. The default is public; however, if the PostGIS extension was installed in another schema, this property should be used to specify the alternate schema name."
+  },
+  {
+    "Key": "dialect.postgres.unnest.insert.enabled",
+    "Default value": "false",
+    "Description": "Specifies whether to enable UNNEST-based batch inserts for PostgreSQL. When enabled, uses PostgreSQL UNNEST() for batch inserts, which can significantly improve performance by reducing the number of SQL statements executed. This optimization is compatible with INSERT and UPSERT modes. For information about the performance benefits of enabling the UNNEST function, see \"Boosting Postgres Insert Performance\" in the Tiger Data blog."
   },
   {
     "Key": "dialect.sqlserver.identity.insert",

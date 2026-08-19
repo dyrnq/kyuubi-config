@@ -377,7 +377,7 @@
   {
     "Key": "signal.data.collection",
     "Default value": "No default",
-    "Description": "Fully-qualified name of the data collection that is used to send signals to the connector. Use the following format to specify the collection name: \u003cdatabaseName\u003e.\u003ctableName\u003e"
+    "Description": "Fully-qualified name of the data collection that is used to send signals to the connector. Use the following format to specify the collection name: \u003cdatabaseName\u003e.\u003ctableName\u003e Collection names are case-sensitive."
   },
   {
     "Key": "signal.enabled.channels",
@@ -548,6 +548,18 @@
     "Key": "use.nongraceful.disconnect",
     "Default value": "false",
     "Description": "A Boolean value that specifies whether the binary log client’s keepalive thread sets the SO_LINGER socket option to 0 to immediately close stale TCP connections. Set the value to true if the connector experiences deadlocks in SSLSocketImpl.close. For more information, see Issue 133 in the mysql-binlog-connector-java GitHub repository."
+  },
+  {
+    "Key": "guardrail.collections.max",
+    "Default value": "0",
+    "Description": "Specifies the maximum number of tables that the connector can capture. Exceeding this limit triggers the action specified by guardrail.collections.limit.action. Set this property to 0 to prevent the connector from triggering guardrail actions."
+  },
+  {
+    "Key": "guardrail.collections.limit.action",
+    "Default value": "warn",
+    "Description": "Specifies the action to trigger if the number of tables that the connector captures exceeds the number that you specify in the guardrail.collections.max property. Set the property to one of the following values: fail The connector fails and reports an exception. warn The connector logs a warning.",
+    "fail": "The connector fails and reports an exception.",
+    "warn": "The connector logs a warning."
   },
   {
     "Key": "schema.history.internal.kafka.topic",

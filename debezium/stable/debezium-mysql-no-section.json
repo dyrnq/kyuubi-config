@@ -138,6 +138,11 @@
     "Description": "A comma-separated list of regular expressions that match source domain IDs in the GTID set used that the connector uses to find the binlog position on the MySQL server. When this property is set, the connector uses only the GTID ranges that have source UUIDs that match one of the specified include patterns. To match the value of a GTID, Debezium applies the regular expression that you specify as an anchored regular expression. That is, the specified expression is matched against the GTID’s domain identifier. If you set this property, do not also set the gtid.source.excludes property."
   },
   {
+    "Key": "gtid.ignore.on.recovery",
+    "Default value": "false",
+    "Description": "Boolean value that specifies whether the connector ignores the GTID set in stored offsets during recovery. When set to true, the connector starts from the stored binlog file and position instead of attempting GTID-based positioning. After streaming resumes, the connector captures GTIDs normally and stores refreshed GTID state in subsequent offsets."
+  },
+  {
     "Key": "include.query",
     "Default value": "false",
     "Description": "Boolean value that specifies whether the change event that the connector emits includes the SQL query that generated the change. Setting this property to true might expose information about tables or fields that you explicitly excluded or masked via other settings. To enable this property, the database property binlog_annotate_row_events must be set to ON. Setting this property has no effect on events that the snapshot process generates. Snapshot events do not include the original SQL query. For more information about configuring the database to return the original SQL statement for each log event, see Enabling query log events."
@@ -201,10 +206,11 @@
   {
     "Key": "time.precision.mode",
     "Default value": "adaptive_time_microseconds",
-    "Description": "Specifies the type of precision that the connector uses to represent time, date, and timestamps values. Set one of the following options: adaptive_time_microseconds The connector captures the date, datetime and timestamp values exactly as in the database using either millisecond, microsecond, or nanosecond precision values based on the database column’s type, with the exception of TIME type fields, which are always captured as microseconds. adaptive (deprecated) The connector captures time and timestamp values exactly as in the database using either millisecond, microsecond, or nanosecond precision values based on the data type of the column. connect The connector always represents time and timestamp values using Kafka Connect’s built-in representations for Time, Date, and Timestamp, which use millisecond precision regardless of the database columns\u0027 precision.",
+    "Description": "Specifies the type of precision that the connector uses to represent time, date, and timestamps values. Set one of the following options: adaptive_time_microseconds The connector captures the date, datetime and timestamp values exactly as in the database using either millisecond, microsecond, or nanosecond precision values based on the database column’s type, with the exception of TIME type fields, which are always captured as microseconds. adaptive (deprecated) The connector captures time and timestamp values exactly as in the database using either millisecond, microsecond, or nanosecond precision values based on the data type of the column. connect The connector always represents time and timestamp values using Kafka Connect’s built-in representations for Time, Date, and Timestamp, which use millisecond precision regardless of the database columns\u0027 precision. isostring The connector represents time, date, and datetime values as ISO-8601 formatted strings at the UTC time zone, using the io.debezium.time.IsoDate, io.debezium.time.IsoTime, and io.debezium.time.IsoTimestamp semantic types.",
     "adaptive_time_microseconds": "The connector captures the date, datetime and timestamp values exactly as in the database using either millisecond, microsecond, or nanosecond precision values based on the database column’s type, with the exception of TIME type fields, which are always captured as microseconds.",
     "adaptive": "(deprecated) The connector captures time and timestamp values exactly as in the database using either millisecond, microsecond, or nanosecond precision values based on the data type of the column.",
-    "connect": "The connector always represents time and timestamp values using Kafka Connect’s built-in representations for Time, Date, and Timestamp, which use millisecond precision regardless of the database columns\u0027 precision."
+    "connect": "The connector always represents time and timestamp values using Kafka Connect’s built-in representations for Time, Date, and Timestamp, which use millisecond precision regardless of the database columns\u0027 precision.",
+    "isostring": "The connector represents time, date, and datetime values as ISO-8601 formatted strings at the UTC time zone, using the io.debezium.time.IsoDate, io.debezium.time.IsoTime, and io.debezium.time.IsoTimestamp semantic types."
   },
   {
     "Key": "tombstones.on.delete",
@@ -224,6 +230,16 @@
     "Description": "The size of a look-ahead buffer used by the binlog reader. The default setting of 0 disables buffering. Under specific conditions, it is possible that the MySQL binlog contains uncommitted data finished by a ROLLBACK statement. Typical examples are using savepoints or mixing temporary and regular table changes in a single transaction. When a beginning of a transaction is detected then Debezium tries to roll forward the binlog position and find either COMMIT or ROLLBACK so it can determine whether to stream the changes from the transaction. The size of the binlog buffer defines the maximum number of changes in the transaction that Debezium can buffer while searching for transaction boundaries. If the size of the transaction is larger than the buffer then Debezium must rewind and re-read the events that have not fit into the buffer while streaming. This feature is incubating. Feedback is encouraged. It is expected that this feature is not completely polished."
   },
   {
+    "Key": "binlog.net.read.timeout",
+    "Default value": "0",
+    "Description": "The number of seconds to wait for a read from the binlog connection to complete before the server times out. A value of 0 means that the connector uses the MySQL server default. In high-latency network environments, the default server value for net_read_timeout might be too low, causing the server to close the binlog streaming connection prematurely with an EOFException. Increase this value to prevent unexpected disconnects during binlog streaming. This value is set at the session level on the binlog streaming connection using SET net_read_timeout\u003d\u003cvalue\u003e. It does not affect the global server setting."
+  },
+  {
+    "Key": "binlog.net.write.timeout",
+    "Default value": "0",
+    "Description": "The number of seconds to wait for a write to the binlog connection to complete before the server times out. A value of 0 means that the connector uses the MySQL server default. When the server transfers large data volumes through the binlog, the default server value for net_write_timeout might be too low, causing the server to close the connection with an EOFException. Increase this value to prevent unexpected disconnects during streaming of large transactions. This value is set at the session level on the binlog streaming connection using SET net_write_timeout\u003d\u003cvalue\u003e. It does not affect the global server setting."
+  },
+  {
     "Key": "connect.keep.alive",
     "Default value": "true",
     "Description": "A Boolean value that specifies whether a separate thread should be used to ensure that the connection to the MySQL server or cluster is kept alive."
@@ -237,6 +253,11 @@
     "Key": "custom.metric.tags",
     "Default value": "No default",
     "Description": "Defines tags that customize MBean object names by adding metadata that provides contextual information. Specify a comma-separated list of key-value pairs. Each key represents a tag for the MBean object name, and the corresponding value represents a value for the key, for example, k1\u003dv1,k2\u003dv2. The connector appends the specified tags to the base MBean object name. Tags can help you to organize and categorize metrics data. You can define tags to identify particular application instances, environments, regions, versions, and so forth. For more information, see Customized MBean names."
+  },
+  {
+    "Key": "custom.sanitize.pattern",
+    "Default value": ".*secret$|.*password$|.*sasl\\.jaas\\.config$|.*basic\\.auth\\.user\\.info|.*registry\\.auth\\.client-secret",
+    "Description": "An optional regular expression that specifies a custom pattern for masking sensitive configuration keys. By default, Debezium masks the value of configuration keys that match a predefined pattern for commonly known sensitive properties such as passwords and authentication tokens. To customize the way that the connector masks configuration key values, set this property to a regular expression that matches specific configuration key values that you want to mask. For example, to mask keys the contain the strings api.key or token, set this property to the following value: \"custom.sanitize.pattern\": \".api\\\\.key.\\\\|.token.\" If you set this property for the connector, Debezium masks any matching instances of configuration key values that it returns for display, logging, or in response to API calls. A string of asterisks replaces the original values, for example, ********."
   },
   {
     "Key": "database.initial.statements",
@@ -277,6 +298,13 @@
     "Key": "database.ssl.truststore.password",
     "Default value": "No default",
     "Description": "The password for the trust store file. Used to check the integrity of the truststore, and unlock the truststore."
+  },
+  {
+    "Key": "ddl.parser.type",
+    "Default value": "default",
+    "Description": "Specifies which ANTLR grammar to use for parsing MySQL DDL statements. Set one of the following options: default (Default) Uses the Oracle MySQL grammar, which is actively maintained and supports MySQL 8.0+ features. This grammar is based on the official MySQL grammar specification and is recommended for production use. legacy Uses the Positive Technologies (PT) MySQL grammar. This option is provided for backward compatibility with existing deployments. The PT grammar may not support all MySQL 8.0+ features. In most cases, you should use the default grammar. Use the legacy grammar only if you encounter compatibility issues with existing DDL statements during migration.",
+    "default": "(Default) Uses the Oracle MySQL grammar, which is actively maintained and supports MySQL 8.0+ features. This grammar is based on the official MySQL grammar specification and is recommended for production use.",
+    "legacy": "Uses the Positive Technologies (PT) MySQL grammar. This option is provided for backward compatibility with existing deployments. The PT grammar may not support all MySQL 8.0+ features. In most cases, you should use the default grammar. Use the legacy grammar only if you encounter compatibility issues with existing DDL statements during migration."
   },
   {
     "Key": "enable.time.adjuster",
@@ -377,7 +405,7 @@
   {
     "Key": "signal.data.collection",
     "Default value": "No default",
-    "Description": "Fully-qualified name of the data collection that is used to send signals to the connector. Use the following format to specify the collection name: \u003cdatabaseName\u003e.\u003ctableName\u003e"
+    "Description": "Fully-qualified name of the data collection that is used to send signals to the connector. Use the following format to specify the collection name: \u003cdatabaseName\u003e.\u003ctableName\u003e Collection names are case-sensitive."
   },
   {
     "Key": "signal.enabled.channels",
@@ -407,7 +435,7 @@
   {
     "Key": "snapshot.include.collection.list",
     "Default value": "All tables specified in the table.include.list.",
-    "Description": "An optional, comma-separated list of regular expressions that match the fully-qualified names (\u003cdatabaseName\u003e.\u003ctableName\u003e) of the tables to include in a snapshot. The specified items must be named in the connector’s table.include.list property. This property takes effect only if the connector’s snapshot.mode property is set to a value other than never. This property does not affect the behavior of incremental snapshots. To match the name of a table, Debezium applies the regular expression that you specify as an anchored regular expression. That is, the specified expression is matched against the entire name string of the table; it does not match substrings that might be present in a table name."
+    "Description": "An optional, comma-separated list of regular expressions that match the fully-qualified names (\u003cdatabaseName\u003e.\u003ctableName\u003e) of the tables to include in a snapshot. The specified items must be named in the connector’s table.include.list property. This property takes effect only if the connector’s snapshot.mode property is set to a value other than no_data. This property does not affect the behavior of incremental snapshots. To match the name of a table, Debezium applies the regular expression that you specify as an anchored regular expression. That is, the specified expression is matched against the entire name string of the table; it does not match substrings that might be present in a table name."
   },
   {
     "Key": "snapshot.lock.timeout.ms",
@@ -434,9 +462,14 @@
     "Description": "Specifies the number of threads that the connector uses when performing an initial snapshot. To enable parallel initial snapshots, set the property to a value greater than 1. In a parallel initial snapshot, the connector processes multiple tables concurrently. Parallel initial snapshots is an incubating feature."
   },
   {
+    "Key": "legacy.snapshot.max.threads",
+    "Default value": "false",
+    "Description": "Specifies whether the parallel initial snapshot uses the legacy table-per-thread algorithm. When set to false (the default), the connector will chunk the contents of the source table across all parallel initial snapshot threads for maximum performance. When set to true, the connector will process each table per thread. Parallel initial snapshots is an incubating feature."
+  },
+  {
     "Key": "snapshot.mode",
     "Default value": "initial",
-    "Description": "Specifies the criteria for running a snapshot when the connector starts. The following settings are available: always The connector performs a snapshot every time that it starts. The snapshot includes the structure and data of the captured tables. Specify this value to populate topics with a complete representation of the data from the captured tables every time that the connector starts. initial The connector runs a snapshot only when no offsets have been recorded for the logical server name, or if it detects that an earlier snapshot failed to complete. After the snapshot completes, the connector begins to stream event records for subsequent database changes. initial_only The connector runs a snapshot only when no offsets have been recorded for the logical server name. After the snapshot completes, the connector stops. It does not transition to streaming to read change events from the binlog. schema_only Deprecated, see no_data. no_data The connector runs a snapshot that captures only the schema, but not any table data. Set this option if you do not need the topics to contain a consistent snapshot of the data, but you want to capture any schema changes that were applied after the last connector restart. schema_only_recovery Deprecated, see recovery. recovery Set this option to restore a database schema history topic that is lost or corrupted. After a restart, the connector runs a snapshot that rebuilds the topic from the source tables. You can also set the property to periodically prune a database schema history topic that experiences unexpected growth. Do not use this mode to perform a snapshot if schema changes were committed to the database after the last connector shutdown. never When the connector starts, rather than performing a snapshot, it immediately begins to stream event records for subsequent database changes. This option is under consideration for future deprecation, in favor of the no_data option. when_needed After the connector starts, it performs a snapshot only if it detects one of the following circumstances: It cannot detect any topic offsets. A previously recorded offset specifies a binlog position or GTID that is not available on the server. configuration_based With this option, you control snapshot behavior through a set of connector properties that have the prefix \u0027snapshot.mode.configuration.based\u0027. custom The connector performs a snapshot according to the implementation specified by the snapshot.mode.custom.name property, which defines a custom implementation of the io.debezium.spi.snapshot.Snapshotter interface.",
+    "Description": "Specifies the criteria for running a snapshot when the connector starts. The following settings are available: always The connector performs a snapshot every time that it starts. The snapshot includes the structure and data of the captured tables. Specify this value to populate topics with a complete representation of the data from the captured tables every time that the connector starts. initial The connector runs a snapshot only when no offsets have been recorded for the logical server name, or if it detects that an earlier snapshot failed to complete. After the snapshot completes, the connector begins to stream event records for subsequent database changes. initial_only The connector runs a snapshot only when no offsets have been recorded for the logical server name. After the snapshot completes, the connector stops. It does not transition to streaming to read change events from the binlog. schema_only Deprecated, see no_data. no_data The connector runs a snapshot that captures only the schema, but not any table data. Set this option if you do not need the topics to contain a consistent snapshot of the data, but you want to capture any schema changes that were applied after the last connector restart. schema_only_recovery Deprecated, see recovery. recovery Set this option to restore a database schema history topic that is lost or corrupted. After a restart, the connector runs a snapshot that rebuilds the topic from the source tables. You can also set the property to periodically prune a database schema history topic that experiences unexpected growth. Do not use this mode to perform a snapshot if schema changes were committed to the database after the last connector shutdown. when_needed After the connector starts, it performs a snapshot only if it detects one of the following circumstances: It cannot detect any topic offsets. A previously recorded offset specifies a binlog position or GTID that is not available on the server. configuration_based With this option, you control snapshot behavior through a set of connector properties that have the prefix \u0027snapshot.mode.configuration.based\u0027. custom The connector performs a snapshot according to the implementation specified by the snapshot.mode.custom.name property, which defines a custom implementation of the io.debezium.spi.snapshot.Snapshotter interface.",
     "always": "The connector performs a snapshot every time that it starts. The snapshot includes the structure and data of the captured tables. Specify this value to populate topics with a complete representation of the data from the captured tables every time that the connector starts.",
     "initial": "The connector runs a snapshot only when no offsets have been recorded for the logical server name, or if it detects that an earlier snapshot failed to complete. After the snapshot completes, the connector begins to stream event records for subsequent database changes.",
     "initial_only": "The connector runs a snapshot only when no offsets have been recorded for the logical server name. After the snapshot completes, the connector stops. It does not transition to streaming to read change events from the binlog.",
@@ -444,7 +477,6 @@
     "no_data": "The connector runs a snapshot that captures only the schema, but not any table data. Set this option if you do not need the topics to contain a consistent snapshot of the data, but you want to capture any schema changes that were applied after the last connector restart.",
     "schema_only_recovery": "Deprecated, see recovery.",
     "recovery": "Set this option to restore a database schema history topic that is lost or corrupted. After a restart, the connector runs a snapshot that rebuilds the topic from the source tables. You can also set the property to periodically prune a database schema history topic that experiences unexpected growth. Do not use this mode to perform a snapshot if schema changes were committed to the database after the last connector shutdown.",
-    "never": "When the connector starts, rather than performing a snapshot, it immediately begins to stream event records for subsequent database changes. This option is under consideration for future deprecation, in favor of the no_data option.",
     "when_needed": "After the connector starts, it performs a snapshot only if it detects one of the following circumstances: It cannot detect any topic offsets. A previously recorded offset specifies a binlog position or GTID that is not available on the server.",
     "configuration_based": "With this option, you control snapshot behavior through a set of connector properties that have the prefix \u0027snapshot.mode.configuration.based\u0027.",
     "custom": "The connector performs a snapshot according to the implementation specified by the snapshot.mode.custom.name property, which defines a custom implementation of the io.debezium.spi.snapshot.Snapshotter interface."
@@ -494,7 +526,10 @@
   {
     "Key": "snapshot.select.statement.overrides",
     "Default value": "No default",
-    "Description": "Specifies the table rows to include in a snapshot. Use the property if you want a snapshot to include only a subset of the rows in a table. This property affects snapshots only. It does not apply to events that the connector reads from the log. The property contains a comma-separated list of fully-qualified table names in the form \u003cdatabaseName\u003e.\u003ctableName\u003e. For example, \"snapshot.select.statement.overrides\": \"inventory.products,customers.orders\" For each table in the list, add a further configuration property that specifies the SELECT statement for the connector to run on the table when it takes a snapshot. The specified SELECT statement determines the subset of table rows to include in the snapshot. Use the following format to specify the name of this SELECT statement property: snapshot.select.statement.overrides.\u003cdatabaseName\u003e.\u003ctableName\u003e For example, snapshot.select.statement.overrides.customers.orders From a customers.orders table that includes the soft-delete column, delete_flag, add the following properties if you want a snapshot to include only those records that are not soft-deleted: \"snapshot.select.statement.overrides\": \"customer.orders\",\n\"snapshot.select.statement.overrides.customer.orders\": \"SELECT * FROM [customers].[orders] WHERE delete_flag \u003d 0 ORDER BY id DESC\" In the resulting snapshot, the connector includes only the records for which delete_flag \u003d 0."
+    "Description": "Specifies the tables for which the connector uses custom SELECT statements to determine which rows to include in a snapshot. This property affects snapshots only. It does not apply to events that the connector reads from the log during the streaming phase. This property consists of two parts that work together: Main property A comma-separated list of fully-qualified table names in the format \u003cdatabaseName\u003e.\u003ctableName\u003e. This list identifies the tables for which you want to specify custom snapshot queries. For example: \"snapshot.select.statement.overrides\": \"inventory.products,customers.orders\" If the fully qualified schema or table name contains special characters, such as spaces, square brackets ([ or ]), or period characters (.), enclose the string in double quotes to prevent the connector from interpreting the special characters as delimiters. Double quotes around table names are optional if the fully qualified table name does not include spaces or special characters. Secondary properties For each table listed in the main property, you must define a corresponding snapshot.select.statement.overrides.\u003cdatabaseName\u003e.\u003ctableName\u003e property that specifies the custom SELECT statement to run during the snapshot. The SELECT statement determines which rows from the table to include in the snapshot. For example, to specify the SELECT statement for the customers.orders table:, add the following property: snapshot.select.statement.overrides.customers.orders If a table is listed in the main property but its corresponding secondary property is missing, the connector logs a warning and uses the default snapshot behavior for that table. Example configuration The following example shows how to configure the snapshot.select.statement.overrides property to perform a snapshot of the customers.orders table that includes only records that are not soft-deleted; that is, the value of the soft-delete field, delete_flag, is set to 0.",
+    "Main property": "A comma-separated list of fully-qualified table names in the format \u003cdatabaseName\u003e.\u003ctableName\u003e. This list identifies the tables for which you want to specify custom snapshot queries. For example: \"snapshot.select.statement.overrides\": \"inventory.products,customers.orders\" If the fully qualified schema or table name contains special characters, such as spaces, square brackets ([ or ]), or period characters (.), enclose the string in double quotes to prevent the connector from interpreting the special characters as delimiters. Double quotes around table names are optional if the fully qualified table name does not include spaces or special characters.",
+    "Secondary properties": "For each table listed in the main property, you must define a corresponding snapshot.select.statement.overrides.\u003cdatabaseName\u003e.\u003ctableName\u003e property that specifies the custom SELECT statement to run during the snapshot. The SELECT statement determines which rows from the table to include in the snapshot. For example, to specify the SELECT statement for the customers.orders table:, add the following property: snapshot.select.statement.overrides.customers.orders If a table is listed in the main property but its corresponding secondary property is missing, the connector logs a warning and uses the default snapshot behavior for that table.",
+    "Example configuration": "The following example shows how to configure the snapshot.select.statement.overrides property to perform a snapshot of the customers.orders table that includes only records that are not soft-deleted; that is, the value of the soft-delete field, delete_flag, is set to 0."
   },
   {
     "Key": "snapshot.tables.order.by.row.count",
@@ -508,6 +543,11 @@
     "Key": "source.struct.version",
     "Default value": "v2",
     "Description": "Schema version for the source block in Debezium events. Debezium 0.10 introduced a few breaking changes to the structure of the source block in order to unify the exposed structure across all the connectors. By setting this option to v1, the structure used in earlier versions can be produced. However, this setting is not recommended and is planned for removal in a future Debezium version."
+  },
+  {
+    "Key": "statistics.metrics.enabled",
+    "Default value": "true",
+    "Description": "Specifies whether the connector collects advanced statistical metrics for streaming metrics, such as quantiles. When set to true, the connector collects the following statistics: Minimum value Maximum value Average value P50 (median) percentile P95 percentile P99 percentile"
   },
   {
     "Key": "streaming.delay.ms",
@@ -532,7 +572,12 @@
   {
     "Key": "topic.heartbeat.prefix",
     "Default value": "__debezium-heartbeat",
-    "Description": "Specifies the name of the topic to which the connector sends heartbeat messages. The topic name takes the following format: topic.heartbeat.prefix.topic.prefix For example, when you set the default value for this property, and the topic prefix is fulfillment, the topic name is __debezium-heartbeat.fulfillment."
+    "Description": "Specifies the name of the topic to which the connector sends heartbeat messages. The topic name takes the following format: topic.heartbeat.prefix.topic.prefix For example, when you set the default value for this property, and the topic prefix is fulfillment, the topic name is __debezium-heartbeat.fulfillment. This property is ignored if topic.heartbeat.name is set."
+  },
+  {
+    "Key": "topic.heartbeat.name",
+    "Default value": "empty",
+    "Description": "Specifies an explicit, full name for the topic to which the connector sends heartbeat messages, overriding the prefix-based naming derived from topic.heartbeat.prefix and topic.prefix. When set, all heartbeat messages are routed to this exact topic name, regardless of the connector’s topic.prefix. This is useful when running multiple connectors and you want to consolidate heartbeat events into a single shared topic, avoiding the creation of a large number of single-partition heartbeat topics. For example, setting this to debezium-heartbeat routes all heartbeat messages to a topic named debezium-heartbeat. If this property is empty or unset, the connector falls back to the default behavior: topic.heartbeat.prefix.topic.prefix."
   },
   {
     "Key": "topic.naming.strategy",
@@ -548,6 +593,48 @@
     "Key": "use.nongraceful.disconnect",
     "Default value": "false",
     "Description": "A Boolean value that specifies whether the binary log client’s keepalive thread sets the SO_LINGER socket option to 0 to immediately close stale TCP connections. Set the value to true if the connector experiences deadlocks in SSLSocketImpl.close. For more information, see Issue 133 in the mysql-binlog-connector-java GitHub repository."
+  },
+  {
+    "Key": "guardrail.collections.max",
+    "Default value": "0",
+    "Description": "Specifies the maximum number of tables that the connector can capture. This limit applies not only to tables being captured for data changes but also to any tables whose schemas are tracked as part of schema history. Exceeding this limit triggers the action specified by guardrail.collections.limit.action. Set this property to 0 to prevent the connector from triggering guardrail actions."
+  },
+  {
+    "Key": "guardrail.collections.limit.action",
+    "Default value": "warn",
+    "Description": "Specifies the action to trigger if the number of tables that the connector captures exceeds the number that you specify in the guardrail.collections.max property. Set the property to one of the following values: fail The connector fails and reports an exception. warn The connector logs a warning.",
+    "fail": "The connector fails and reports an exception.",
+    "warn": "The connector logs a warning."
+  },
+  {
+    "Key": "target.types",
+    "Default value": "DATE,DATETIME,TIMESTAMP",
+    "Description": "Comma-separated subset of DATE, DATETIME, TIMESTAMP controlling which JDBC temporal types the converter applies to."
+  },
+  {
+    "Key": "fallback.date",
+    "Default value": "NULL",
+    "Description": "Value emitted for zero-date DATE rows. NULL (or unset) promotes the column schema to optional and emits null. Otherwise an ISO-8601 date literal (yyyy-MM-dd)."
+  },
+  {
+    "Key": "fallback.datetime",
+    "Default value": "NULL",
+    "Description": "Value emitted for zero-date DATETIME rows. NULL (or unset) promotes the column schema to optional and emits null. Otherwise a UTC datetime literal (yyyy-MM-dd HH:mm:ss)."
+  },
+  {
+    "Key": "fallback.timestamp",
+    "Default value": "NULL",
+    "Description": "Value emitted for zero-date TIMESTAMP rows. NULL (or unset) promotes the column schema to optional and emits null. Otherwise an ISO-8601 offset datetime literal (for example, 1970-01-01T00:00:00Z)."
+  },
+  {
+    "Key": "column.\u003cdb\u003e.\u003ctable\u003e.\u003ccolumn\u003e.fallback",
+    "Default value": "(unset)",
+    "Description": "Column-specific override of the type-level fallback. Same allowed values as the type-level options (NULL or a type-appropriate literal). The lookup key uses the fully-qualified column name reported by RelationalColumn#dataCollection()."
+  },
+  {
+    "Key": "selector",
+    "Default value": ".*",
+    "Description": "Comma-separated list of regular expressions matched against \u003cdb\u003e.\u003ctable\u003e.\u003ccolumn\u003e. Only matching columns are passed through the converter. The default wildcard applies the converter to every column whose JDBC type is included in target.types."
   },
   {
     "Key": "schema.history.internal.kafka.topic",
@@ -593,6 +680,11 @@
     "Key": "schema.history.internal.store.only.captured.databases.ddl",
     "Default value": "false",
     "Description": "A Boolean value that specifies whether the connector records schema structures from all logical databases in the database instance. Specify one of the following values: true The connector records schema structures only for tables in the logical database and schema from which Debezium captures change events. false The connector records schema structures for all logical databases."
+  },
+  {
+    "Key": "schema.history.internal.memory.optimization",
+    "Default value": "off",
+    "Description": "Controls how Debezium deduplicates identical schema objects (tables, columns, attributes) in memory using an interner. Specify one of the following values: off No deduplication is performed (the default). on Each connector uses its own isolated intern pool. Reduces heap usage within a single connector without interfering with other connectors. shared All connectors configured with shared share a single global intern pool. Maximises deduplication when many connectors track tables with similar structures."
   },
   {
     "Key": "signal.kafka.topic",
