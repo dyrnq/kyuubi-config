@@ -204,6 +204,13 @@
         "Since": "1.0.0"
       },
       {
+        "Key": "kyuubi.backend.server.event.async.enabled",
+        "Default": "false",
+        "Meaning": "Whether backend server event logging is asynchronous.",
+        "Type": "boolean",
+        "Since": "1.11.0"
+      },
+      {
         "Key": "kyuubi.backend.server.event.json.log.path",
         "Default": "file:///tmp/kyuubi/events",
         "Meaning": "The location of server events go for the built-in JSON logger",
@@ -481,109 +488,102 @@
     "name": "engine",
     "list": [
       {
-        "Key": "kyuubi.engine.chat.ernie.http.connect.timeout",
-        "Default": "PT2M",
-        "Meaning": "The timeout[ms] for establishing the connection with the ernie bot server. A timeout value of zero is interpreted as an infinite timeout.",
-        "Type": "duration",
-        "Since": "1.9.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.ernie.http.proxy",
-        "Default": "\u003cundefined\u003e",
-        "Meaning": "HTTP proxy url for API calling in ernie bot engine. e.g. http://127.0.0.1:1088",
-        "Type": "string",
-        "Since": "1.9.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.ernie.http.socket.timeout",
-        "Default": "PT2M",
-        "Meaning": "The timeout[ms] for waiting for data packets after ernie bot server connection is established. A timeout value of zero is interpreted as an infinite timeout.",
-        "Type": "duration",
-        "Since": "1.9.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.ernie.model",
-        "Default": "completions",
-        "Meaning": "ID of the model used in ernie bot. Available models are completions_pro, ernie_bot_8k, completions and eb-instantModel overview.",
-        "Type": "string",
-        "Since": "1.9.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.ernie.token",
-        "Default": "\u003cundefined\u003e",
-        "Meaning": "The token to access ernie bot open API, which could be got at https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Ilkkrb0i5",
-        "Type": "string",
-        "Since": "1.9.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.extra.classpath",
-        "Default": "\u003cundefined\u003e",
-        "Meaning": "The extra classpath for the Chat engine, for configuring the location of the SDK and etc.",
-        "Type": "string",
-        "Since": "1.8.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.gpt.apiKey",
-        "Default": "\u003cundefined\u003e",
-        "Meaning": "The key to access OpenAI open API, which could be got at https://platform.openai.com/account/api-keys",
-        "Type": "string",
-        "Since": "1.8.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.gpt.http.connect.timeout",
-        "Default": "PT2M",
-        "Meaning": "The timeout[ms] for establishing the connection with the Chat GPT server. A timeout value of zero is interpreted as an infinite timeout.",
-        "Type": "duration",
-        "Since": "1.8.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.gpt.http.proxy",
-        "Default": "\u003cundefined\u003e",
-        "Meaning": "HTTP proxy url for API calling in Chat GPT engine. e.g. http://127.0.0.1:1087",
-        "Type": "string",
-        "Since": "1.8.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.gpt.http.socket.timeout",
-        "Default": "PT2M",
-        "Meaning": "The timeout[ms] for waiting for data packets after Chat GPT server connection is established. A timeout value of zero is interpreted as an infinite timeout.",
-        "Type": "duration",
-        "Since": "1.8.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.gpt.model",
-        "Default": "gpt-3.5-turbo",
-        "Meaning": "ID of the model used in ChatGPT. Available models refer to OpenAI\u0027s Model overview.",
-        "Type": "string",
-        "Since": "1.8.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.java.options",
-        "Default": "\u003cundefined\u003e",
-        "Meaning": "The extra Java options for the Chat engine",
-        "Type": "string",
-        "Since": "1.8.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.memory",
-        "Default": "1g",
-        "Meaning": "The heap memory for the Chat engine",
-        "Type": "string",
-        "Since": "1.8.0"
-      },
-      {
-        "Key": "kyuubi.engine.chat.provider",
-        "Default": "ECHO",
-        "Meaning": "The provider for the Chat engine. Candidates: ECHO: simply replies a welcome message. GPT: a.k.a ChatGPT, powered by OpenAI. ERNIE: ErnieBot, powered by Baidu.",
-        "Type": "string",
-        "Since": "1.8.0"
-      },
-      {
         "Key": "kyuubi.engine.connection.url.use.hostname",
         "Default": "true",
         "Meaning": "(deprecated) When true, the engine registers with hostname to zookeeper. When Spark runs on K8s with cluster mode, set to false to ensure that server can connect to engine",
         "Type": "boolean",
         "Since": "1.3.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.approval.mode",
+        "Default": "NORMAL",
+        "Meaning": "Default approval mode for tool execution in the Data Agent engine. Candidates: AUTO_APPROVE: all tools are auto-approved without user interaction. NORMAL: only destructive tools require explicit approval. STRICT: all tools require explicit user approval.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.compaction.trigger.tokens",
+        "Default": "128000",
+        "Meaning": "The prompt-token threshold above which the Data Agent\u0027s compaction middleware summarizes older conversation history into a compact message. The check is made each turn as real_prompt_tokens_of_previous_LLM_call + estimate_of_newly_appended_tail; when this predicted prompt size reaches the configured value, older messages are replaced by a single summary message while the most recent exchanges are kept verbatim. Set to a very large value (e.g., 9223372036854775807) to effectively disable compaction.",
+        "Type": "long",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.extra.classpath",
+        "Default": "\u003cundefined\u003e",
+        "Meaning": "The extra classpath for the Data Agent engine, for configuring the location of the LLM SDK and etc.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.java.options",
+        "Default": "\u003cundefined\u003e",
+        "Meaning": "The extra Java options for the Data Agent engine",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.jdbc.url",
+        "Default": "\u003cundefined\u003e",
+        "Meaning": "The JDBC URL for the Data Agent engine to connect to the target database. If not set, the Data Agent connects back to this Kyuubi server (via ZooKeeper service discovery for ZK-HA, otherwise the advertised thrift host and port). Kerberos authentication is not supported yet.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.max.iterations",
+        "Default": "100",
+        "Meaning": "The maximum number of ReAct loop iterations for the Data Agent engine.",
+        "Type": "int",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.memory",
+        "Default": "1g",
+        "Meaning": "The heap memory for the Data Agent engine",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.model",
+        "Default": "\u003cundefined\u003e",
+        "Meaning": "The model ID used by the Data Agent engine.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.openai.api.key",
+        "Default": "\u003cundefined\u003e",
+        "Meaning": "The API key for the OpenAI-compatible chat-completion endpoint used by the Data Agent engine.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.openai.endpoint",
+        "Default": "\u003cundefined\u003e",
+        "Meaning": "The base URL of the OpenAI-compatible chat-completion endpoint used by the Data Agent engine.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.provider",
+        "Default": "ECHO",
+        "Meaning": "The provider for the Data Agent engine. Candidates: ECHO: simply echoes the input, for testing purpose. OPENAI_COMPATIBLE: OpenAI-compatible LLM provider.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.query.timeout",
+        "Default": "PT3M",
+        "Meaning": "The JDBC query execution timeout for the Data Agent SQL tools. Passed to Statement.setQueryTimeout so the server (Spark/Trino/...) can cooperatively cancel long-running queries and release cluster resources. Should be set lower than kyuubi.engine.data.agent.tool.call.timeout so server-side cancellation has time to react before the outer wall-clock cap fires.",
+        "Type": "duration",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.engine.data.agent.tool.call.timeout",
+        "Default": "PT5M",
+        "Meaning": "The maximum wall-clock execution time for any tool call in the Data Agent engine. Acts as the outer safety net enforced by the agent runtime via Future.cancel(), applied uniformly to every tool. For SQL tools the inner JDBC-level timeout is controlled separately by kyuubi.engine.data.agent.query.timeout, which should be set lower so server-side cancellation has time to react before this hard cap fires.",
+        "Type": "duration",
+        "Since": "1.12.0"
       },
       {
         "Key": "kyuubi.engine.deregister.exception.classes",
@@ -1085,7 +1085,7 @@
       {
         "Key": "kyuubi.engine.type",
         "Default": "SPARK_SQL",
-        "Meaning": "Specify the detailed engine supported by Kyuubi. The engine type bindings to SESSION scope. This configuration is experimental. Currently, available configs are: SPARK_SQL: specify this engine type will launch a Spark engine which can provide all the capacity of the Apache Spark. Note, it\u0027s a default engine type. FLINK_SQL: specify this engine type will launch a Flink engine which can provide all the capacity of the Apache Flink. TRINO: specify this engine type will launch a Trino engine which can provide all the capacity of the Trino. HIVE_SQL: specify this engine type will launch a Hive engine which can provide all the capacity of the Hive Server2. JDBC: specify this engine type will launch a JDBC engine which can forward queries to the database system through the certain JDBC driver, for now, it supports Doris, MySQL, Phoenix, PostgreSQL, StarRocks, Impala and ClickHouse. CHAT: specify this engine type will launch a Chat engine.",
+        "Meaning": "Specify the detailed engine supported by Kyuubi. The engine type bindings to SESSION scope. This configuration is experimental. Currently, available configs are: SPARK_SQL: specify this engine type will launch a Spark engine which can provide all the capacity of the Apache Spark. Note, it\u0027s a default engine type. FLINK_SQL: specify this engine type will launch a Flink engine which can provide all the capacity of the Apache Flink. TRINO: specify this engine type will launch a Trino engine which can provide all the capacity of the Trino. HIVE_SQL: specify this engine type will launch a Hive engine which can provide all the capacity of the Hive Server2. JDBC: specify this engine type will launch a JDBC engine which can forward queries to the database system through the certain JDBC driver, for now, it supports Doris, MySQL, Phoenix, PostgreSQL, StarRocks, Impala and ClickHouse.",
         "Type": "string",
         "Since": "1.4.0"
       },
@@ -1219,6 +1219,13 @@
         "Meaning": "Size of the wait queue for the async event handler thread pool",
         "Type": "int",
         "Since": "1.7.0"
+      },
+      {
+        "Key": "kyuubi.event.json.log.managePermissions.enabled",
+        "Default": "true",
+        "Meaning": "Whether the built-in JSON event logger manages the permissions of event log directories and files. When enabled, Kyuubi sets event log directories to 770 and event log files to 660. When disabled, Kyuubi only creates and writes event log paths, leaving permissions to the underlying file system defaults, inherited ACLs, or external authorization systems.",
+        "Type": "boolean",
+        "Since": "1.12.0"
       }
     ]
   },
@@ -1254,6 +1261,13 @@
         "Since": "1.5.0"
       },
       {
+        "Key": "kyuubi.frontend.data.agent.operation.timeout",
+        "Default": "PT2M",
+        "Meaning": "Timeout for waiting on data agent engine launch and operation start in the REST frontend.",
+        "Type": "duration",
+        "Since": "1.12.0"
+      },
+      {
         "Key": "kyuubi.frontend.jetty.sendVersion.enabled",
         "Default": "true",
         "Meaning": "Whether to send Jetty version in HTTP response.",
@@ -1282,51 +1296,9 @@
         "Since": "1.0.0"
       },
       {
-        "Key": "kyuubi.frontend.mysql.bind.host",
-        "Default": "\u003cundefined\u003e",
-        "Meaning": "Hostname or IP of the machine on which to run the MySQL frontend service.",
-        "Type": "string",
-        "Since": "1.4.0"
-      },
-      {
-        "Key": "kyuubi.frontend.mysql.bind.port",
-        "Default": "3309",
-        "Meaning": "Port of the machine on which to run the MySQL frontend service.",
-        "Type": "int",
-        "Since": "1.4.0"
-      },
-      {
-        "Key": "kyuubi.frontend.mysql.max.worker.threads",
-        "Default": "999",
-        "Meaning": "Maximum number of threads in the command execution thread pool for the MySQL frontend service",
-        "Type": "int",
-        "Since": "1.4.0"
-      },
-      {
-        "Key": "kyuubi.frontend.mysql.min.worker.threads",
-        "Default": "9",
-        "Meaning": "Minimum number of threads in the command execution thread pool for the MySQL frontend service",
-        "Type": "int",
-        "Since": "1.4.0"
-      },
-      {
-        "Key": "kyuubi.frontend.mysql.netty.worker.threads",
-        "Default": "\u003cundefined\u003e",
-        "Meaning": "Number of thread in the netty worker event loop of MySQL frontend service. Use min(cpu_cores, 8) in default.",
-        "Type": "int",
-        "Since": "1.4.0"
-      },
-      {
-        "Key": "kyuubi.frontend.mysql.worker.keepalive.time",
-        "Default": "PT1M",
-        "Meaning": "Time(ms) that an idle async thread of the command execution thread pool will wait for a new task to arrive before terminating in MySQL frontend service",
-        "Type": "duration",
-        "Since": "1.4.0"
-      },
-      {
         "Key": "kyuubi.frontend.protocols",
         "Default": "THRIFT_BINARY,REST",
-        "Meaning": "A comma-separated list for all frontend protocols THRIFT_BINARY - HiveServer2 compatible thrift binary protocol. THRIFT_HTTP - HiveServer2 compatible thrift http protocol. REST - Kyuubi defined REST API(experimental). MYSQL - MySQL compatible text protocol(experimental). TRINO - Trino compatible http protocol(experimental).",
+        "Meaning": "A comma-separated list for all frontend protocols THRIFT_BINARY - HiveServer2 compatible thrift binary protocol. THRIFT_HTTP - HiveServer2 compatible thrift http protocol. REST - Kyuubi defined REST API(experimental). TRINO - Trino compatible http protocol(experimental).",
         "Type": "seq",
         "Since": "1.4.0"
       },
@@ -1352,11 +1324,32 @@
         "Since": "1.4.0"
       },
       {
+        "Key": "kyuubi.frontend.rest.engine.ui.proxy.enabled",
+        "Default": "false",
+        "Meaning": "Whether to route Engine UI traffic via Kyuubi REST frontend proxy. When disabled, the Web UI links directly to the Kyuubi engine URL.",
+        "Type": "boolean",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.frontend.rest.engine.ui.proxy.hosts",
+        "Default": "",
+        "Meaning": "A comma-separated list of hosts that Engine UI proxy requests can route to when kyuubi.frontend.rest.engine.ui.proxy.enabled is enabled. Host matching is case-insensitive and supports * as a wildcard, for example, *.example.com. If empty, all Engine UI proxy requests are denied.",
+        "Type": "seq",
+        "Since": "1.12.0"
+      },
+      {
         "Key": "kyuubi.frontend.rest.jetty.stopTimeout",
         "Default": "PT5S",
         "Meaning": "Stop timeout for Jetty server used by the RESTful frontend service.",
         "Type": "duration",
         "Since": "1.8.1"
+      },
+      {
+        "Key": "kyuubi.frontend.rest.legacy.v1.sessionsReturnAllUsers",
+        "Default": "false",
+        "Meaning": "When true, GET /api/v1/sessions returns all sessions on the server regardless of the calling user (legacy behavior). When false (default), only sessions owned by the authenticated user are returned. This flag is provided for backward compatibility and will be removed in a future release.",
+        "Type": "boolean",
+        "Since": "1.12.0"
       },
       {
         "Key": "kyuubi.frontend.rest.max.worker.threads",
@@ -1812,6 +1805,20 @@
         "Since": "1.0.0"
       },
       {
+        "Key": "kyuubi.ha.zookeeper.engine.auth.keytab",
+        "Default": "\u003cundefined\u003e",
+        "Meaning": "Location of the Kyuubi server\u0027s keytab that is used for the engine\u0027s ZooKeeper authentication. It fallback to kyuubi.ha.zookeeper.auth.keytab",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.ha.zookeeper.engine.auth.principal",
+        "Default": "\u003cundefined\u003e",
+        "Meaning": "Kerberos principal name that is used for the engine\u0027s ZooKeeper authentication. It fallback to kyuubi.ha.zookeeper.auth.principal",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
         "Key": "kyuubi.ha.zookeeper.engine.auth.type",
         "Default": "NONE",
         "Meaning": "The type of ZooKeeper authentication for the engine, all candidates are NONE KERBEROS DIGEST",
@@ -1852,6 +1859,67 @@
         "Meaning": "The timeout(ms) of a connected session to be idled",
         "Type": "int",
         "Since": "1.0.0"
+      }
+    ]
+  },
+  {
+    "name": "internal",
+    "list": [
+      {
+        "Key": "kyuubi.internal.security.crypto.cipher",
+        "Default": "AES/CBC/PKCS5PADDING",
+        "Meaning": "The cipher transformation to use for encrypting internal access token. Only take affects when kyuubi.internal.security.enabled is set to true.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.internal.security.crypto.ivLength",
+        "Default": "16",
+        "Meaning": "Initial vector length, in bytes. Only take affects when kyuubi.internal.security.enabled is set to true.",
+        "Type": "int",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.internal.security.crypto.keyAlgorithm",
+        "Default": "AES",
+        "Meaning": "The algorithm for generated secret keys. Only take affects when kyuubi.internal.security.enabled is set to true.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.internal.security.crypto.keyLength",
+        "Default": "128",
+        "Meaning": "The length in bits of the encryption key to generate. Only take affects when kyuubi.internal.security.enabled is set to true. Valid values are 128, 192 and 256",
+        "Type": "int",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.internal.security.enabled",
+        "Default": "false",
+        "Meaning": "Whether to enable secure access across all the internal communications, both between kyuubi server and kyuubi engine between kyuubi server instances You need to also provide configure kyuubi.internal.security.secret.provider to manage the encryption secret.",
+        "Type": "boolean",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.internal.security.secret.provider",
+        "Default": "zookeeper",
+        "Meaning": "The class used to manage the internal security secret. This class must be a subclass of EngineSecuritySecretProvider. Kyuubi provides the following built-in implementations: simple: Use the pre-shared secret set by kyuubi.internal.security.secret.provider.simple.secret. zookeeper: Use the secret stored in ZooKeeper. kyuubi.ha.zookeeper.engine.secure.secret.node must be configured. Only take affects when kyuubi.internal.security.enabled is set to true.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.internal.security.secret.provider.simple.secret",
+        "Default": "\u003cundefined\u003e",
+        "Meaning": "The secret key used for internal security access. Only take affects when kyuubi.internal.security.enabled is set to true and kyuubi.internal.security.secret.provider is \u0027simple\u0027",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
+        "Key": "kyuubi.internal.security.token.max.lifetime",
+        "Default": "PT10M",
+        "Meaning": "The max lifetime of the token used for internal secure access. Only take affects when kyuubi.internal.security.enabled is set to true.",
+        "Type": "duration",
+        "Since": "1.12.0"
       }
     ]
   },
@@ -1985,7 +2053,7 @@
       {
         "Key": "kyuubi.kubernetes.spark.appUrlPattern",
         "Default": "http://{{SPARK_DRIVER_SVC}}.{{KUBERNETES_NAMESPACE}}.svc:{{SPARK_UI_PORT}}",
-        "Meaning": "The pattern to generate the spark on kubernetes application UI URL. The pattern should contain placeholders for the application variables. Available placeholders are {{SPARK_APP_ID}}, {{SPARK_DRIVER_SVC}}, {{KUBERNETES_NAMESPACE}}, {{KUBERNETES_CONTEXT}} and {{SPARK_UI_PORT}}.",
+        "Meaning": "The pattern to generate the spark on kubernetes application UI URL. The pattern should contain placeholders for the application variables. Available placeholders are {{SPARK_APP_ID}}, {{SPARK_DRIVER_SVC}}, {{SPARK_DRIVER_POD_IP}}, {{KUBERNETES_NAMESPACE}}, {{KUBERNETES_CONTEXT}} and {{SPARK_UI_PORT}}.",
         "Type": "string",
         "Since": "1.10.0"
       },
@@ -2056,6 +2124,13 @@
     "name": "metadata",
     "list": [
       {
+        "Key": "kyuubi.metadata.cleaner.batch.size",
+        "Default": "1000",
+        "Meaning": "The batch size for cleaning expired metadata. This is used to avoid holding the delete lock for a long time when there are too many expired metadata to be cleaned.",
+        "Type": "int",
+        "Since": "1.11.0"
+      },
+      {
         "Key": "kyuubi.metadata.cleaner.enabled",
         "Default": "true",
         "Meaning": "Whether to clean the metadata periodically. If it is enabled, Kyuubi will clean the metadata that is in the terminate state with max age limitation.",
@@ -2082,6 +2157,13 @@
         "Meaning": "The number of threads for recovery from the metadata store when the Kyuubi server restarts.",
         "Type": "int",
         "Since": "1.6.0"
+      },
+      {
+        "Key": "kyuubi.metadata.recovery.waitEngineSubmission",
+        "Default": "false",
+        "Meaning": "Whether a metadata recovery task should wait for its corresponding engine submission to complete before finishing. All recovery tasks are submitted to a fixed thread pool controlled by kyuubi.metadata.recovery.threads. If true, a task blocks until the engine submission is done, helping throttle the load on the system if kyuubi.session.engine.startup.waitCompletion is false. If false, the task returns immediately after opening the session without waiting.",
+        "Type": "boolean",
+        "Since": "1.10.3"
       },
       {
         "Key": "kyuubi.metadata.request.async.retry.enabled",
@@ -2162,8 +2244,8 @@
       },
       {
         "Key": "kyuubi.metadata.store.jdbc.url",
-        "Default": "jdbc:sqlite:\u003cKYUUBI_HOME\u003e/kyuubi_state_store.db",
-        "Meaning": "The JDBC url for server JDBC metadata store. By default, it is a SQLite database url, and the state information is not shared across Kyuubi instances. To enable high availability for multiple kyuubi instances, please specify a production JDBC url. Note: this value support the variables substitution: \u003cKYUUBI_HOME\u003e.",
+        "Default": "jdbc:sqlite:{{KYUUBI_HOME}}/kyuubi_state_store.db",
+        "Meaning": "The JDBC url for server JDBC metadata store. By default, it is a SQLite database url, and the state information is not shared across Kyuubi instances. To enable high availability for multiple kyuubi instances, please specify a production JDBC url. Note: this value support the variables substitution: {{KYUUBI_HOME}}, {{KYUUBI_WORK_DIR_ROOT}}.",
         "Type": "string",
         "Since": "1.6.0"
       },
@@ -2202,8 +2284,8 @@
       },
       {
         "Key": "kyuubi.metrics.json.location",
-        "Default": "metrics",
-        "Meaning": "Where the JSON metrics file located",
+        "Default": "{{KYUUBI_HOME}}/metrics",
+        "Meaning": "Where the JSON metrics file located. Note: this value support the variables substitution: {{KYUUBI_HOME}}, {{KYUUBI_WORK_DIR_ROOT}}.",
         "Type": "string",
         "Since": "1.2.0"
       },
@@ -2414,6 +2496,13 @@
         "Since": "1.8.0"
       },
       {
+        "Key": "kyuubi.server.conf.retrieveMode",
+        "Default": "REDACTED",
+        "Meaning": "Controls how session configurations are returned in REST API responses. Supported values: REDACTED: Mask values that match kyuubi.server.redaction.regex (default). ORIGINAL: Return the raw config values as-is. NONE: Omit the conf map from responses entirely.",
+        "Type": "string",
+        "Since": "1.12.0"
+      },
+      {
         "Key": "kyuubi.server.info.provider",
         "Default": "ENGINE",
         "Meaning": "The server information provider name, some clients may rely on this information to check the server compatibilities and functionalities. SERVER: Return Kyuubi server information. ENGINE: Return Kyuubi engine information.",
@@ -2510,6 +2599,13 @@
         "Meaning": "Regex to decide which Kyuubi contain sensitive information. When this regex matches a property key or value, the value is redacted from the various logs.",
         "Type": "",
         "Since": "1.6.0"
+      },
+      {
+        "Key": "kyuubi.server.spark.file.config.list",
+        "Default": "",
+        "Meaning": "A comma-separated list of additional Spark parameters for which Kyuubi checks whether the upload path is included in kyuubi.session.local.dir.allow.list.",
+        "Type": "set",
+        "Since": "1.12.0"
       },
       {
         "Key": "kyuubi.server.tempFile.expireTime",
@@ -2862,7 +2958,7 @@
       {
         "Key": "kyuubi.session.local.dir.allow.list",
         "Default": "",
-        "Meaning": "The local dir list that are allowed to access by the kyuubi session application. End-users might set some parameters such as spark.files and it will upload some local files when launching the kyuubi engine, if the local dir allow list is defined, kyuubi will check whether the path to upload is in the allow list. Note that, if it is empty, there is no limitation for that. And please use absolute paths.",
+        "Meaning": "The local dir list that are allowed to access by the kyuubi session application. End-users might set some parameters such as spark.files and it will upload some local files when launching the kyuubi engine, if the local dir allow list is defined, kyuubi will check whether the path to upload is in the allow list. Note that, if it is empty, there is no limitation for that. And please use absolute paths. Also, currently this config takes effect only for Spark engine.",
         "Type": "set",
         "Since": "1.6.0"
       },
