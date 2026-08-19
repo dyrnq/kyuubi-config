@@ -9,7 +9,7 @@
     "Option": "advertised.listeners",
     "Type": "String",
     "Default": "(None)",
-    "Description": "The externally advertised address and port for client connections. Required in distributed environments when the bind address is not publicly reachable. Format matches bind.listeners (listener_name://host:port). Defaults to the value of bind.listeners if not explicitly configured."
+    "Description": "The externally advertised address and port for client connections. Required in distributed environments when the bind address is not publicly reachable. Format matches bind.listeners ({listener_name}://{host}:{port}). Defaults to the value of bind.listeners if not explicitly configured."
   },
   {
     "Option": "internal.listener.name",
@@ -20,7 +20,7 @@
   {
     "Option": "security.protocol.map",
     "Type": "Map",
-    "Default": "",
+    "Default": "(none)",
     "Description": "A map defining the authentication protocol for each listener. The format is listenerName1:protocol1,listenerName2:protocol2, e.g., INTERNAL:PLAINTEXT,CLIENT:GSSAPI. Each listener can be associated with a specific authentication protocol. Listeners not included in the map will use PLAINTEXT by default, which does not require authentication."
   },
   {
@@ -54,9 +54,15 @@
     "Description": "The default size of the write buffer for writing the local files to remote file systems."
   },
   {
+    "Option": "plugin.classloader.parent-first-patterns.additional",
+    "Type": "List\u003cString\u003e",
+    "Default": "(None)",
+    "Description": "A (semicolon-separated) list of patterns that specifies which classes should always be resolved through the plugin parent ClassLoader first. A pattern is a simple prefix that is checked against the fully qualified class name. These patterns are appended to classloader.parent-first-patterns.default."
+  },
+  {
     "Option": "plugin.classloader.parent-first-patterns.default",
     "Type": "String",
-    "Default": "java., com.alibaba.fluss., javax.annotation., org.slf4j, org.apache.log4j, org.apache.logging, org.apache.commons.logging, ch.qos.logback",
+    "Default": "java., org.apache.fluss., javax.annotation., org.slf4j, org.apache.log4j, org.apache.logging, org.apache.commons.logging, ch.qos.logback",
     "Description": "A (semicolon-separated) list of patterns that specifies which classes should always be resolved through the plugin parent ClassLoader first. A pattern is a simple prefix that is checked against the fully qualified class name. This setting should generally not be modified."
   },
   {
@@ -64,6 +70,18 @@
     "Type": "Duration",
     "Default": "10min",
     "Description": "The interval of auto partition check. The default value is 10 minutes."
+  },
+  {
+    "Option": "allow.create.log.tables",
+    "Type": "Boolean",
+    "Default": "true",
+    "Description": "Whether to allow creation of log tables. When set to false, attempts to create log tables (tables without primary key) will be rejected. The default value is true."
+  },
+  {
+    "Option": "allow.create.kv.tables",
+    "Type": "Boolean",
+    "Default": "true",
+    "Description": "Whether to allow creation of kv tables (primary key tables). When set to false, attempts to create kv tables (tables with primary key) will be rejected. The default value is true."
   },
   {
     "Option": "max.partition.num",
@@ -75,7 +93,7 @@
     "Option": "max.bucket.num",
     "Type": "Integer",
     "Default": "128000",
-    "Description": "The maximum number of buckets that can be created for a table. The default value is 128000"
+    "Description": "The maximum number of buckets that can be created for a table. The default value is 128000."
   },
   {
     "Option": "acl.notification.expiration-time",
@@ -102,10 +120,28 @@
     "Description": "A semicolon-separated list of superusers who have unrestricted access to all operations and resources. Note that the delimiter is semicolon since SSL user names may contain comma, and each super user should be specified in the format principal_type:principal_name, e.g., User:admin;User:bob. This configuration is critical for defining administrative privileges in the system."
   },
   {
+    "Option": "server.io-pool.size",
+    "Type": "Integer",
+    "Default": "10",
+    "Description": "The size of the IO thread pool to run blocking operations for both coordinator and tablet servers. This includes discard unnecessary snapshot files, transfer kv snapshot files, and transfer remote log files. Increase this value if you experience slow IO operations. The default value is 10."
+  },
+  {
     "Option": "coordinator.io-pool.size",
     "Type": "Integer",
     "Default": "10",
-    "Description": "The size of the IO thread pool to run blocking operations for coordinator server. This includes discard unnecessary snapshot files. Increase this value if you experience slow unnecessary snapshot files clean. The default value is 10."
+    "Description": "Deprecated: This option is deprecated. Please use server.io-pool.size instead. The size of the IO thread pool to run blocking operations for coordinator server. This includes discard unnecessary snapshot files. Increase this value if you experience slow unnecessary snapshot files clean. The default value is 10."
+  },
+  {
+    "Option": "coordinator.producer-offsets.ttl",
+    "Type": "Duration",
+    "Default": "24h",
+    "Description": "The TTL (time-to-live) for producer offsets. Producer offsets older than this TTL will be automatically cleaned up by the coordinator server. Producer offsets are used for undo recovery when a Flink job fails over before completing its first checkpoint. The default value is 24 hours."
+  },
+  {
+    "Option": "coordinator.producer-offsets.cleanup-interval",
+    "Type": "Duration",
+    "Default": "1h",
+    "Description": "The interval for cleaning up expired producer offsets and orphan files in remote storage. The cleanup task runs periodically to remove expired offsets and any orphan files that may have been left behind due to incomplete operations. The default value is 1 hour."
   },
   {
     "Option": "tablet-server.id",
@@ -117,13 +153,13 @@
     "Option": "tablet-server.rack",
     "Type": "String",
     "Default": "(None)",
-    "Description": "The rack for the tabletServer. This will be used in rack aware bucket assignment for fault tolerance. Examples: RACK1, cn-hangzhou-server10"
+    "Description": "The rack for the TabletServer. This will be used in rack aware bucket assignment for fault tolerance. Examples: RACK1, cn-hangzhou-server10"
   },
   {
     "Option": "data.dir",
     "Type": "String",
     "Default": "/tmp/fluss-data",
-    "Description": "This configuration controls the directory where fluss will store its data. The default value is /tmp/fluss-data"
+    "Description": "This configuration controls the directory where Fluss will store its data. The default value is /tmp/fluss-data"
   },
   {
     "Option": "server.writer-id.expiration-time",
@@ -166,6 +202,18 @@
     "Type": "Duration",
     "Default": "2^(63)-1ns",
     "Description": "Defines how long the buffer pool will block when waiting for segments."
+  },
+  {
+    "Option": "tablet-server.controlled-shutdown.max-retries",
+    "Type": "Integer",
+    "Default": "3",
+    "Description": "Maximum number of attempts to transfer leadership before proceeding with an unclean shutdown during a controlled shutdown procedure."
+  },
+  {
+    "Option": "tablet-server.controlled-shutdown.retry-interval",
+    "Type": "Duration",
+    "Default": "1000ms",
+    "Description": "Time interval between retry attempts when trying to transfer leadership during controlled shutdown."
   },
   {
     "Option": "zookeeper.address",
@@ -222,6 +270,12 @@
     "Description": "The file path from which the ZooKeeper client reads its configuration. This allows each ZooKeeper client instance to load its own configuration file, instead of relying on shared JVM-level environment settings. This enables fine-grained control over ZooKeeper client behavior."
   },
   {
+    "Option": "zookeeper.client.max-inflight-requests",
+    "Type": "String",
+    "Default": "100",
+    "Description": "The maximum number of unacknowledged requests the client will send to ZooKeeper before blocking."
+  },
+  {
     "Option": "netty.server.num-network-threads",
     "Type": "Integer",
     "Default": "3",
@@ -240,6 +294,12 @@
     "Description": "The number of queued requests allowed for worker threads, before blocking the I/O threads."
   },
   {
+    "Option": "netty.server.max-request-size",
+    "Type": "MemorySize",
+    "Default": "100mb",
+    "Description": "The maximum size of a single request that the server can receive. This limits the maximum frame length at the Netty pipeline level to protect the server from malicious clients sending oversized requests that could exhaust server memory."
+  },
+  {
     "Option": "netty.connection.max-idle-time",
     "Type": "Duration",
     "Default": "10min",
@@ -248,8 +308,8 @@
   {
     "Option": "netty.client.num-network-threads",
     "Type": "Integer",
-    "Default": "1",
-    "Description": "The number of threads that the client uses for sending requests to the network and receiving responses from network. The default value is 1"
+    "Default": "4",
+    "Description": "The number of threads that the client uses for sending requests to the network and receiving responses from network. The default value is 4."
   },
   {
     "Option": "log.segment.file-size",
@@ -267,7 +327,7 @@
     "Option": "log.index.interval-size",
     "Type": "MemorySize",
     "Default": "4k",
-    "Description": "This setting controls how frequently fluss adds an index entry to its offset index. The default setting ensures that we index a message roughly every 4096 bytes. More indexing allows reads to jump closer to the exact position in the log but makes the index larger. You probably don\u0027t need to change this."
+    "Description": "This setting controls how frequently Fluss adds an index entry to its offset index. The default setting ensures that we index a message roughly every 4096 bytes. More indexing allows reads to jump closer to the exact position in the log but makes the index larger. You probably don\u0027t need to change this."
   },
   {
     "Option": "log.file-preallocate",
@@ -291,7 +351,7 @@
     "Option": "log.replica.max-lag-time",
     "Type": "Duration",
     "Default": "30s",
-    "Description": "If a follower replica hasn\u0027t sent any fetch log requests or hasn\u0027t consumed up the leaders log end offset for at least this time, the leader will remove the follower replica form isr"
+    "Description": "If a follower replica hasn\u0027t sent any fetch log requests or hasn\u0027t consumed up the leaders log end offset for at least this time, the leader will remove the follower replica from isr"
   },
   {
     "Option": "log.replica.write-operation-purge-number",
@@ -369,7 +429,7 @@
     "Option": "remote.log.data-transfer-thread-num",
     "Type": "Integer",
     "Default": "4",
-    "Description": "The number of threads the server uses to transfer (download and upload) remote log file can be data file, index file and remote log metadata file."
+    "Description": "Deprecated: This option is deprecated. Please use server.io-pool.size instead. The number of threads the server uses to transfer (download and upload) remote log file can be data file, index file and remote log metadata file."
   },
   {
     "Option": "kv.snapshot.interval",
@@ -387,13 +447,19 @@
     "Option": "kv.snapshot.transfer-thread-num",
     "Type": "Integer",
     "Default": "4",
-    "Description": "The number of threads the server uses to transfer (download and upload) kv snapshot files."
+    "Description": "Deprecated: This option is deprecated. Please use server.io-pool.size instead. The number of threads the server uses to transfer (download and upload) kv snapshot files."
   },
   {
     "Option": "kv.snapshot.num-retained",
     "Type": "Integer",
     "Default": "1",
     "Description": "The maximum number of completed snapshots to retain."
+  },
+  {
+    "Option": "kv.snapshot.lease-expiration-check-interval",
+    "Type": "Duration",
+    "Default": "10min",
+    "Description": "The interval to check the expiration of kv snapshot leases. The default setting is 10 minutes."
   },
   {
     "Option": "kv.rocksdb.thread.num",
@@ -422,7 +488,7 @@
   {
     "Option": "kv.rocksdb.log.dir",
     "Type": "String",
-    "Default": "(None)",
+    "Default": "${FLUSS_HOME}/log/rocksdb",
     "Description": "The directory for RocksDB\u0027s information logging files. If empty (Fluss default setting), log files will be in the same directory as the Fluss log. If non-empty, this directory will be used and the data directory\u0027s absolute path will be used as the prefix of the log file name. If setting this option as a non-existing location, e.g /dev/null, RocksDB will then create the log under its own database folder as before."
   },
   {
@@ -447,13 +513,13 @@
     "Option": "kv.rocksdb.compaction.level.use-dynamic-size",
     "Type": "Boolean",
     "Default": "false",
-    "Description": "If true, RocksDB will pick target size of each level dynamically. From an empty DB, RocksDB would make last level the base level, which means merging L0 data into the last level, until it exceeds max_bytes_for_level_base. And then repeat this process for second last level and so on. The default value is false. For more information, please refer to %s https://github.com/facebook/rocksdb/wiki/Leveled-Compaction#level_compaction_dynamic_level_bytes-is-true RocksDB\u0027s doc."
+    "Description": "If true, RocksDB will pick target size of each level dynamically. From an empty DB, RocksDB would make last level the base level, which means merging L0 data into the last level, until it exceeds max_bytes_for_level_base. And then repeat this process for second last level and so on. The default value is false. For more information, please refer to RocksDB\u0027s doc ."
   },
   {
     "Option": "kv.rocksdb.compression.per.level",
     "Type": "Enum",
     "Default": "LZ4,LZ4,LZ4,LZ4,LZ4,ZSTD,ZSTD",
-    "Description": "A comma-separated list of Compression Type. Different levels can have different compression policies. In many cases, lower levels use fast compression algorithms, while higher levels with more data use slower but more effective compression algorithms. The N th element in the List corresponds to the compression type of the level N-1 When kv.rocksdb.compaction.level.use-dynamic-size is true, compression_per_level[0] still determines L0, but other elements are based on the base level and may not match the level seen in the info log. Note: If the List size is smaller than the level number, the undefined lower level uses the last Compression Type in the List. The optional values include NO, SNAPPY, LZ4, ZSTD. For more information about compression type, please refer to doc https://github.com/facebook/rocksdb/wiki/Compression. The default value is ‘LZ4,LZ4,LZ4,LZ4,LZ4,ZSTD,ZSTD’, indicates there is lz4 compaction of level0 and level4, ZSTD compaction algorithm is used from level5 to level6. LZ4 is a lightweight compression algorithm so it usually strikes a good balance between space and CPU usage. ZSTD is more space save than LZ4, but it is more CPU-intensive. Different machines deploy compaction modes according to CPU and I/O resources. The default value is for the scenario that CPU resources are adequate. If you find the IO pressure of the system is not big when writing a lot of data, but CPU resources are inadequate, you can exchange I/O resources for CPU resources and change the compaction mode to NO,NO,NO,LZ4,LZ4,ZSTD,ZSTD."
+    "Description": "A comma-separated list of Compression Type. Different levels can have different compression policies. In many cases, lower levels use fast compression algorithms, while higher levels with more data use slower but more effective compression algorithms. The N th element in the List corresponds to the compression type of the level N-1 When kv.rocksdb.compaction.level.use-dynamic-size is true, compression_per_level[0] still determines L0, but other elements are based on the base level and may not match the level seen in the info log. Note: If the List size is smaller than the level number, the undefined lower level uses the last Compression Type in the List. The optional values include NO, SNAPPY, LZ4, ZSTD. For more information about compression type, please refer to doc. The default value is ‘LZ4,LZ4,LZ4,LZ4,LZ4,ZSTD,ZSTD’, indicates there is lz4 compaction of level0 and level4, ZSTD compaction algorithm is used from level5 to level6. LZ4 is a lightweight compression algorithm so it usually strikes a good balance between space and CPU usage. ZSTD is more space save than LZ4, but it is more CPU-intensive. Different machines deploy compaction modes according to CPU and I/O resources. The default value is for the scenario that CPU resources are adequate. If you find the IO pressure of the system is not big when writing a lot of data, but CPU resources are inadequate, you can exchange I/O resources for CPU resources and change the compaction mode to NO,NO,NO,LZ4,LZ4,ZSTD,ZSTD."
   },
   {
     "Option": "kv.rocksdb.compaction.level.target-file-size-base",
@@ -498,6 +564,30 @@
     "Description": "The amount of the cache for data blocks in RocksDB. The default block-cache size is 8MB."
   },
   {
+    "Option": "kv.rocksdb.block.cache-index-and-filter-blocks",
+    "Type": "Boolean",
+    "Default": "false",
+    "Description": "If true, index and filter blocks will be stored in block cache, together with all other data blocks. This helps to limit memory usage so that the total memory used by RocksDB is bounded by block cache size. The default value is false."
+  },
+  {
+    "Option": "kv.rocksdb.block.cache-index-and-filter-blocks-with-high-priority",
+    "Type": "Boolean",
+    "Default": "false",
+    "Description": "If true and cache_index_and_filter_blocks is enabled, index and filter blocks will be stored with high priority in block cache, making them less likely to be evicted than data blocks. The default value is false."
+  },
+  {
+    "Option": "kv.rocksdb.block.pin-l0-filter-and-index-blocks-in-cache",
+    "Type": "Boolean",
+    "Default": "false",
+    "Description": "If true and cache_index_and_filter_blocks is enabled, L0 index and filter blocks will be pinned in block cache and will not be evicted. This helps avoid performance degradation due to cache misses on L0 index/filter blocks. The default value is false."
+  },
+  {
+    "Option": "kv.rocksdb.block.pin-top-level-index-and-filter",
+    "Type": "Boolean",
+    "Default": "false",
+    "Description": "If true, the top-level index of partitioned index/filter blocks will be pinned in block cache and will not be evicted. The default value is false."
+  },
+  {
     "Option": "kv.rocksdb.use-bloom-filter",
     "Type": "Boolean",
     "Default": "true",
@@ -514,6 +604,12 @@
     "Type": "Boolean",
     "Default": "false",
     "Description": "If true, RocksDB will use block-based filter instead of full filter, this only take effect when bloom filter is used. The default value is false."
+  },
+  {
+    "Option": "kv.rocksdb.shared-rate-limiter-bytes-per-sec",
+    "Type": "MemorySize",
+    "Default": "Long.MAX_VALUE",
+    "Description": "The bytes per second rate limit for RocksDB flush and compaction operations shared across all RocksDB instances on the TabletServer. The rate limiter is always enabled. The default value is Long.MAX_VALUE (effectively unlimited). Set to a lower value (e.g., 100MB) to limit the rate. This configuration can be updated dynamically without server restart. See Updating Configs for more details."
   },
   {
     "Option": "kv.recover.log-record-batch.max-size",
@@ -540,16 +636,52 @@
     "Description": "The port for the JMXServer that JMX clients can connect to. If not set, the JMXServer won\u0027t start. In order to be able to run several instances of the reporter on one host (e.g. when one TabletServer is colocated with the CoordinatorServer) it is advisable to use a port range like 9990-9999."
   },
   {
-    "Option": "datalake.format",
-    "Type": "ENUM",
+    "Option": "metrics.reporter.prometheus-push.host-url",
+    "Type": "String",
     "Default": "(None)",
-    "Description": "The datalake format used by of Fluss to be as lakehouse storage, such as Paimon, Iceberg, Hudi. Now, only support Paimon."
+    "Description": "The PushGateway server host URL including scheme, host name, and port"
+  },
+  {
+    "Option": "metrics.reporter.prometheus-push.job-name",
+    "Type": "String",
+    "Default": "(None)",
+    "Description": "The job name under which metrics will be pushed"
+  },
+  {
+    "Option": "metrics.reporter.prometheus-push.push-interval",
+    "Type": "String",
+    "Default": "10 seconds",
+    "Description": "The interval of pushing metrics to Prometheus PushGateway, defaults to 10 SECONDS."
+  },
+  {
+    "Option": "metrics.reporter.prometheus-push.random-job-name-suffix",
+    "Type": "Boolean",
+    "Default": "true",
+    "Description": "Specifies whether a random suffix should be appended to the job name, defaults to true. This is useful when multiple instances of the reporter are running on the same host."
+  },
+  {
+    "Option": "metrics.reporter.prometheus-push.delete-on-shutdown",
+    "Type": "Boolean",
+    "Default": "true",
+    "Description": "Specifies whether to delete metrics from the PushGateway on shutdown, defaults to true. Fluss will try its best to delete the metrics but this is not guaranteed."
+  },
+  {
+    "Option": "metrics.reporter.prometheus-push.grouping-key",
+    "Type": "String",
+    "Default": "(None)",
+    "Description": "Specifies the grouping key which is the group and global labels of all metrics. The label name and value are separated by \u0027\u003d\u0027, and labels are separated by \u0027;\u0027, e.g., k1\u003dv1;k2\u003dv2."
+  },
+  {
+    "Option": "datalake.format",
+    "Type": "Enum",
+    "Default": "(None)",
+    "Description": "The datalake format used by of Fluss to be as lakehouse storage. Currently, supported formats are Paimon, Iceberg, and Lance. In the future, more kinds of data lake format will be supported, such as DeltaLake or Hudi."
   },
   {
     "Option": "kafka.enabled",
-    "Type": "boolean",
+    "Type": "Boolean",
     "Default": "false",
-    "Description": "Whether enable fluss kafka. Disabled by default. When this option is set to true, the fluss kafka will be enabled."
+    "Description": "Whether enable Fluss Kafka. Disabled by default. When this option is set to true, the Fluss Kafka will be enabled."
   },
   {
     "Option": "kafka.listener.names",
@@ -561,7 +693,7 @@
     "Option": "kafka.database",
     "Type": "String",
     "Default": "kafka",
-    "Description": "The database for fluss kafka. The default database is kafka."
+    "Description": "The database for Fluss Kafka. The default database is kafka."
   },
   {
     "Option": "kafka.connection.max-idle-time",
