@@ -68,7 +68,7 @@
   {
     "Property Name": "spark.executor.memory",
     "Default": "1g",
-    "Meaning": "Amount of memory to use per executor process, in the same format as JVM memory strings with a size unit suffix (\"k\", \"m\", \"g\" or \"t\") (e.g. 512m, 2g).",
+    "Meaning": "Amount of memory to use per executor process, in the same format as JVM memory strings with a size unit suffix (\"k\", \"m\", \"g\" or \"t\") (e.g. 512m, 2g), and with minimum value 450m.",
     "Since Version": "0.7.0"
   },
   {
@@ -198,6 +198,12 @@
     "Since Version": "3.0.0"
   },
   {
+    "Property Name": "spark.driver.log.redirectConsoleOutputs",
+    "Default": "stdout,stderr",
+    "Meaning": "Comma-separated list of the console output kind for driver that needs to redirect to logging system. Supported values are `stdout`, `stderr`. It only takes affect when `spark.plugins` is configured with `org.apache.spark.deploy.RedirectConsolePlugin`.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.decommission.enabled",
     "Default": "false",
     "Meaning": "When decommission enabled, Spark will try its best to shut down the executor gracefully. Spark will try to migrate all the RDD blocks (controlled by spark.storage.decommission.rddBlocks.enabled) and shuffle blocks (controlled by spark.storage.decommission.shuffleBlocks.enabled) from the decommissioning executor to a remote executor when spark.storage.decommission.enabled is enabled. With decommission enabled, Spark will also decommission an executor instead of killing when spark.dynamicAllocation.enabled enabled.",
@@ -318,6 +324,12 @@
     "Since Version": "1.1.0"
   },
   {
+    "Property Name": "spark.executor.logs.redirectConsoleOutputs",
+    "Default": "stdout,stderr",
+    "Meaning": "Comma-separated list of the console output kind for executor that needs to redirect to logging system. Supported values are `stdout`, `stderr`. It only takes affect when `spark.plugins` is configured with `org.apache.spark.deploy.RedirectConsolePlugin`.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.executor.userClassPathFirst",
     "Default": "false",
     "Meaning": "(Experimental) Same functionality as spark.driver.userClassPathFirst, but applied to executor instances.",
@@ -366,6 +378,30 @@
     "Since Version": "1.2.0"
   },
   {
+    "Property Name": "spark.python.factory.idleWorkerMaxPoolSize",
+    "Default": "(none)",
+    "Meaning": "Maximum number of idle Python workers to keep. If unset, the number is unbounded. If set to a positive integer N, at most N idle workers are retained; least-recently used workers are evicted first.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.python.worker.killOnIdleTimeout",
+    "Default": "false",
+    "Meaning": "Whether Spark should terminate the Python worker process when the idle timeout (as defined by spark.python.worker.idleTimeoutSeconds) is reached. If enabled, Spark will terminate the Python worker process in addition to logging the status.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.python.worker.tracebackDumpIntervalSeconds",
+    "Default": "0",
+    "Meaning": "The interval (in seconds) for Python workers to dump their tracebacks. If it\u0027s positive, the Python worker will periodically dump the traceback into its `stderr`. The default is `0` that means it is disabled.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.python.unix.domain.socket.enabled",
+    "Default": "false",
+    "Meaning": "When set to true, the Python driver uses a Unix domain socket for operations like creating or collecting a DataFrame from local data, using accumulators, and executing Python functions with PySpark such as Python UDFs. This configuration only applies to Spark Classic and Spark Connect server.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.files",
     "Default": "",
     "Meaning": "Comma-separated list of files to be placed in the working directory of each executor. Globs are allowed.",
@@ -376,6 +412,12 @@
     "Default": "",
     "Meaning": "Comma-separated list of .zip, .egg, or .py files to place on the PYTHONPATH for Python apps. Globs are allowed.",
     "Since Version": "1.0.1"
+  },
+  {
+    "Property Name": "spark.submit.callSystemExitOnMainExit",
+    "Default": "false",
+    "Meaning": "If true, SparkSubmit will call System.exit() to initiate JVM shutdown once the user\u0027s main method has exited. This can be useful in cases where non-daemon JVM threads might otherwise prevent the JVM from shutting down on its own.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.jars",
@@ -714,6 +756,12 @@
     "Since Version": "3.0.0"
   },
   {
+    "Property Name": "spark.eventLog.excludedPatterns",
+    "Default": "(none)",
+    "Meaning": "Specifies comma-separated event names to be excluded from the event logs.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.eventLog.dir",
     "Default": "file:///tmp/spark-events",
     "Meaning": "Base directory in which Spark events are logged, if spark.eventLog.enabled is true. Within this base directory, Spark creates a sub-directory for each application, and logs the events specific to the application in this directory. Users may want to set this to a unified location like an HDFS directory so history files can be read by the history server.",
@@ -739,7 +787,7 @@
   },
   {
     "Property Name": "spark.eventLog.rolling.enabled",
-    "Default": "false",
+    "Default": "true",
     "Meaning": "Whether rolling over event log files is enabled. If set to true, it cuts down each event log file to the configured size.",
     "Since Version": "3.0.0"
   },
@@ -948,12 +996,6 @@
     "Since Version": "1.4.0"
   },
   {
-    "Property Name": "spark.appStatusStore.diskStoreDir",
-    "Default": "None",
-    "Meaning": "Local directory where to store diagnostic information of SQL executions. This configuration is only for live UI.",
-    "Since Version": "3.4.0"
-  },
-  {
     "Property Name": "spark.broadcast.compress",
     "Default": "true",
     "Meaning": "Whether to compress broadcast variables before sending them. Generally a good idea. Compression will use spark.io.compression.codec.",
@@ -967,7 +1009,7 @@
   },
   {
     "Property Name": "spark.checkpoint.compress",
-    "Default": "false",
+    "Default": "true",
     "Meaning": "Whether to compress RDD checkpoints. Generally a good idea. Compression will use spark.io.compression.codec.",
     "Since Version": "2.2.0"
   },
@@ -1008,6 +1050,12 @@
     "Since Version": "3.2.0"
   },
   {
+    "Property Name": "spark.io.compression.zstd.strategy",
+    "Default": "(none)",
+    "Meaning": "Compression strategy for Zstd compression codec. The higher the value is, the more complex it becomes, usually resulting stronger but slower compression or higher CPU cost.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.io.compression.zstd.workers",
     "Default": "0",
     "Meaning": "Thread size spawned to compress in parallel when using Zstd. When value is 0 no worker is spawned, it works in single-threaded mode. When value \u003e 0, it triggers asynchronous mode, corresponding number of threads are spawned. More workers improve performance, but also increase memory cost.",
@@ -1015,7 +1063,7 @@
   },
   {
     "Property Name": "spark.io.compression.lzf.parallel.enabled",
-    "Default": "false",
+    "Default": "true",
     "Meaning": "When true, LZF compression will use multiple threads to compress data in parallel.",
     "Since Version": "4.0.0"
   },
@@ -1102,6 +1150,12 @@
     "Default": "0",
     "Meaning": "The absolute amount of memory which can be used for off-heap allocation, in bytes unless otherwise specified. This setting has no impact on heap memory usage, so if your executors\u0027 total memory consumption must fit within some hard limit then be sure to shrink your JVM heap size accordingly. This must be set to a positive value when spark.memory.offHeap.enabled\u003dtrue.",
     "Since Version": "1.6.0"
+  },
+  {
+    "Property Name": "spark.memory.unmanagedMemoryPollingInterval",
+    "Default": "0s",
+    "Meaning": "Interval for polling unmanaged memory users to track their memory usage. Unmanaged memory users are components that manage their own memory outside of Spark\u0027s core memory management, such as RocksDB for Streaming State Store. Setting this to 0 disables unmanaged memory polling.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.storage.unrollMemoryThreshold",
@@ -1366,6 +1420,18 @@
     "Default": "(random)",
     "Meaning": "Port for the driver to listen on. This is used for communicating with the executors and the standalone Master.",
     "Since Version": "0.7.0"
+  },
+  {
+    "Property Name": "spark.driver.metrics.pollingInterval",
+    "Default": "10s",
+    "Meaning": "How often to collect driver metrics (in milliseconds). If unset, the polling is done at the executor heartbeat interval. If set, the polling is done at this interval.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.io.mode.default",
+    "Default": "AUTO",
+    "Meaning": "The default IO mode for Netty transports. One of NIO, EPOLL, KQUEUE, or AUTO. The default value is AUTO which means to use native Netty libraries if available. In other words, for Linux environments, EPOLL is used if available before using NIO. For MacOS/BSD environments, KQUEUE is used if available before using NIO.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.rpc.io.backLog",
@@ -2178,16 +2244,34 @@
     "Since Version": "3.5.2"
   },
   {
+    "Property Name": "spark.sql.classic.shuffleDependency.fileCleanup.enabled",
+    "Default": "false",
+    "Meaning": "When enabled, shuffle files will be cleaned up at the end of classic SQL executions. Note that this cleanup may cause stage retries and regenerate shuffle files if the same dataframe reference is executed again.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.sql.cli.print.header",
     "Default": "false",
     "Meaning": "When set to true, spark-sql CLI prints the names of the columns in query output.",
     "Since Version": "3.2.0"
   },
   {
+    "Property Name": "spark.sql.collation.allowInMapKeys",
+    "Default": "false",
+    "Meaning": "Allow for non-UTF8_BINARY collated strings inside of map\u0027s keys",
+    "Since Version": "4.0.0"
+  },
+  {
     "Property Name": "spark.sql.columnNameOfCorruptRecord",
     "Default": "_corrupt_record",
     "Meaning": "The name of internal column for storing raw/un-parsed JSON and CSV records that fail to parse.",
     "Since Version": "1.2.0"
+  },
+  {
+    "Property Name": "spark.sql.connect.shuffleDependency.fileCleanup.enabled",
+    "Default": "(value of spark.sql.shuffleDependency.fileCleanup.enabled)",
+    "Meaning": "When enabled, shuffle files will be cleaned up at the end of Spark Connect SQL executions.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.sql.csv.filterPushdown.enabled",
@@ -2220,14 +2304,38 @@
     "Since Version": "3.0.0"
   },
   {
+    "Property Name": "spark.sql.defaultPath",
+    "Default": "",
+    "Meaning": "Default SQL PATH used when no SET PATH has been issued in the session; this is also the value to which SET PATH \u003d DEFAULT_PATH expands. Accepts the full SET PATH grammar; an inner DEFAULT_PATH token resolves to the spark-builtin default ordering. The PATH keyword is not allowed in this conf value. When empty, the spark-builtin default ordering controlled by spark.sql.functionResolution.sessionOrder applies. Validated for syntax at set time; redundant entries are tolerated (lookup uses first-match resolution). The interactive SET PATH form still rejects static duplicates as a typo guard.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.dropTableOnView.enabled",
+    "Default": "true",
+    "Meaning": "When true, DROP TABLE command will work on VIEW as well.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.sql.error.messageFormat",
     "Default": "PRETTY",
-    "Meaning": "When PRETTY, the error message consists of textual representation of error class, message and query context. The MINIMAL and STANDARD formats are pretty JSON formats where STANDARD includes an additional JSON field message. This configuration property influences on error messages of Thrift Server and SQL CLI while running queries.",
+    "Meaning": "When PRETTY, the error message consists of textual representation of error class, message and query context. Stack traces are only shown for internal errors (SQLSTATE XX***). When DEBUG, the output is the same as PRETTY but stack traces are always included. The MINIMAL and STANDARD formats are pretty JSON formats where STANDARD includes an additional JSON field message. This configuration property influences on error messages of Thrift Server and SQL CLI while running queries.",
     "Since Version": "3.4.0"
   },
   {
+    "Property Name": "spark.sql.execution.arrow.compression.codec",
+    "Default": "none",
+    "Meaning": "Compression codec used to compress Arrow IPC data when transferring data between JVM and Python processes (e.g., toPandas, toArrow). This can significantly reduce memory usage and network bandwidth when transferring large datasets. Supported codecs: \u0027none\u0027 (no compression), \u0027zstd\u0027 (Zstandard), \u0027lz4\u0027 (LZ4). Note that compression may add CPU overhead but can provide substantial memory savings especially for datasets with high compression ratios.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.sql.execution.arrow.compression.zstd.level",
+    "Default": "3",
+    "Meaning": "Compression level for Zstandard (zstd) codec when compressing Arrow IPC data. This config is only used when spark.sql.execution.arrow.compression.codec is set to \u0027zstd\u0027. Negative values provide ultra-fast compression with lower compression ratios. Positive values provide normal to maximum compression, with higher values giving better compression but slower speed. The default value 3 provides a good balance between compression speed and compression ratio.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.sql.execution.arrow.enabled",
-    "Default": "false",
+    "Default": "true",
     "Meaning": "(Deprecated since Spark 3.0, please set \u0027spark.sql.execution.arrow.pyspark.enabled\u0027.)",
     "Since Version": "2.3.0"
   },
@@ -2246,7 +2354,7 @@
   {
     "Property Name": "spark.sql.execution.arrow.maxRecordsPerBatch",
     "Default": "10000",
-    "Meaning": "When using Apache Arrow, limit the maximum number of records that can be written to a single ArrowRecordBatch in memory. This configuration is not effective for the grouping API such as DataFrame(.cogroup).groupby.applyInPandas because each group becomes each ArrowRecordBatch. If set to zero or negative there is no limit. See also spark.sql.execution.arrow.maxBytesPerBatch. If both are set, each batch is created when any condition of both is met.",
+    "Meaning": "When using Apache Arrow, limit the maximum number of records that can be written to a single ArrowRecordBatch in memory. If set to zero or negative there is no limit. See also spark.sql.execution.arrow.maxBytesPerBatch. If both are set, each batch is created when any condition of both is met.",
     "Since Version": "2.3.0"
   },
   {
@@ -2268,15 +2376,27 @@
     "Since Version": "3.2.0"
   },
   {
+    "Property Name": "spark.sql.execution.arrow.pyspark.validateSchema.enabled",
+    "Default": "false",
+    "Meaning": "When true, validate the schema of Arrow batches returned by mapInArrow, mapInPandas and DataSource against the expected schema to ensure that they are compatible.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.sql.execution.arrow.pythonUDF.columnarInput.enabled",
+    "Default": "true",
+    "Meaning": "When true, Arrow-based Python UDFs (pandas UDFs) can accept columnar input directly from upstream operators that produce Arrow-backed ColumnarBatch (e.g., DataSource V2 connectors), bypassing the ColumnarToRow and ArrowWriter conversion. This optimization reduces data transfer overhead between the JVM and Python worker processes.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.sql.execution.arrow.sparkr.enabled",
     "Default": "false",
     "Meaning": "When true, make use of Apache Arrow for columnar data transfers in SparkR. This optimization applies to: 1. createDataFrame when its input is an R DataFrame 2. collect 3. dapply 4. gapply The following data types are unsupported: FloatType, BinaryType, ArrayType, StructType and MapType.",
     "Since Version": "3.0.0"
   },
   {
-    "Property Name": "spark.sql.execution.arrow.transformWithStateInPandas.maxRecordsPerBatch",
+    "Property Name": "spark.sql.execution.arrow.transformWithStateInPySpark.maxStateRecordsPerBatch",
     "Default": "10000",
-    "Meaning": "When using TransformWithStateInPandas, limit the maximum number of state records that can be written to a single ArrowRecordBatch in memory.",
+    "Meaning": "When using TransformWithState in PySpark (both Python Row and Pandas), limit the maximum number of state records that can be written to a single ArrowRecordBatch in memory.",
     "Since Version": "4.0.0"
   },
   {
@@ -2310,6 +2430,18 @@
     "Since Version": "3.0.0"
   },
   {
+    "Property Name": "spark.sql.execution.pyspark.binaryAsBytes",
+    "Default": "true",
+    "Meaning": "When true, BinaryType is consistently mapped to bytes in PySpark. When false, restores the PySpark behavior before 4.1.0. Before 4.1.0, BinaryType is mapped to bytearray for regular UDF and UDTF without Arrow optimization, DataFrame APIs (both Spark Classic and Spark Connect), and data sources; BinaryType is mapped to bytes for Arrow-optimized UDF and UDTF with legacy pandas conversion.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.sql.execution.pyspark.udf.daemonKillWorkerOnFlushFailure",
+    "Default": "(value of spark.python.daemon.killWorkerOnFlushFailure)",
+    "Meaning": "Same as spark.python.daemon.killWorkerOnFlushFailure for Python execution with DataFrame and SQL. It can change during runtime.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.sql.execution.pyspark.udf.faulthandler.enabled",
     "Default": "(value of spark.python.worker.faulthandler.enabled)",
     "Meaning": "Same as spark.python.worker.faulthandler.enabled for Python execution with DataFrame and SQL. It can change during runtime.",
@@ -2328,10 +2460,22 @@
     "Since Version": "4.0.0"
   },
   {
+    "Property Name": "spark.sql.execution.pyspark.udf.killOnIdleTimeout",
+    "Default": "(value of spark.python.worker.killOnIdleTimeout)",
+    "Meaning": "Same as spark.python.worker.killOnIdleTimeout for Python execution with DataFrame and SQL. It can change during runtime.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.sql.execution.pyspark.udf.simplifiedTraceback.enabled",
     "Default": "true",
     "Meaning": "When true, the traceback from Python UDFs is simplified. It hides the Python worker, (de)serialization, etc from PySpark in tracebacks, and only shows the exception messages from UDFs. Note that this works only with CPython 3.7+.",
     "Since Version": "3.1.0"
+  },
+  {
+    "Property Name": "spark.sql.execution.pyspark.udf.tracebackDumpIntervalSeconds",
+    "Default": "(value of spark.python.worker.tracebackDumpIntervalSeconds)",
+    "Meaning": "Same as spark.python.worker.tracebackDumpIntervalSeconds for Python execution with DataFrame and SQL. It can change during runtime.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.sql.execution.python.udf.buffer.size",
@@ -2353,13 +2497,25 @@
   },
   {
     "Property Name": "spark.sql.execution.pythonUDF.arrow.enabled",
-    "Default": "false",
+    "Default": "true",
     "Meaning": "Enable Arrow optimization in regular Python UDFs. This optimization can only be enabled when the given function takes at least one argument.",
     "Since Version": "3.4.0"
   },
   {
-    "Property Name": "spark.sql.execution.pythonUDTF.arrow.enabled",
+    "Property Name": "spark.sql.execution.pythonUDF.pandas.intToDecimalCoercionEnabled",
     "Default": "false",
+    "Meaning": "When true, convert int to Decimal python objects before converting Pandas.Series to Arrow array during serialization.Disabled by default, impacts performance.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.sql.execution.pythonUDF.pandas.preferIntExtensionDtype",
+    "Default": "false",
+    "Meaning": "When true, convert integers to Pandas ExtensionDtype (e.g. pandas.Int64Dtype) for Pandas UDF execution. Otherwise, depends on the behavior of pyarrow.Array.to_pandas on each input arrow batch.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.execution.pythonUDTF.arrow.enabled",
+    "Default": "true",
     "Meaning": "Enable Arrow optimization for Python UDTFs.",
     "Since Version": "3.5.0"
   },
@@ -2374,6 +2530,12 @@
     "Default": "(none)",
     "Meaning": "A comma-separated list of classes that implement the org.apache.spark.sql.ExtendedExplainGenerator trait. If provided, Spark will print extended plan information from the providers in explain plan and in the UI",
     "Since Version": "4.0.0"
+  },
+  {
+    "Property Name": "spark.sql.fileSource.insert.enforceNotNull",
+    "Default": "false",
+    "Meaning": "When true, Spark enforces NOT NULL constraints when inserting data into file-based data source tables (e.g., Parquet, ORC, JSON), consistent with the behavior for other data sources and V2 catalog tables. When false (default), null values are silently accepted into NOT NULL columns.",
+    "Since Version": "4.2.0"
   },
   {
     "Property Name": "spark.sql.files.ignoreCorruptFiles",
@@ -2430,6 +2592,12 @@
     "Since Version": "2.3.0"
   },
   {
+    "Property Name": "spark.sql.function.protobufExtensions.enabled",
+    "Default": "false",
+    "Meaning": "When true, the from_protobuf and to_protobuf operators will support proto2 extensions when a binary file descriptor set is provided. This property will have no effect for the overloads taking a Java class name instead of a file descriptor set.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.sql.groupByAliases",
     "Default": "true",
     "Meaning": "When true, aliases in a select list can be used in group by clauses. When false, an analysis exception is thrown in the case.",
@@ -2452,6 +2620,12 @@
     "Default": "true",
     "Meaning": "When set to true, and spark.sql.hive.convertMetastoreParquet or spark.sql.hive.convertMetastoreOrc is true, the built-in ORC/Parquet writer is usedto process inserting into unpartitioned ORC/Parquet tables created by using the HiveSQL syntax.",
     "Since Version": "4.0.0"
+  },
+  {
+    "Property Name": "spark.sql.hive.convertMetastoreAsNullable",
+    "Default": "false",
+    "Meaning": "When set to true, apply nullable to the schema when Spark use datasource APIs instead of Hive serde to read/write Hive tables in Parquet or ORC formats. This flag is effective only if convertMetastoreParquet or convertMetastoreOrc is enabled respectively. It\u0027s recommended to set to true, when the nullability of table schema is inconsistent between the metastore and the data files.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.sql.hive.convertMetastoreCtas",
@@ -2562,6 +2736,18 @@
     "Since Version": "4.0.0"
   },
   {
+    "Property Name": "spark.sql.insertIntoReplaceOn.enabled",
+    "Default": "true",
+    "Meaning": "Enable the SQL syntax INSERT INTO ... REPLACE ON (...). The command atomically inserts new rows into a table after deleting all existing rows that match the new rows according to the specified matching condition. The inserted rows are specified by a VALUES expression or the result of a query.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.insertIntoReplaceUsing.enabled",
+    "Default": "true",
+    "Meaning": "Enable the SQL syntax INSERT INTO ... REPLACE USING (...). The command atomically inserts new rows into a table after deleting all existing rows that match the new rows according to the key columns specified in the statement. The inserted rows are specified by a VALUES expression or the result of a query.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.sql.json.filterPushdown.enabled",
     "Default": "true",
     "Meaning": "When true, enable filter pushdown to JSON datasource.",
@@ -2586,6 +2772,12 @@
     "Since Version": "3.2.0"
   },
   {
+    "Property Name": "spark.sql.legacy.hive.thriftServer.useZeroBasedColumnOrdinalPosition",
+    "Default": "false",
+    "Meaning": "When set to true, Hive Thrift server returns 0-based ORDINAL_POSITION in the result of GetColumns operation, instead of the corrected 1-based.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.sql.mapKeyDedupPolicy",
     "Default": "EXCEPTION",
     "Meaning": "The policy to deduplicate map keys in builtin function: CreateMap, MapFromArrays, MapFromEntries, StringToMap, MapConcat and TransformKeys. When EXCEPTION, the query fails if duplicated map keys are detected. When LAST_WIN, the map key that is inserted at last takes precedence.",
@@ -2596,6 +2788,12 @@
     "Default": "https://maven-central.storage-download.googleapis.com/maven2/",
     "Meaning": "A comma-delimited string config of the optional additional remote Maven mirror repositories. This is only used for downloading Hive jars in IsolatedClientLoader if the default Maven Central repo is unreachable.",
     "Since Version": "3.0.0"
+  },
+  {
+    "Property Name": "spark.sql.maxBroadcastTableSize",
+    "Default": "8589934592b",
+    "Meaning": "The maximum table size in bytes that can be broadcast in broadcast joins.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.sql.maxMetadataStringLength",
@@ -2628,6 +2826,12 @@
     "Since Version": "4.0.0"
   },
   {
+    "Property Name": "spark.sql.optimizer.avoidDoubleFilterEval",
+    "Default": "true",
+    "Meaning": "When true avoid pushing expensive (UDF, etc.) filters down if it could result indouble evaluation. This was the behaviour prior to 3.X.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.sql.optimizer.collapseProjectAlwaysInline",
     "Default": "false",
     "Meaning": "Whether to always collapse two adjacent projections and inline expressions even if it causes extra duplication.",
@@ -2656,6 +2860,30 @@
     "Default": "(none)",
     "Meaning": "Configures a list of rules to be disabled in the optimizer, in which the rules are specified by their rule names and separated by comma. It is not guaranteed that all the rules in this configuration will eventually be excluded, as some rules are necessary for correctness. The optimizer will log the rules that have indeed been excluded.",
     "Since Version": "2.4.0"
+  },
+  {
+    "Property Name": "spark.sql.optimizer.mergeSubplans.filterPropagation.enabled",
+    "Default": "true",
+    "Meaning": "When set to true, subquery plans that differ only in their filter conditions can be merged by propagating filters up to enclosing non-grouping aggregates.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.optimizer.mergeSubplans.filterPropagation.symmetricFilterPropagation.enabled",
+    "Default": "false",
+    "Meaning": "When set to true, two non-grouping aggregate subplans that both have filter conditions (but with different predicates) can be merged into a single scan using FILTER (WHERE ...) clauses on each aggregate expression. Merging two filtered scans broadens the combined filter to OR(f1, f2), which may reduce IO pruning (e.g. partition or file skipping) compared to the individual filters. Disabled by default; enable once the behaviour has been validated in your workload, particularly on heavily partitioned or file-pruned tables. Has no effect when spark.sql.optimizer.mergeSubplans.filterPropagation.enabled is false.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.optimizer.mergeSubplans.filterPropagation.throughJoin.enabled",
+    "Default": "false",
+    "Meaning": "When set to true, filter attributes can propagate through Join nodes during subplan merging, allowing subplans that differ only in their filter conditions and share a common join to be merged into a single scan. A filter attribute is only propagated through a join when it originates from the non-nullable (preserved) side: the left side of LeftOuter/LeftSemi/LeftAnti, the right side of RightOuter, or either side of Inner/Cross. FullOuter joins are never eligible. Has no effect when spark.sql.optimizer.mergeSubplans.filterPropagation.enabled is false.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.optimizer.pushDownJoinThroughUnion.enabled",
+    "Default": "false",
+    "Meaning": "When true, pushes down Join through Union when the right side is small enough to broadcast. This can improve performance by allowing each Union branch to directly perform a broadcast join, avoiding materializing the entire Union result.",
+    "Since Version": "4.2.0"
   },
   {
     "Property Name": "spark.sql.optimizer.runtime.bloomFilter.applicationSideScanSizeThreshold",
@@ -2702,7 +2930,7 @@
   {
     "Property Name": "spark.sql.optimizer.runtime.rowLevelOperationGroupFilter.enabled",
     "Default": "true",
-    "Meaning": "Enables runtime group filtering for group-based row-level operations. Data sources that replace groups of data (e.g. files, partitions) may prune entire groups using provided data source filters when planning a row-level operation scan. However, such filtering is limited as not all expressions can be converted into data source filters and some expressions can only be evaluated by Spark (e.g. subqueries). Since rewriting groups is expensive, Spark can execute a query at runtime to find what records match the condition of the row-level operation. The information about matching records will be passed back to the row-level operation scan, allowing data sources to discard groups that don\u0027t have to be rewritten.",
+    "Meaning": "Enables runtime filtering for group-based and delta-based row-level operations. Data sources may prune entire file groups at runtime when planning a row-level operation scan. Planning-time filter pushdown is limited as not all expressions can be converted into data source filters and some expressions can only be evaluated by Spark (e.g. subqueries). Since rewriting groups or scanning unnecessary files is expensive, Spark can execute a lightweight query at runtime to find what records match the condition of the row-level operation. The information about matching records will be passed back to the row-level operation scan, allowing data sources to skip files that don\u0027t have to be processed.",
     "Since Version": "3.4.0"
   },
   {
@@ -2880,6 +3108,24 @@
     "Since Version": "2.3.0"
   },
   {
+    "Property Name": "spark.sql.parser.singleCharacterPipeOperator.enabled",
+    "Default": "true",
+    "Meaning": "When true, the single character pipe token \u0027|\u0027 can be used as an alternative to \u0027|\u003e\u0027 for SQL pipe operators. When false, only \u0027|\u003e\u0027 is recognized as a pipe operator, and \u0027|\u0027 is only used for bitwise OR operations. This provides syntax compatibility with other languages like Splunk SPL and Kusto that use \u0027|\u0027 for pipe operations.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.path.enabled",
+    "Default": "false",
+    "Meaning": "When true, enables the SQL Standard PATH feature: SET PATH, path-based routine resolution, and CURRENT_PATH(). When false, SET PATH is rejected and resolution uses the default path only.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.pipelines.maxFlowRetryAttempts",
+    "Default": "2",
+    "Meaning": "Maximum number of times a flow can be retried",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.sql.pivotMaxValues",
     "Default": "10000",
     "Meaning": "When doing a pivot without specifying values for the pivot column this is the maximum number of (distinct) values that will be collected without error.",
@@ -2896,6 +3142,12 @@
     "Default": "false",
     "Meaning": "When true, Spark does not replace CHAR/VARCHAR types the STRING type, which is the default behavior of Spark 3.0 and earlier versions. This means the length checks for CHAR/VARCHAR types is enforced and CHAR type is also properly padded.",
     "Since Version": "4.0.0"
+  },
+  {
+    "Property Name": "spark.sql.pyspark.dataSource.profiler",
+    "Default": "(none)",
+    "Meaning": "Configure the Python Data Source profiler by enabling or disabling it with the option to choose between \"perf\" and \"memory\" types, or unsetting the config disables the profiler. This is disabled by default.",
+    "Since Version": "4.2.0"
   },
   {
     "Property Name": "spark.sql.pyspark.inferNestedDictAsStruct.enabled",
@@ -2916,10 +3168,22 @@
     "Since Version": "4.0.0"
   },
   {
+    "Property Name": "spark.sql.pyspark.toJSON.returnDataFrame",
+    "Default": "false",
+    "Meaning": "When true, DataFrame.toJSON in PySpark Classic returns a Dataframe instead of RDD.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.sql.pyspark.udf.profiler",
     "Default": "(none)",
     "Meaning": "Configure the Python/Pandas UDF profiler by enabling or disabling it with the option to choose between \"perf\" and \"memory\" types, or unsetting the config disables the profiler. This is disabled by default.",
     "Since Version": "4.0.0"
+  },
+  {
+    "Property Name": "spark.sql.pyspark.worker.logging.enabled",
+    "Default": "false",
+    "Meaning": "When set to true, this configuration enables comprehensive logging within Python worker processes that execute User-Defined Functions (UDFs), User-Defined Table Functions (UDTFs), and other Python-based operations in Spark SQL.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.sql.readSideCharPadding",
@@ -2959,15 +3223,27 @@
   },
   {
     "Property Name": "spark.sql.scripting.enabled",
-    "Default": "false",
+    "Default": "true",
     "Meaning": "SQL Scripting feature is under development and its use should be done under this feature flag. SQL Scripting enables users to write procedural SQL including control flow and error handling.",
     "Since Version": "4.0.0"
   },
   {
     "Property Name": "spark.sql.session.localRelationCacheThreshold",
-    "Default": "67108864",
+    "Default": "1048576",
     "Meaning": "The threshold for the size in bytes of local relations to be cached at the driver side after serialization.",
     "Since Version": "3.5.0"
+  },
+  {
+    "Property Name": "spark.sql.session.localRelationChunkSizeBytes",
+    "Default": "16777216",
+    "Meaning": "The chunk size in bytes when splitting ChunkedCachedLocalRelation.data into batches. A new chunk is created when either spark.sql.session.localRelationChunkSizeBytes or spark.sql.session.localRelationChunkSizeRows is reached. Limited by the spark.sql.session.localRelationBatchOfChunksSizeBytes, a minimum of the two confs is used to determine the chunk size.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.sql.session.localRelationChunkSizeRows",
+    "Default": "10000",
+    "Meaning": "The chunk size in number of rows when splitting ChunkedCachedLocalRelation.data into batches. A new chunk is created when either spark.sql.session.localRelationChunkSizeBytes or spark.sql.session.localRelationChunkSizeRows is reached.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.sql.session.timeZone",
@@ -2976,15 +3252,27 @@
     "Since Version": "2.2.0"
   },
   {
+    "Property Name": "spark.sql.shuffle.orderIndependentChecksum.enableFullRetryOnMismatch",
+    "Default": "true",
+    "Meaning": "Whether to retry all tasks of a consumer stage when we detect checksum mismatches with its producer stages.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.sql.shuffle.orderIndependentChecksum.enabled",
+    "Default": "true",
+    "Meaning": "Whether to calculate order independent checksum for the shuffle data or not. If enabled, Spark will calculate a checksum that is independent of the input row order for each mapper and returns the checksums from executors to driver. This is different from the checksum computed when spark.shuffle.checksum.enabled is enabled which is sensitive to shuffle data ordering to detect file corruption. While this checksum will be the same even if the shuffle row order changes and it is used to detect whether different task attempts of the same partition produce different output data or not (same set of keyValue pairs). In case the output data has changed across retries, Spark will need to retry all tasks of the consumer stages to avoid correctness issues.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.sql.shuffle.partitions",
     "Default": "200",
-    "Meaning": "The default number of partitions to use when shuffling data for joins or aggregations. Note: For structured streaming, this configuration cannot be changed between query restarts from the same checkpoint location.",
+    "Meaning": "The default number of partitions to use when shuffling data for joins or aggregations.",
     "Since Version": "1.1.0"
   },
   {
     "Property Name": "spark.sql.shuffleDependency.fileCleanup.enabled",
     "Default": "false",
-    "Meaning": "When enabled, shuffle files will be cleaned up at the end of Spark Connect SQL executions.",
+    "Meaning": "(Deprecated since Spark 4.1, please set \u0027spark.sql.connect.shuffleDependency.fileCleanup.enabled\u0027.)",
     "Since Version": "4.0.0"
   },
   {
@@ -3055,14 +3343,14 @@
   },
   {
     "Property Name": "spark.sql.sources.v2.bucketing.enabled",
-    "Default": "false",
+    "Default": "true",
     "Meaning": "Similar to spark.sql.sources.bucketing.enabled, this config is used to enable bucketing for V2 data sources. When turned on, Spark will recognize the specific distribution reported by a V2 data source through SupportsReportPartitioning, and will try to avoid shuffle if necessary.",
     "Since Version": "3.3.0"
   },
   {
     "Property Name": "spark.sql.sources.v2.bucketing.partiallyClusteredDistribution.enabled",
     "Default": "false",
-    "Meaning": "During a storage-partitioned join, whether to allow input partitions to be partially clustered, when both sides of the join are of KeyGroupedPartitioning. At planning time, Spark will pick the side with less data size based on table statistics, group and replicate them to match the other side. This is an optimization on skew join and can help to reduce data skewness when certain partitions are assigned large amount of data. This config requires both spark.sql.sources.v2.bucketing.enabled and spark.sql.sources.v2.bucketing.pushPartValues.enabled to be enabled",
+    "Meaning": "During a storage-partitioned join, whether to allow input partitions to be partially clustered, when both sides of the join are of KeyedPartitioning. At planning time, Spark will pick the side with less data size based on table statistics, group and replicate them to match the other side. This is an optimization on skew join and can help to reduce data skewness when certain partitions are assigned large amount of data. This config requires both spark.sql.sources.v2.bucketing.enabled and spark.sql.sources.v2.bucketing.pushPartValues.enabled to be enabled",
     "Since Version": "3.4.0"
   },
   {
@@ -3072,15 +3360,33 @@
     "Since Version": "4.0.0"
   },
   {
+    "Property Name": "spark.sql.sources.v2.bucketing.partitionKeyOrdering.enabled",
+    "Default": "false",
+    "Meaning": "When enabled, Spark derives output ordering from the partition key expressions of a V2 data source that reports a KeyedPartitioning but does not report explicit ordering via SupportsReportOrdering. Within a single partition all rows share the same key value, so the data is trivially sorted by those expressions. Requires spark.sql.sources.v2.bucketing.enabled to be enabled.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.sources.v2.bucketing.preserveKeyOrderingOnCoalesce.enabled",
+    "Default": "false",
+    "Meaning": "When enabled, Spark preserves sort orders over partition key expressions when GroupPartitionsExec coalesces multiple input partitions into one output partition. Because all merged partitions share the same partition key value, sort orders over those key expressions remain valid after the merge. This applies to both key-derived ordering (from SupportsReportOrdering) and ordering derived from spark.sql.sources.v2.bucketing.partitionKeyOrdering.enabled. Requires spark.sql.sources.v2.bucketing.enabled to be enabled.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.sources.v2.bucketing.preserveOrderingOnCoalesce.enabled",
+    "Default": "false",
+    "Meaning": "When turned on, GroupPartitionsExec will use sorted merge to preserve full ordering (as opposed to the key-derived ordering preserved by spark.sql.sources.v2.bucketing.preserveKeyOrderingOnCoalesce.enabled) when coalescing multiple partitions with the same key. This allows eliminating downstream sorts when data is both partitioned and sorted. When this config is enabled, the effect of spark.sql.sources.v2.bucketing.preserveKeyOrderingOnCoalesce.enabled is fully subsumed: full ordering implies key-derived ordering. However, sorted merge uses more resources (priority queue, comparison overhead) than simple concatenation, especially when coalescing many partitions. When turned off, only key-derived ordering is preserved during coalescing. This config requires spark.sql.sources.v2.bucketing.enabled to be enabled.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.sql.sources.v2.bucketing.pushPartValues.enabled",
     "Default": "true",
-    "Meaning": "Whether to pushdown common partition values when spark.sql.sources.v2.bucketing.enabled is enabled. When turned on, if both sides of a join are of KeyGroupedPartitioning and if they share compatible partition keys, even if they don\u0027t have the exact same partition values, Spark will calculate a superset of partition values and pushdown that info to scan nodes, which will use empty partitions for the missing partition values on either side. This could help to eliminate unnecessary shuffles",
+    "Meaning": "Whether to pushdown common partition values when spark.sql.sources.v2.bucketing.enabled is enabled. When turned on, if both sides of a join are of KeyedPartitioning and if they share compatible partition keys, even if they don\u0027t have the exact same partition values, Spark will calculate a superset of partition values and pushdown that info to group partition nodes, which will use empty partitions for the missing partition values on either side. This could help to eliminate unnecessary shuffles",
     "Since Version": "3.4.0"
   },
   {
     "Property Name": "spark.sql.sources.v2.bucketing.shuffle.enabled",
     "Default": "false",
-    "Meaning": "During a storage-partitioned join, whether to allow to shuffle only one side. When only one side is KeyGroupedPartitioning, if the conditions are met, spark will only shuffle the other side. This optimization will reduce the amount of data that needs to be shuffle. This config requires spark.sql.sources.v2.bucketing.enabled to be enabled",
+    "Meaning": "During a storage-partitioned join, whether to allow to shuffle only one side. When only one side is KeyedPartitioning, if the conditions are met, spark will only shuffle the other side. This optimization will reduce the amount of data that needs to be shuffle. This config requires spark.sql.sources.v2.bucketing.enabled to be enabled",
     "Since Version": "4.0.0"
   },
   {
@@ -3180,10 +3486,28 @@
     "Since Version": "2.1.1"
   },
   {
+    "Property Name": "spark.sql.streaming.realTimeMode.allowlistCheck",
+    "Default": "true",
+    "Meaning": "Whether to check all operators, sinks used in real-time mode are in the allowlist.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.sql.streaming.realTimeMode.minBatchDuration",
+    "Default": "5000ms",
+    "Meaning": "The minimum long-running batch duration in milliseconds for real-time mode.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.sql.streaming.sessionWindow.merge.sessions.in.local.partition",
     "Default": "false",
     "Meaning": "When true, streaming session window sorts and merge sessions in local partition prior to shuffle. This is to reduce the rows to shuffle, but only beneficial when there\u0027re lots of rows in a batch being assigned to same sessions.",
     "Since Version": "3.2.0"
+  },
+  {
+    "Property Name": "spark.sql.streaming.stateStore.commitValidation.enabled",
+    "Default": "true",
+    "Meaning": "When true, Spark will validate that all StateStore instances have committed for stateful streaming queries using foreachBatch. This helps detect cases where user-defined functions in foreachBatch (e.g., show(), limit()) don\u0027t process all partitions, which can lead to incorrect results. The validation only applies to foreachBatch sinks without global aggregates or limits.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.sql.streaming.stateStore.encodingFormat",
@@ -3216,6 +3540,12 @@
     "Since Version": "4.0.0"
   },
   {
+    "Property Name": "spark.sql.streaming.validateEventTimeWatermarkColumn",
+    "Default": "true",
+    "Meaning": "When true, check that eventTime in withWatermark is a top-level column.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.sql.thriftServer.interruptOnCancel",
     "Default": "(value of spark.sql.execution.interruptOnCancel)",
     "Meaning": "When true, all running tasks will be interrupted if one cancels a query. When false, all running tasks will remain until finished.",
@@ -3232,6 +3562,12 @@
     "Default": "(none)",
     "Meaning": "Set a Fair Scheduler pool for a JDBC client session.",
     "Since Version": "1.1.1"
+  },
+  {
+    "Property Name": "spark.sql.thriftserver.shuffleDependency.fileCleanup.enabled",
+    "Default": "false",
+    "Meaning": "When enabled, shuffle files will be cleaned up at the end of Thrift server SQL executions.",
+    "Since Version": "4.2.0"
   },
   {
     "Property Name": "spark.sql.thriftserver.ui.retainedSessions",
@@ -3276,6 +3612,18 @@
     "Since Version": "3.5.0"
   },
   {
+    "Property Name": "spark.sql.udt.allowCreatingUDTFromString",
+    "Default": "true",
+    "Meaning": "When true, Spark loads and instantiates the UserDefinedType class named in a schema string (for example the schema stored in Parquet/ORC file metadata) while inferring or parsing a schema. Because the class name is taken from the data being read, a crafted file can make Spark load an arbitrary class from the classpath. Set this to false to block loading UDT classes by name, optionally allowing specific classes via \u0027spark.sql.udt.allowedDynamicUDTClasses\u0027.",
+    "Since Version": "4.1.3"
+  },
+  {
+    "Property Name": "spark.sql.udt.allowedDynamicUDTClasses",
+    "Default": "",
+    "Meaning": "When \u0027spark.sql.udt.allowCreatingUDTFromString\u0027 is false, UserDefinedType classes listed here (by fully qualified class name) may still be loaded and instantiated from a schema string. Has no effect when UDT loading is enabled.",
+    "Since Version": "4.1.3"
+  },
+  {
     "Property Name": "spark.sql.ui.explainMode",
     "Default": "formatted",
     "Meaning": "Configures the query explain mode used in the Spark SQL UI. The value can be \u0027simple\u0027, \u0027extended\u0027, \u0027codegen\u0027, \u0027cost\u0027, or \u0027formatted\u0027. The default value is \u0027formatted\u0027.",
@@ -3286,6 +3634,24 @@
     "Default": "true",
     "Meaning": "This enables substitution using syntax like ${var}, ${system:var}, and ${env:var}.",
     "Since Version": "2.0.0"
+  },
+  {
+    "Property Name": "spark.sql.window.segmentTree.blockSize",
+    "Default": "65536",
+    "Meaning": "Block size, in rows, for the block-chunked segment tree used by moving window frames. Each leaf of the tree aggregates this many consecutive rows. Smaller values reduce per-partition memory and speed up tree build for small partitions, but make the tree deeper and increase query cost for wide frames. Larger values amortize build cost and shrink the tree but increase the per-block prefix/suffix scan cost within a block. The default is tuned for partitions on the order of tens of thousands to millions of rows.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.window.segmentTree.enabled",
+    "Default": "false",
+    "Meaning": "Use block-chunked segment tree for moving aggregate window frames whose functions are all DeclarativeAggregate without FILTER/DISTINCT.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.sql.xml.variant.respectInferSchema",
+    "Default": "true",
+    "Meaning": "Kill switch for the SPARK-56554 fix. When true (default), the XML to Variant parser honors the \u0027inferSchema\u0027 option: if \u0027inferSchema\u0027 is false, primitive leaf values (text and attributes) are preserved as strings inside the Variant instead of being inferred as boolean, long, or decimal. Set this conf to false to restore the pre-SPARK-56554 behavior of always inferring types regardless of the \u0027inferSchema\u0027 option.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.sql.cache.serializer",
@@ -3337,14 +3703,14 @@
   },
   {
     "Property Name": "spark.sql.hive.metastore.sharedPrefixes",
-    "Default": "com.mysql.jdbc,org.postgresql,com.microsoft.sqlserver,oracle.jdbc",
+    "Default": "com.mysql.jdbc,com.mysql.cj,org.postgresql,com.microsoft.sqlserver,oracle.jdbc",
     "Meaning": "A comma separated list of class prefixes that should be loaded using the classloader that is shared between Spark SQL and a specific version of Hive. An example of classes that should be shared is JDBC drivers that are needed to talk to the metastore. Other classes that need to be shared are those that interact with classes that are already shared. For example, custom appenders that are used by log4j.",
     "Since Version": "1.4.0"
   },
   {
     "Property Name": "spark.sql.hive.metastore.version",
     "Default": "2.3.10",
-    "Meaning": "Version of the Hive metastore. Available options are 2.0.0 through 2.3.10, 3.0.0 through 3.1.3 and 4.0.0 through 4.0.1.",
+    "Meaning": "Version of the Hive metastore. Available options are 2.0.0 through 2.3.10, 3.0.0 through 3.1.3 and 4.0.0 through 4.1.0.",
     "Since Version": "1.4.0"
   },
   {
@@ -3918,6 +4284,12 @@
     "Since Version": "2.3.0"
   },
   {
+    "Property Name": "spark.ui.contentSecurityPolicy.enabled",
+    "Default": "false",
+    "Meaning": "When enabled, the Content-Security-Policy (CSP) HTTP response header is set for the Spark UI, restricting the sources from which the browser is allowed to load resources as a defense-in-depth measure against cross-site scripting (XSS).",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.security.credentials.${service}.enabled",
     "Default": "true",
     "Meaning": "Controls whether to obtain credentials for services when security is enabled. By default, credentials for all supported services are retrieved when those services are configured, but it\u0027s possible to disable that behavior if it somehow conflicts with the application being run.",
@@ -3938,14 +4310,26 @@
   {
     "Property Name": "spark.history.fs.logDirectory",
     "Default": "file:/tmp/spark-events",
-    "Meaning": "For the filesystem history provider, the URL to the directory containing application event logs to load. This can be a local file:// path, an HDFS path hdfs://namenode/shared/spark-logs or that of an alternative filesystem supported by the Hadoop APIs.",
+    "Meaning": "For the filesystem history provider, the URL to the directory containing application event logs to load. This can be a local file:// path, an HDFS path hdfs://namenode/shared/spark-logs or that of an alternative filesystem supported by the Hadoop APIs. Multiple directories can be specified as a comma-separated list (e.g., hdfs:///logs/prod,s3a://bucket/logs/staging). Directories can be on the same or different filesystems. The directories should be disjoint (not nested within each other). If event log files with the same name exist in different directories, each file is indexed separately based on its source directory. When multiple directories are configured, all existing spark.history.fs.* settings apply globally across all directories (there are no per-directory configurations).",
     "Since Version": "1.1.0"
+  },
+  {
+    "Property Name": "spark.history.fs.logDirectory.names",
+    "Default": "(none)",
+    "Meaning": "Optional comma-separated list of display names for the log directories specified in spark.history.fs.logDirectory. Names correspond to directories by position. If not set, the full path is shown in the UI. Empty entries fall back to the full path. Duplicate display names are rejected at startup.",
+    "Since Version": "4.2.0"
   },
   {
     "Property Name": "spark.history.fs.update.interval",
     "Default": "10s",
-    "Meaning": "The period at which the filesystem history provider checks for new or updated logs in the log directory. A shorter interval detects new applications faster, at the expense of more server load re-reading updated applications. As soon as an update has completed, listings of the completed and incomplete applications will reflect the changes.",
+    "Meaning": "The period at which the filesystem history provider checks for new or updated logs in the log directory. A shorter interval detects new applications faster, at the expense of more server load re-reading updated applications. As soon as an update has completed, listings of the completed and incomplete applications will reflect the changes. When multiple log directories are configured, one scan cycle covers all directories sequentially.",
     "Since Version": "1.4.0"
+  },
+  {
+    "Property Name": "spark.history.fs.update.scanDisabledPathPatterns",
+    "Default": "(none)",
+    "Meaning": "Comma-separated list of regular expressions matched against log directory paths. Directories whose full path matches any pattern will not be scanned periodically (e.g., s3a://.*,gs://.* disables scanning for all S3 and GCS directories). Applications in these directories rely on on-demand loading instead of scanning and will not appear in the listing until accessed by appId. When accessed, accurate metadata is populated immediately. Logs that are never accessed are not subject to the cleaner; use external lifecycle management (e.g., S3 Lifecycle Policies, GCS Object Lifecycle Management) for those.",
+    "Since Version": "4.2.0"
   },
   {
     "Property Name": "spark.history.retainedApplications",
@@ -3992,19 +4376,19 @@
   {
     "Property Name": "spark.history.fs.cleaner.interval",
     "Default": "1d",
-    "Meaning": "When spark.history.fs.cleaner.enabled\u003dtrue, specifies how often the filesystem job history cleaner checks for files to delete. Files are deleted if at least one of two conditions holds. First, they\u0027re deleted if they\u0027re older than spark.history.fs.cleaner.maxAge. They are also deleted if the number of files is more than spark.history.fs.cleaner.maxNum, Spark tries to clean up the completed attempts from the applications based on the order of their oldest attempt time.",
+    "Meaning": "When spark.history.fs.cleaner.enabled\u003dtrue, specifies how often the filesystem job history cleaner checks for files to delete. Files are deleted if at least one of two conditions holds. First, they\u0027re deleted if they\u0027re older than spark.history.fs.cleaner.maxAge. They are also deleted if the number of files is more than spark.history.fs.cleaner.maxNum, Spark tries to clean up the completed attempts from the applications based on the order of their oldest attempt time. When multiple log directories are configured, one cleaner cycle covers all directories.",
     "Since Version": "1.4.0"
   },
   {
     "Property Name": "spark.history.fs.cleaner.maxAge",
     "Default": "7d",
-    "Meaning": "When spark.history.fs.cleaner.enabled\u003dtrue, job history files older than this will be deleted when the filesystem history cleaner runs.",
+    "Meaning": "When spark.history.fs.cleaner.enabled\u003dtrue, job history files older than this will be deleted when the filesystem history cleaner runs. When multiple log directories are configured, this age threshold applies to files across all directories.",
     "Since Version": "1.4.0"
   },
   {
     "Property Name": "spark.history.fs.cleaner.maxNum",
     "Default": "Int.MaxValue",
-    "Meaning": "When spark.history.fs.cleaner.enabled\u003dtrue, specifies the maximum number of files in the event log directory. Spark tries to clean up the completed attempt logs to maintain the log directory under this limit. This should be smaller than the underlying file system limit like `dfs.namenode.fs-limits.max-directory-items` in HDFS.",
+    "Meaning": "When spark.history.fs.cleaner.enabled\u003dtrue, specifies the maximum number of files in the event log directory. Spark tries to clean up the completed attempt logs to maintain the log directory under this limit. This should be smaller than the underlying file system limit like `dfs.namenode.fs-limits.max-directory-items` in HDFS. When multiple log directories are configured, this limit applies to the total number of files across all directories. The oldest completed attempts are deleted first regardless of which directory they belong to.",
     "Since Version": "3.0.0"
   },
   {
@@ -4040,8 +4424,14 @@
   {
     "Property Name": "spark.history.fs.numReplayThreads",
     "Default": "25% of available cores",
-    "Meaning": "Number of threads that will be used by history server to process event logs.",
+    "Meaning": "Number of threads that will be used by history server to process event logs. When multiple log directories are configured, the thread pool is shared across all directories.",
     "Since Version": "2.0.0"
+  },
+  {
+    "Property Name": "spark.history.fs.numCompactThreads",
+    "Default": "25% of available cores",
+    "Meaning": "Number of threads that will be used by history server to compact event logs. When multiple log directories are configured, the thread pool is shared across all directories.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.history.store.maxDiskUsage",
@@ -4076,8 +4466,14 @@
   {
     "Property Name": "spark.history.fs.eventLog.rolling.maxFilesToRetain",
     "Default": "Int.MaxValue",
-    "Meaning": "The maximum number of event log files which will be retained as non-compacted. By default, all event log files will be retained. The lowest value is 1 for technical reason. Please read the section of \"Applying compaction of old event log files\" for more details.",
+    "Meaning": "The maximum number of event log files which will be retained as non-compacted. By default, all event log files will be retained. The lowest value is 1 for technical reason. Please read the section of \"Applying compaction of old event log files\" for more details. When multiple log directories are configured, this setting applies independently to each directory.",
     "Since Version": "3.0.0"
+  },
+  {
+    "Property Name": "spark.history.fs.eventLog.rolling.onDemandLoadEnabled",
+    "Default": "true",
+    "Meaning": "Whether to look up rolling event log locations on demand manner before listing files.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.history.store.hybridStore.enabled",
@@ -4100,7 +4496,7 @@
   {
     "Property Name": "spark.history.fs.update.batchSize",
     "Default": "Int.MaxValue",
-    "Meaning": "Specifies the batch size for updating new eventlog files. This controls each scan process to be completed within a reasonable time, and such prevent the initial scan from running too long and blocking new eventlog files to be scanned in time in large environments.",
+    "Meaning": "Specifies the batch size for updating new eventlog files. This controls each scan process to be completed within a reasonable time, and such prevent the initial scan from running too long and blocking new eventlog files to be scanned in time in large environments. When multiple log directories are configured, this batch size applies independently to each directory\u0027s scan.",
     "Since Version": "3.4.0"
   },
   {
@@ -4260,9 +4656,15 @@
     "Since Version": "1.2.0"
   },
   {
+    "Property Name": "spark.yarn.am.defaultJavaOptions",
+    "Default": "(none)",
+    "Meaning": "A string of default JVM options to prepend to spark.yarn.am.extraJavaOptions for the YARN Application Master in client mode. Note that it is illegal to set maximum heap size (-Xmx) settings with this option. Maximum heap size settings can be set with spark.yarn.am.memory. This is intended to be set by administrators.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.yarn.am.extraJavaOptions",
     "Default": "(none)",
-    "Meaning": "A string of extra JVM options to pass to the YARN Application Master in client mode. In cluster mode, use spark.driver.extraJavaOptions instead. Note that it is illegal to set maximum heap size (-Xmx) settings with this option. Maximum heap size settings can be set with spark.yarn.am.memory",
+    "Meaning": "A string of extra JVM options to pass to the YARN Application Master in client mode. In cluster mode, use spark.driver.extraJavaOptions instead. Note that it is illegal to set maximum heap size (-Xmx) settings with this option. Maximum heap size settings can be set with spark.yarn.am.memory. spark.yarn.am.defaultJavaOptions will be prepended to this configuration.",
     "Since Version": "1.3.0"
   },
   {
@@ -4484,19 +4886,19 @@
   {
     "Property Name": "spark.kubernetes.container.image",
     "Default": "(none)",
-    "Meaning": "Container image to use for the Spark application. This is usually of the form example.com/repo/spark:v1.0.0. This configuration is required and must be provided by the user, unless explicit images are provided for each different container type.",
+    "Meaning": "Container image to use for the Spark application. This is usually of the form example.com/repo/spark:v1.0.0. This configuration is required and must be provided by the user, unless explicit images are provided for each different container type. Note that is the built-in variable that will be substituted with current Spark\u0027s version.",
     "Since Version": "2.3.0"
   },
   {
     "Property Name": "spark.kubernetes.driver.container.image",
     "Default": "(value of spark.kubernetes.container.image)",
-    "Meaning": "Custom container image to use for the driver.",
+    "Meaning": "Custom container image to use for the driver. Note that is the built-in variable that will be substituted with current Spark\u0027s version.",
     "Since Version": "2.3.0"
   },
   {
     "Property Name": "spark.kubernetes.executor.container.image",
     "Default": "(value of spark.kubernetes.container.image)",
-    "Meaning": "Custom container image to use for executors.",
+    "Meaning": "Custom container image to use for executors. Note that is the built-in variable that will be substituted with current Spark\u0027s version.",
     "Since Version": "2.3.0"
   },
   {
@@ -4513,7 +4915,7 @@
   },
   {
     "Property Name": "spark.kubernetes.allocation.batch.size",
-    "Default": "10",
+    "Default": "20",
     "Meaning": "Number of pods to launch at once in each round of executor pod allocation.",
     "Since Version": "2.3.0"
   },
@@ -4522,6 +4924,18 @@
     "Default": "1s",
     "Meaning": "Time to wait between each round of executor pod allocation. Specifying values less than 1 second may lead to excessive CPU usage on the spark driver.",
     "Since Version": "2.3.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.allocation.maximum",
+    "Default": "Int.MaxValue",
+    "Meaning": "The maximum number of executor pods to try to create during the whole job lifecycle.",
+    "Since Version": "4.1.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.allocation.recoveryMode.enabled",
+    "Default": "(none)",
+    "Meaning": "When Spark driver detects an executor termination due to OOM, Spark starts to allocate the recovery-mode executors which accept only a single task per executor JVM. In other words, the recovery-mode executors replace the OOM-terminated executors to survive from the resource-hungry tasks for the remaining tasks and stages. If set to false, Spark will not use the recovery-mode executors.",
+    "Since Version": "4.2.0"
   },
   {
     "Property Name": "spark.kubernetes.jars.avoidDownloadSchemes",
@@ -4878,12 +5292,6 @@
     "Since Version": "2.4.0"
   },
   {
-    "Property Name": "spark.kubernetes.pyspark.pythonVersion",
-    "Default": "\"3\"",
-    "Meaning": "This sets the major Python version of the docker image used to run the driver and executor containers. It can be only \"3\". This configuration was deprecated from Spark 3.1.0, and is effectively no-op. Users should set \u0027spark.pyspark.python\u0027 and \u0027spark.pyspark.driver.python\u0027 configurations or \u0027PYSPARK_PYTHON\u0027 and \u0027PYSPARK_DRIVER_PYTHON\u0027 environment variables.",
-    "Since Version": "2.4.0"
-  },
-  {
     "Property Name": "spark.kubernetes.kerberos.krb5.path",
     "Default": "(none)",
     "Meaning": "Specify the local location of the krb5.conf file to be mounted on the driver and executors for Kerberos interaction. It is important to note that the KDC defined needs to be visible from inside the containers.",
@@ -4942,6 +5350,12 @@
     "Default": "true",
     "Meaning": "Specify whether executor pods should be deleted in case of failure or normal termination.",
     "Since Version": "3.0.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.executor.terminationGracePeriodSeconds",
+    "Default": "30s",
+    "Meaning": "Time to wait for graceful termination of executor pods.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.kubernetes.executor.checkAllContainers",
@@ -5010,6 +5424,12 @@
     "Since Version": "3.3.0"
   },
   {
+    "Property Name": "spark.kubernetes.executor.podDeletionCost",
+    "Default": "(none)",
+    "Meaning": "Value to apply to the controller.kubernetes.io/pod-deletion-cost annotation when Spark tells a deployment-based allocator to remove executor pods. Set this to steer Kubernetes to remove the same pods that Spark selected when the deployment scales down.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.kubernetes.executor.scheduler.name",
     "Default": "(none)",
     "Meaning": "Specify the scheduler name for each executor pod.",
@@ -5052,6 +5472,12 @@
     "Since Version": "3.2.0"
   },
   {
+    "Property Name": "spark.kubernetes.driver.annotateExitException",
+    "Default": "false",
+    "Meaning": "If set to true, Spark will store the exit exception failed applications in the Kubernetes API server using the spark.exit-exception annotation.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.kubernetes.driver.service.ipFamilyPolicy",
     "Default": "SingleStack",
     "Meaning": "K8s IP Family Policy for Driver Service. Valid values are SingleStack, PreferDualStack, and RequireDualStack.",
@@ -5062,6 +5488,12 @@
     "Default": "IPv4",
     "Meaning": "A list of IP families for K8s Driver Service. Valid values are IPv4 and IPv6.",
     "Since Version": "3.4.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.executor.useDriverPodIP",
+    "Default": "false",
+    "Meaning": "If true, executor pods use Driver pod IP directly instead of Driver Service.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.kubernetes.driver.ownPersistentVolumeClaim",
@@ -5090,14 +5522,26 @@
   {
     "Property Name": "spark.kubernetes.driver.pod.featureSteps",
     "Default": "(none)",
-    "Meaning": "Class names of an extra driver pod feature step implementing `KubernetesFeatureConfigStep`. This is a developer API. Comma separated. Runs after all of Spark internal feature steps. Since 3.3.0, your driver feature step can implement `KubernetesDriverCustomFeatureConfigStep` where the driver config is also available.",
+    "Meaning": "Class names of an extra driver pod feature step implementing `KubernetesFeatureConfigStep`. This is a stable developer API. Comma separated. Runs after all of Spark internal feature steps. Since 3.3.0, your driver feature step can implement `KubernetesDriverCustomFeatureConfigStep` where the driver config is also available.",
     "Since Version": "3.2.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.driver.pod.excludedFeatureSteps",
+    "Default": "(none)",
+    "Meaning": "Class names of a driver pod feature step to exclude. This is a developer API. Comma separated.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.kubernetes.executor.pod.featureSteps",
     "Default": "(none)",
-    "Meaning": "Class names of an extra executor pod feature step implementing `KubernetesFeatureConfigStep`. This is a developer API. Comma separated. Runs after all of Spark internal feature steps. Since 3.3.0, your executor feature step can implement `KubernetesExecutorCustomFeatureConfigStep` where the executor config is also available.",
+    "Meaning": "Class names of an extra executor pod feature step implementing `KubernetesFeatureConfigStep`. This is a stable developer API. Comma separated. Runs after all of Spark internal feature steps. Since 3.3.0, your executor feature step can implement `KubernetesExecutorCustomFeatureConfigStep` where the executor config is also available.",
     "Since Version": "3.2.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.executor.pod.excludedFeatureSteps",
+    "Default": "(none)",
+    "Meaning": "Class names of an executor pod feature step to exclude. This is a developer API. Comma separated.",
+    "Since Version": "4.1.0"
   },
   {
     "Property Name": "spark.kubernetes.allocation.maxPendingPods",
@@ -5106,9 +5550,15 @@
     "Since Version": "3.2.0"
   },
   {
+    "Property Name": "spark.kubernetes.allocation.maxPendingPodsPerRp",
+    "Default": "Int.MaxValue",
+    "Meaning": "Maximum number of pending PODs allowed per resource profile ID during executor allocation. This provides finer-grained control over pending pods by limiting them per resource profile rather than globally. When set, this limit is enforced independently for each resource profile ID.",
+    "Since Version": "4.1.0"
+  },
+  {
     "Property Name": "spark.kubernetes.allocation.pods.allocator",
     "Default": "direct",
-    "Meaning": "Allocator to use for pods. Possible values are direct (the default) and statefulset, or a full class name of a class implementing `AbstractPodsAllocator`. Future version may add Job or replicaset. This is a developer API and may change or be removed at anytime.",
+    "Meaning": "Allocator to use for pods. Possible values are direct (the default), statefulset, deployment, or a full class name of a class implementing `AbstractPodsAllocator`. Future version may add Job or replicaset. This is a developer API and may change or be removed at anytime.",
     "Since Version": "3.3.0"
   },
   {
@@ -5154,6 +5604,42 @@
     "Since Version": "3.3.0"
   },
   {
+    "Property Name": "spark.kubernetes.executor.resizeInterval",
+    "Default": "0s",
+    "Meaning": "Interval between executor resize operations. To disable, set 0 (default). Takes effect only when org.apache.spark.scheduler.cluster.k8s.ExecutorResizePlugin is registered via spark.plugins.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.executor.resizeThreshold",
+    "Default": "0.9",
+    "Meaning": "The threshold to resize. Takes effect only when org.apache.spark.scheduler.cluster.k8s.ExecutorResizePlugin is registered via spark.plugins.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.executor.resizeFactor",
+    "Default": "0.1",
+    "Meaning": "The factor to resize. Takes effect only when org.apache.spark.scheduler.cluster.k8s.ExecutorResizePlugin is registered via spark.plugins.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.executor.pvc.resizeInterval",
+    "Default": "5min",
+    "Meaning": "Interval between executor PVC resize operations, in minutes. Defaults to 5 minutes. Set to 0 to disable. Must be 0 or a positive multiple of 5 minutes. Takes effect only when org.apache.spark.scheduler.cluster.k8s.ExecutorPVCResizePlugin is registered via spark.plugins.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.executor.pvc.resizeThreshold",
+    "Default": "0.5",
+    "Meaning": "The PVC usage ratio (used / capacity) above which the driver triggers a resize. Takes effect only when org.apache.spark.scheduler.cluster.k8s.ExecutorPVCResizePlugin is registered via spark.plugins.",
+    "Since Version": "4.2.0"
+  },
+  {
+    "Property Name": "spark.kubernetes.executor.pvc.resizeFactor",
+    "Default": "1.0",
+    "Meaning": "The factor to grow PVC storage by, relative to the current request. Takes effect only when org.apache.spark.scheduler.cluster.k8s.ExecutorPVCResizePlugin is registered via spark.plugins.",
+    "Since Version": "4.2.0"
+  },
+  {
     "Property Name": "spark.master.ui.port",
     "Default": "8080",
     "Meaning": "Specifies the port number of the Master Web UI endpoint.",
@@ -5179,7 +5665,7 @@
   },
   {
     "Property Name": "spark.master.rest.enabled",
-    "Default": "false",
+    "Default": "true",
     "Meaning": "Whether to use the Master REST API endpoint or not.",
     "Since Version": "1.3.0"
   },
@@ -5276,7 +5762,7 @@
   {
     "Property Name": "spark.dead.worker.persistence",
     "Default": "15",
-    "Meaning": "Number of iterations to keep the deae worker information in UI. By default, the dead worker is visible for (15 + 1) * spark.worker.timeout since its last heartbeat.",
+    "Meaning": "Number of iterations to keep the dead worker information in UI. By default, the dead worker is visible for (15 + 1) * spark.worker.timeout since its last heartbeat.",
     "Since Version": "0.8.0"
   },
   {
