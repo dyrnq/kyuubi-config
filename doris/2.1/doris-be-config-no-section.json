@@ -85,7 +85,7 @@
   },
   {
     "Key": "brpc_num_threads",
-    "Default": "-1"
+    "Default": "256"
   },
   {
     "Key": "thrift_rpc_timeout_ms",
@@ -589,7 +589,7 @@
   },
   {
     "Key": "write_buffer_size",
-    "Default": "104,857,600"
+    "Default": "209,715,200"
   },
   {
     "Key": "remote_storage_read_buffer_mb",

@@ -89,7 +89,7 @@
   },
   {
     "Key": "brpc_num_threads",
-    "Default": "-1"
+    "Default": "256"
   },
   {
     "Key": "thrift_rpc_timeout_ms",
@@ -320,12 +320,24 @@
     "Default": "86400"
   },
   {
-    "Key": "max_single_replica_compaction_threads",
-    "Default": "-1"
-  },
-  {
     "Key": "update_replica_infos_interval_seconds",
     "Default": "60 (s)"
+  },
+  {
+    "Key": "cold_data_compaction_score_threshold",
+    "Default": "100"
+  },
+  {
+    "Key": "cold_data_compaction_thread_num",
+    "Default": "2"
+  },
+  {
+    "Key": "cold_data_compaction_interval_sec",
+    "Default": "1800 (seconds)"
+  },
+  {
+    "Key": "enable_compaction_pause_on_high_memory",
+    "Default": "false (was true before 4.0.8)"
   },
   {
     "Key": "enable_stream_load_record",
@@ -426,6 +438,10 @@
   {
     "Key": "olap_table_sink_send_interval_auto_partition_factor",
     "Default": "0.001"
+  },
+  {
+    "Key": "enable_group_commit_streamload_be_forward",
+    "Default": "false"
   },
   {
     "Key": "delete_worker_count",
@@ -529,7 +545,7 @@
   },
   {
     "Key": "write_buffer_size",
-    "Default": "104,857,600"
+    "Default": "209,715,200"
   },
   {
     "Key": "remote_storage_read_buffer_mb",
@@ -793,10 +809,6 @@
   },
   {
     "Key": "enable_simdjson_reader",
-    "Default": "true"
-  },
-  {
-    "Key": "enable_query_memory_overcommit",
     "Default": "true"
   },
   {

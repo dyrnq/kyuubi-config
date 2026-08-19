@@ -112,6 +112,10 @@
     "Default": "true"
   },
   {
+    "Key": "fe_meta_auth_token",
+    "Default": "\"\" (empty string)"
+  },
+  {
     "Key": "enable_multi_tags",
     "Default": "false"
   },
@@ -668,6 +672,10 @@
     "Default": "5"
   },
   {
+    "Key": "enable_stream_load_profile",
+    "Default": "false"
+  },
+  {
     "Key": "log_roll_size_mb",
     "Default": "1024 （1G）"
   },
@@ -892,12 +900,12 @@
     "Default": "86400L (1 day)"
   },
   {
-    "Key": "storage_cooldown_second",
-    "Default": "30 * 24 * 3600L （30 day）"
-  },
-  {
     "Key": "default_storage_medium",
     "Default": "HDD"
+  },
+  {
+    "Key": "default_compression_type",
+    "Default": "LZ4F (before 4.0.3), ZSTD (since 4.0.3)"
   },
   {
     "Key": "enable_storage_policy",
@@ -946,6 +954,14 @@
   {
     "Key": "max_create_table_timeout_second",
     "Default": "60 （s）"
+  },
+  {
+    "Key": "autobucket_min_buckets",
+    "Default": "3 (was 1 before 4.0.8)"
+  },
+  {
+    "Key": "autobucket_max_buckets",
+    "Default": "128"
   },
   {
     "Key": "file_scan_node_split_num",
@@ -1174,5 +1190,9 @@
   {
     "Key": "meta_service_endpoint",
     "Default": "\"\""
+  },
+  {
+    "Key": "enable_group_commit_streamload_be_forward",
+    "Default": "false"
   }
 ]
