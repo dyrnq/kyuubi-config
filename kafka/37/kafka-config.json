@@ -1,6 +1,6 @@
 [
   {
-    "name": "3.1 Broker Configs",
+    "name": "Broker Configs",
     "list": [
       {
         "Name": "advertised.listeners",
@@ -2570,7 +2570,7 @@
     ]
   },
   {
-    "name": "3.2 Topic-Level Configs",
+    "name": "Topic-Level Configs",
     "list": [
       {
         "Name": "cleanup.policy",
@@ -2854,7 +2854,7 @@
     ]
   },
   {
-    "name": "3.3 Producer Configs",
+    "name": "Producer Configs",
     "list": [
       {
         "Name": "key.serializer",
@@ -3579,7 +3579,7 @@
     ]
   },
   {
-    "name": "3.4 Consumer Configs",
+    "name": "Consumer Configs",
     "list": [
       {
         "Name": "key.deserializer",
@@ -4336,7 +4336,7 @@
     ]
   },
   {
-    "name": "3.5 Kafka Connect Configs",
+    "name": "Kafka Connect Configs",
     "list": [
       {
         "Name": "config.storage.topic",
@@ -5541,7 +5541,7 @@
     ]
   },
   {
-    "name": "3.6 Kafka Streams Configs",
+    "name": "Kafka Streams Configs",
     "list": [
       {
         "Name": "application.id",
@@ -6026,7 +6026,7 @@
     ]
   },
   {
-    "name": "3.7 Admin Configs",
+    "name": "Admin Configs",
     "list": [
       {
         "Name": "bootstrap.controllers",
@@ -6607,7 +6607,7 @@
     ]
   },
   {
-    "name": "3.8 MirrorMaker Configs",
+    "name": "MirrorMaker Configs",
     "list": [
       {
         "Name": "source.cluster.alias",
@@ -7484,7 +7484,7 @@
     ]
   },
   {
-    "name": "3.9 System Properties",
+    "name": "System Properties",
     "list": [
       {
         "Name": "org.apache.kafka.disallowed.login.modules",
@@ -7495,7 +7495,7 @@
     ]
   },
   {
-    "name": "3.10 Tiered Storage Configs",
+    "name": "Tiered Storage Configs",
     "list": [
       {
         "Name": "log.local.retention.bytes",

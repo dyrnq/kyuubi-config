@@ -1,6 +1,6 @@
 [
   {
-    "name": "3.1 Broker Configs",
+    "name": "Broker Configs",
     "list": [
       {
         "Name": "advertised.listeners",
@@ -2696,7 +2696,7 @@
     ]
   },
   {
-    "name": "3.2 Topic-Level Configs",
+    "name": "Topic-Level Configs",
     "list": [
       {
         "Name": "cleanup.policy",
@@ -3007,7 +3007,7 @@
     ]
   },
   {
-    "name": "3.3 Producer Configs",
+    "name": "Producer Configs",
     "list": [
       {
         "Name": "key.serializer",
@@ -3764,7 +3764,7 @@
     ]
   },
   {
-    "name": "3.4 Consumer Configs",
+    "name": "Consumer Configs",
     "list": [
       {
         "Name": "key.deserializer",
@@ -4529,7 +4529,7 @@
     ]
   },
   {
-    "name": "3.5 Kafka Connect Configs",
+    "name": "Kafka Connect Configs",
     "list": [
       {
         "Name": "config.storage.topic",
@@ -5758,7 +5758,7 @@
     ]
   },
   {
-    "name": "3.6 Kafka Streams Configs",
+    "name": "Kafka Streams Configs",
     "list": [
       {
         "Name": "application.id",
@@ -6251,7 +6251,7 @@
     ]
   },
   {
-    "name": "3.7 Admin Configs",
+    "name": "Admin Configs",
     "list": [
       {
         "Name": "bootstrap.controllers",
@@ -6840,7 +6840,7 @@
     ]
   },
   {
-    "name": "3.8 MirrorMaker Configs",
+    "name": "MirrorMaker Configs",
     "list": [
       {
         "Name": "source.cluster.alias",
@@ -7725,24 +7725,18 @@
     ]
   },
   {
-    "name": "3.9 System Properties",
+    "name": "System Properties",
     "list": [
       {
         "Name": "org.apache.kafka.disallowed.login.modules",
         "Desc": "This system property is used to disable the problematic login modules usage in SASL JAAS configuration. This property accepts comma-separated list of loginModule names. By default com.sun.security.auth.module.JndiLoginModule loginModule is disabled.",
         "Since": "3.4.0",
         "Default Value": "com.sun.security.auth.module.JndiLoginModule"
-      },
-      {
-        "Name": "org.apache.kafka.automatic.config.providers",
-        "Desc": "This system property controls the automatic loading of ConfigProvider implementations in Apache Kafka. ConfigProviders are used to dynamically supply configuration values from sources such as files, directories, or environment variables. This property accepts a comma-separated list of ConfigProvider names. By default, all built-in ConfigProviders are enabled, including FileConfigProvider, DirectoryConfigProvider, and EnvVarConfigProvider.",
-        "Since": "3.8.0",
-        "Default Value": "All built-in ConfigProviders are enabled"
       }
     ]
   },
   {
-    "name": "3.10 Tiered Storage Configs",
+    "name": "Tiered Storage Configs",
     "list": [
       {
         "Name": "log.local.retention.bytes",

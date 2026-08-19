@@ -1,5 +1,14 @@
 [
   {
+    "Name": "controller.listener.names",
+    "Desc": "A comma-separated list of the names of the listeners used by the controller. This is required when communicating with the controller quorum, the broker will always use the first listener in this list.",
+    "Type": "list",
+    "Default": "",
+    "Valid Values": "",
+    "Importance": "high",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "node.id",
     "Desc": "The node ID associated with the roles this process is playing when process.roles is non-empty. This is required configuration when running in KRaft mode.",
     "Type": "int",
@@ -38,7 +47,7 @@
   {
     "Name": "advertised.listeners",
     "Desc": "Specifies the listener addresses that the Kafka brokers will advertise to clients and other brokers. The config is useful where the actual listener configuration listeners does not represent the addresses that clients should use to connect, such as in cloud environments. The addresses are published to and managed by the controller, the brokers pull these data from the controller as needed. In IaaS environments, this may need to be different from the interface to which the broker binds. If this is not set, the value for listeners will be used. Unlike listeners, it is not valid to advertise the 0.0.0.0 meta-address. Also unlike listeners, there can be duplicated ports in this property, so that one listener can be configured to advertise another listener\u0027s address. This can be useful in some cases where external load balancers are used.",
-    "Type": "string",
+    "Type": "list",
     "Default": "null",
     "Valid Values": "",
     "Importance": "high",
@@ -90,15 +99,6 @@
     "Update Mode": "cluster-wide"
   },
   {
-    "Name": "controller.listener.names",
-    "Desc": "A comma-separated list of the names of the listeners used by the controller. This is required when communicating with the controller quorum, the broker will always use the first listener in this list.",
-    "Type": "string",
-    "Default": "null",
-    "Valid Values": "",
-    "Importance": "high",
-    "Update Mode": "read-only"
-  },
-  {
     "Name": "controller.quorum.bootstrap.servers",
     "Desc": "List of endpoints to use for bootstrapping the cluster metadata. The endpoints are specified in comma-separated list of {host}:{port} entries. For example: localhost:9092,localhost:9093,localhost:9094.",
     "Type": "list",
@@ -112,7 +112,7 @@
     "Desc": "Maximum time in milliseconds before starting new elections. This is used in the binary exponential backoff mechanism that helps prevent gridlocked elections",
     "Type": "int",
     "Default": "1000 (1 second)",
-    "Valid Values": "",
+    "Valid Values": "[0,...]",
     "Importance": "high",
     "Update Mode": "read-only"
   },
@@ -121,7 +121,7 @@
     "Desc": "Maximum time in milliseconds to wait without being able to fetch from the leader before triggering a new election",
     "Type": "int",
     "Default": "1000 (1 second)",
-    "Valid Values": "",
+    "Valid Values": "[0,...]",
     "Importance": "high",
     "Update Mode": "read-only"
   },
@@ -130,13 +130,13 @@
     "Desc": "Maximum time without a successful fetch from the current leader before becoming a candidate and triggering an election for voters; Maximum time a leader can go without receiving valid fetch or fetchSnapshot request from a majority of the quorum before resigning.",
     "Type": "int",
     "Default": "2000 (2 seconds)",
-    "Valid Values": "",
+    "Valid Values": "[0,...]",
     "Importance": "high",
     "Update Mode": "read-only"
   },
   {
     "Name": "controller.quorum.voters",
-    "Desc": "Map of id/endpoint information for the set of voters in a comma-separated list of {id}@{host}:{port} entries. For example: 1@localhost:9092,2@localhost:9093,3@localhost:9094",
+    "Desc": "Map of id/endpoint information for the set of voters in a comma-separated list of {id}@{host}:{port} entries. This is the old way of defining membership for controller quorums and should NOT be set if using dynamic quorums. Instead, controller.quorum.bootstrap.servers should be set,and the voter set is determined by the --standalone or --initial-controllers flags when formatting.For example: 1@localhost:9092,2@localhost:9093,3@localhost:9094",
     "Type": "list",
     "Default": "\"\"",
     "Valid Values": "non-empty list",
@@ -145,7 +145,7 @@
   },
   {
     "Name": "delete.topic.enable",
-    "Desc": "Enables delete topic. Delete topic through the admin tool will have no effect if this config is turned off",
+    "Desc": "When set to true, topics can be deleted by the admin client. When set to false, deletion requests will be explicitly rejected by the broker.",
     "Type": "boolean",
     "Default": "true",
     "Valid Values": "",
@@ -155,15 +155,24 @@
   {
     "Name": "early.start.listeners",
     "Desc": "A comma-separated list of listener names which may be started before the authorizer has finished initialization. This is useful when the authorizer is dependent on the cluster itself for bootstrapping, as is the case for the StandardAuthorizer (which stores ACLs in the metadata log.) By default, all listeners included in controller.listener.names will also be early start listeners. A listener should not appear in this list if it accepts external traffic.",
-    "Type": "string",
+    "Type": "list",
     "Default": "null",
     "Valid Values": "",
     "Importance": "high",
     "Update Mode": "read-only"
   },
   {
+    "Name": "group.coordinator.background.threads",
+    "Desc": "The number of threads used by the group coordinator for processing background tasks (e.g. updating regular expression subscriptions and offloaded assignments).",
+    "Type": "int",
+    "Default": "2",
+    "Valid Values": "[1,...]",
+    "Importance": "high",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "group.coordinator.threads",
-    "Desc": "The number of threads used by the group coordinator.",
+    "Desc": "The number of threads used by the group coordinator for processing requests.",
     "Type": "int",
     "Default": "4",
     "Valid Values": "[1,...]",
@@ -182,7 +191,7 @@
   {
     "Name": "listeners",
     "Desc": "Listener List - Comma-separated list of URIs we will listen on and the listener names. If the listener name is not a security protocol, listener.security.protocol.map must also be set. Listener names and port numbers must be unique unless one listener is an IPv4 address and the other listener is an IPv6 address (for the same port). Specify hostname as 0.0.0.0 to bind to all interfaces. Leave hostname empty to bind to default interface. Examples of legal listener lists: PLAINTEXT://myhost:9092,SSL://:9091 CLIENT://0.0.0.0:9092,REPLICATION://localhost:9093 PLAINTEXT://127.0.0.1:9092,SSL://[::1]:9092",
-    "Type": "string",
+    "Type": "list",
     "Default": "PLAINTEXT://:9092",
     "Valid Values": "",
     "Importance": "high",
@@ -190,8 +199,8 @@
   },
   {
     "Name": "log.dir",
-    "Desc": "The directory in which the log data is kept (supplemental for log.dirs property)",
-    "Type": "string",
+    "Desc": "A comma-separated list of the directories where the log data is stored. (supplemental to log.dirs property)",
+    "Type": "list",
     "Default": "/tmp/kafka-logs",
     "Valid Values": "",
     "Importance": "high",
@@ -200,7 +209,7 @@
   {
     "Name": "log.dirs",
     "Desc": "A comma-separated list of the directories where the log data is stored. If not set, the value in log.dir is used.",
-    "Type": "string",
+    "Type": "list",
     "Default": "null",
     "Valid Values": "",
     "Importance": "high",
@@ -343,7 +352,7 @@
   },
   {
     "Name": "message.max.bytes",
-    "Desc": "The largest record batch size allowed by Kafka (after compression if compression is enabled). If this is increased and there are consumers older than 0.10.2, the consumers\u0027 fetch size must also be increased so that they can fetch record batches this large. In the latest message format version, records are always grouped into batches for efficiency. In previous message format versions, uncompressed records are not grouped into batches and this limit only applies to a single record in that case.This can be set per topic with the topic level max.message.bytes config.",
+    "Desc": "The largest record batch size allowed by Kafka (after compression if compression is enabled).This can be set per topic with the topic level max.message.bytes config.",
     "Type": "int",
     "Default": "1048588",
     "Valid Values": "[0,...]",
@@ -382,7 +391,7 @@
     "Desc": "The maximum size of a single metadata log file.",
     "Type": "int",
     "Default": "1073741824 (1 gibibyte)",
-    "Valid Values": "[12,...]",
+    "Valid Values": "[8388608,...]",
     "Importance": "high",
     "Update Mode": "read-only"
   },
@@ -415,7 +424,7 @@
   },
   {
     "Name": "min.insync.replicas",
-    "Desc": "When a producer sets acks to \"all\" (or \"-1\"), this configuration specifies the minimum number of replicas that must acknowledge a write for the write to be considered successful. If this minimum cannot be met, then the producer will raise an exception (either NotEnoughReplicas or NotEnoughReplicasAfterAppend). Regardless of the acks setting, the messages will not be visible to the consumers until they are replicated to all in-sync replicas and the min.insync.replicas condition is met. When used together, min.insync.replicas and acks allow you to enforce greater durability guarantees. A typical scenario would be to create a topic with a replication factor of 3, set min.insync.replicas to 2, and produce with acks of \"all\". This will ensure that a majority of replicas must persist a write before it\u0027s considered successful by the producer and it\u0027s visible to consumers.",
+    "Desc": "Specifies the minimum number of in-sync replicas (including the leader) required for a write to succeed when a producer sets acks to \"all\" (or \"-1\"). In the acks\u003dall case, every in-sync replica must acknowledge a write for it to be considered successful. E.g., if a topic has replication.factor of 3 and the ISR set includes all three replicas, then all three replicas must acknowledge an acks\u003dall write for it to succeed, even if min.insync.replicas happens to be less than 3. If acks\u003dall and the current ISR set contains fewer than min.insync.replicas members, then the producer will raise an exception (either NotEnoughReplicas or NotEnoughReplicasAfterAppend). Regardless of the acks setting, the messages will not be visible to the consumers until they are replicated to all in-sync replicas and the min.insync.replicas condition is met. When used together, min.insync.replicas and acks allow you to enforce greater durability guarantees. A typical scenario would be to create a topic with a replication factor of 3, set min.insync.replicas to 2, and produce with acks of \"all\". This ensures that a majority of replicas must persist a write before it\u0027s considered successful by the producer and it\u0027s visible to consumers.",
     "Type": "int",
     "Default": "1",
     "Valid Values": "[1,...]",
@@ -463,7 +472,7 @@
     "Desc": "Number of fetcher threads used to replicate records from each source broker. The total number of fetchers on each broker is bound by num.replica.fetchers multiplied by the number of brokers in the cluster.Increasing this value can increase the degree of I/O parallelism in the follower and leader broker at the cost of higher CPU and memory utilization.",
     "Type": "int",
     "Default": "1",
-    "Valid Values": "",
+    "Valid Values": "[1,...]",
     "Importance": "high",
     "Update Mode": "cluster-wide"
   },
@@ -559,7 +568,7 @@
   },
   {
     "Name": "replica.fetch.min.bytes",
-    "Desc": "Minimum bytes expected for each fetch response. If not enough bytes, wait up to replica.fetch.wait.max.ms (broker config).",
+    "Desc": "Minimum bytes expected for each fetch response. If not enough bytes, wait up to replica.fetch.wait.max.ms (broker config). Even if the total data available in the broker exceeds replica.fetch.min.bytes, the actual returned size may still be less than this value due to per-partition limits replica.fetch.max.bytes and max returned limits replica.fetch.response.max.bytes",
     "Type": "int",
     "Default": "1",
     "Valid Values": "",
@@ -877,7 +886,7 @@
     "Desc": "The duration in milliseconds that the leader will wait for writes to accumulate before flushing them to disk.",
     "Type": "int",
     "Default": "25",
-    "Valid Values": "",
+    "Valid Values": "[0,...]",
     "Importance": "medium",
     "Update Mode": "read-only"
   },
@@ -886,7 +895,7 @@
     "Desc": "The configuration controls the maximum amount of time the client will wait for the response of a request. If the response is not received before the timeout elapses the client will resend the request if necessary or fail the request if retries are exhausted.",
     "Type": "int",
     "Default": "2000 (2 seconds)",
-    "Valid Values": "",
+    "Valid Values": "[0,...]",
     "Importance": "medium",
     "Update Mode": "read-only"
   },
@@ -900,8 +909,17 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "cordoned.log.dirs",
+    "Desc": "A comma-separated list of the directories that are cordoned. Entries in this list must be entries in log.dirs or log.dir configuration. This can also be set to * to cordon all log directories.",
+    "Type": "list",
+    "Default": "\"\"",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "per-broker"
+  },
+  {
     "Name": "default.replication.factor",
-    "Desc": "The replication factor for automatically created topics, and for topics created with -1 as the replication factor",
+    "Desc": "The default replication factor per topic. This configuration affects the following paths:",
     "Type": "int",
     "Default": "1",
     "Valid Values": "",
@@ -963,6 +981,33 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "follower.fetch.last.tiered.offset.enable",
+    "Desc": "When enabled, an empty follower skips offsets up to the last tiered offset and begins replication from the next offset.",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "cluster-wide"
+  },
+  {
+    "Name": "follower.replication.throttled.rate",
+    "Desc": "A long representing the upper bound (bytes/sec) on replication traffic for followers enumerated in the property follower.replication.throttled.replicas (for each topic). This property can be only set dynamically. It is suggested that the limit be kept above 1MB/s for accurate behaviour.",
+    "Type": "long",
+    "Default": "9223372036854775807",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "cluster-wide"
+  },
+  {
+    "Name": "group.consumer.assignment.interval.ms",
+    "Desc": "The interval between assignment updates for a consumer group.",
+    "Type": "int",
+    "Default": "1000 (1 second)",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "cluster-wide"
+  },
+  {
     "Name": "group.consumer.assignors",
     "Desc": "The server side assignors as a list of either names for builtin assignors or full class names for customer assignors. The first one in the list is considered as the default assignor to be used in the case where the consumer does not specify an assignor. The supported builtin assignors are: uniform, range.",
     "Type": "list",
@@ -977,6 +1022,15 @@
     "Type": "int",
     "Default": "5000 (5 seconds)",
     "Valid Values": "[1,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.consumer.max.assignment.interval.ms",
+    "Desc": "The maximum interval between assignment updates for a consumer group.",
+    "Type": "int",
+    "Default": "15000 (15 seconds)",
+    "Valid Values": "[0,...]",
     "Importance": "medium",
     "Update Mode": "read-only"
   },
@@ -1017,6 +1071,15 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "group.consumer.min.assignment.interval.ms",
+    "Desc": "The minimum interval between assignment updates for a consumer group.",
+    "Type": "int",
+    "Default": "0",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "group.consumer.min.heartbeat.interval.ms",
     "Desc": "The minimum heartbeat interval for registered consumers.",
     "Type": "int",
@@ -1045,19 +1108,28 @@
   },
   {
     "Name": "group.coordinator.append.linger.ms",
-    "Desc": "The duration in milliseconds that the coordinator will wait for writes to accumulate before flushing them to disk. Transactional writes are not accumulated.",
+    "Desc": "The duration in milliseconds that the coordinator will wait for writes to accumulate before flushing them to disk. Increasing this value improves write efficiency and batch size, but also increases the response latency for requests, as the coordinator must wait for batches to be flushed to disk before completing request processing. Transactional writes are not accumulated. Set to -1 for an adaptive linger time that minimizes latency based on the workload.",
     "Type": "int",
-    "Default": "5",
-    "Valid Values": "[0,...]",
+    "Default": "-1",
+    "Valid Values": "[-1,...]",
     "Importance": "medium",
     "Update Mode": "read-only"
   },
   {
+    "Name": "group.coordinator.cached.buffer.max.bytes",
+    "Desc": "The maximum buffer size that the GroupCoordinator will retain for reuse. Note: Setting this larger than the maximum message size is not recommended. In this case, every write buffer will be eligible for recycling, which renders this configuration ineffective as a size limit.",
+    "Type": "int",
+    "Default": "1048588",
+    "Valid Values": "[524288,...]",
+    "Importance": "medium",
+    "Update Mode": "cluster-wide"
+  },
+  {
     "Name": "group.coordinator.rebalance.protocols",
-    "Desc": "The list of enabled rebalance protocols.The share rebalance protocol is in early access and therefore must not be used in production.",
+    "Desc": "This configuration is deprecated and will be removed in Kafka 5.0. The list of enabled rebalance protocols. In Kafka 5.0, all protocols will always be enabled and cannot be disabled via this configuration. Use feature versions (group.version, streams.version, share.version) managed by kafka-features.sh instead.",
     "Type": "list",
-    "Default": "classic,consumer",
-    "Valid Values": "[consumer, classic, share]",
+    "Default": "classic,consumer,streams",
+    "Valid Values": "[consumer, classic, share, streams]",
     "Importance": "medium",
     "Update Mode": "read-only"
   },
@@ -1098,6 +1170,24 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "group.share.assignment.interval.ms",
+    "Desc": "The interval between assignment updates for a share group.",
+    "Type": "int",
+    "Default": "1000 (1 second)",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "cluster-wide"
+  },
+  {
+    "Name": "group.share.assignors",
+    "Desc": "The server-side assignors as a list of either names for built-in assignors or full class names for custom assignors. The list must contain only a single entry which is used by all groups. The supported built-in assignors are: simple.",
+    "Type": "list",
+    "Default": "simple",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "group.share.delivery.count.limit",
     "Desc": "The maximum number of delivery attempts for a record delivered to a share group.",
     "Type": "int",
@@ -1116,11 +1206,20 @@
     "Update Mode": "read-only"
   },
   {
-    "Name": "group.share.max.groups",
-    "Desc": "The maximum number of share groups.",
-    "Type": "short",
+    "Name": "group.share.max.assignment.interval.ms",
+    "Desc": "The maximum interval between assignment updates for a share group.",
+    "Type": "int",
+    "Default": "15000 (15 seconds)",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.share.max.delivery.count.limit",
+    "Desc": "The maximum value of a group configuration for the maximum number of delivery attempts for a record delivered to a share group.",
+    "Type": "int",
     "Default": "10",
-    "Valid Values": "[1,...,100]",
+    "Valid Values": "[5,...,25]",
     "Importance": "medium",
     "Update Mode": "read-only"
   },
@@ -1134,8 +1233,17 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "group.share.max.partition.max.record.locks",
+    "Desc": "The maximum value of a group configuration for the record lock limit per share-partition.",
+    "Type": "int",
+    "Default": "4000",
+    "Valid Values": "[2000,...,10000]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "group.share.max.record.lock.duration.ms",
-    "Desc": "The record acquisition lock maximum duration in milliseconds for share groups.",
+    "Desc": "The maximum value of a group configuration for record acquisition lock duration in milliseconds.",
     "Type": "int",
     "Default": "60000 (1 minute)",
     "Valid Values": "[30000,...,3600000]",
@@ -1152,11 +1260,38 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "group.share.max.share.sessions",
+    "Desc": "The maximum number of share sessions per broker.",
+    "Type": "int",
+    "Default": "2000",
+    "Valid Values": "[1,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "group.share.max.size",
     "Desc": "The maximum number of members that a single share group can accommodate.",
     "Type": "int",
     "Default": "200",
     "Valid Values": "[1,...,1000]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.share.min.assignment.interval.ms",
+    "Desc": "The minimum interval between assignment updates for a share group.",
+    "Type": "int",
+    "Default": "0",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.share.min.delivery.count.limit",
+    "Desc": "The minimum value of a group configuration for the maximum number of delivery attempts for a record delivered to a share group.",
+    "Type": "int",
+    "Default": "2",
+    "Valid Values": "[2,...,5]",
     "Importance": "medium",
     "Update Mode": "read-only"
   },
@@ -1170,8 +1305,17 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "group.share.min.partition.max.record.locks",
+    "Desc": "The minimum value of a group configuration for the record lock limit per share-partition.",
+    "Type": "int",
+    "Default": "100",
+    "Valid Values": "[100,...,2000]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "group.share.min.record.lock.duration.ms",
-    "Desc": "The record acquisition lock minimum duration in milliseconds for share groups.",
+    "Desc": "The minimum value of a group configuration for record acquisition lock duration in milliseconds.",
     "Type": "int",
     "Default": "15000 (15 seconds)",
     "Valid Values": "[1000,...,30000]",
@@ -1191,7 +1335,7 @@
     "Name": "group.share.partition.max.record.locks",
     "Desc": "Share-group record lock limit per share-partition.",
     "Type": "int",
-    "Default": "200",
+    "Default": "2000",
     "Valid Values": "[100,...,10000]",
     "Importance": "medium",
     "Update Mode": "read-only"
@@ -1215,6 +1359,123 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "group.streams.assignment.interval.ms",
+    "Desc": "The interval between assignment updates for a streams group.",
+    "Type": "int",
+    "Default": "1000 (1 second)",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "cluster-wide"
+  },
+  {
+    "Name": "group.streams.heartbeat.interval.ms",
+    "Desc": "The heartbeat interval given to the members.",
+    "Type": "int",
+    "Default": "5000 (5 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.initial.rebalance.delay.ms",
+    "Desc": "The amount of time the group coordinator will wait for more streams clients to join a new group before performing the first rebalance. A longer delay means potentially fewer rebalances.",
+    "Type": "int",
+    "Default": "3000 (3 seconds)",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.max.assignment.interval.ms",
+    "Desc": "The maximum interval between assignment updates for a streams group.",
+    "Type": "int",
+    "Default": "15000 (15 seconds)",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.max.heartbeat.interval.ms",
+    "Desc": "The maximum allowed value for the group-level configuration of streams.heartbeat.interval.ms",
+    "Type": "int",
+    "Default": "15000 (15 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.max.session.timeout.ms",
+    "Desc": "The maximum allowed value for the group-level configuration of streams.session.timeout.ms",
+    "Type": "int",
+    "Default": "60000 (1 minute)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.max.size",
+    "Desc": "The maximum number of streams clients that a single streams group can accommodate.",
+    "Type": "int",
+    "Default": "2147483647",
+    "Valid Values": "[1,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.max.standby.replicas",
+    "Desc": "The maximum allowed value for the group-level configuration of streams.num.standby.replicas",
+    "Type": "int",
+    "Default": "2",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.min.assignment.interval.ms",
+    "Desc": "The minimum interval between assignment updates for a streams group.",
+    "Type": "int",
+    "Default": "0",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.min.heartbeat.interval.ms",
+    "Desc": "The minimum allowed value for the group-level configuration of streams.heartbeat.interval.ms",
+    "Type": "int",
+    "Default": "5000 (5 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.min.session.timeout.ms",
+    "Desc": "The minimum allowed value for the group-level configuration of streams.session.timeout.ms",
+    "Type": "int",
+    "Default": "45000 (45 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.num.standby.replicas",
+    "Desc": "The number of standby replicas for each task.",
+    "Type": "int",
+    "Default": "0",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "group.streams.session.timeout.ms",
+    "Desc": "The timeout to detect client failures when using the streams group protocol.",
+    "Type": "int",
+    "Default": "45000 (45 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "initial.broker.registration.timeout.ms",
     "Desc": "When initially registering with the controller quorum, the number of milliseconds to wait before declaring failure and exiting the broker process.",
     "Type": "int",
@@ -1231,6 +1492,15 @@
     "Valid Values": "",
     "Importance": "medium",
     "Update Mode": "read-only"
+  },
+  {
+    "Name": "leader.replication.throttled.rate",
+    "Desc": "A long representing the upper bound (bytes/sec) on replication traffic for leaders enumerated in the property leader.replication.throttled.replicas (for each topic). This property can be only set dynamically. It is suggested that the limit be kept above 1MB/s for accurate behaviour.",
+    "Type": "long",
+    "Default": "9223372036854775807",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "cluster-wide"
   },
   {
     "Name": "log.cleaner.backoff.ms",
@@ -1261,7 +1531,7 @@
   },
   {
     "Name": "log.cleaner.enable",
-    "Desc": "Enable the log cleaner process to run on the server. Should be enabled if using any topics with a cleanup.policy\u003dcompact including the internal offsets topic. If disabled those topics will not be compacted and continually grow in size.",
+    "Desc": "This configuration has been deprecated and will be removed in Kafka 5.0. Users should not set it to false to prepare for its future removal. Enable the log cleaner process to run on the server. Should be enabled if using any topics with a cleanup.policy\u003dcompact including the internal offsets topic. If disabled those topics will not be compacted and continually grow in size.",
     "Type": "boolean",
     "Default": "true",
     "Valid Values": "",
@@ -1333,7 +1603,7 @@
   },
   {
     "Name": "log.cleanup.policy",
-    "Desc": "The default cleanup policy for segments beyond the retention window. A comma separated list of valid policies.",
+    "Desc": "This config designates the retention policy to use on log segments. The \"delete\" policy (which is the default) will discard old segments when their retention time or size limit has been reached. The \"compact\" policy will enable log compaction, which retains the latest value for each key. It is also possible to specify both policies in a comma-separated list (e.g. \"delete,compact\"). In this case, old segments will be discarded per the retention time and size configuration, while retained segments will be compacted. An empty list means infinite retention - no cleanup policies will be applied and log segments will be retained indefinitely. Note that with remote storage enabled, local retention limits (log.local.retention.ms and log.local.retention.bytes) are still applied to local segments.",
     "Type": "list",
     "Default": "delete",
     "Valid Values": "[compact, delete]",
@@ -1360,7 +1630,7 @@
   },
   {
     "Name": "log.local.retention.bytes",
-    "Desc": "The maximum size of local log segments that can grow for a partition before it gets eligible for deletion. Default value is -2, it represents `log.retention.bytes` value to be used. The effective value should always be less than or equal to `log.retention.bytes` value.",
+    "Desc": "The maximum size of local log segments that can grow for a partition before it gets eligible for deletion. Default value is -2, it represents log.retention.bytes value to be used. The effective value should always be less than or equal to log.retention.bytes value.",
     "Type": "long",
     "Default": "-2",
     "Valid Values": "[-2,...]",
@@ -1369,7 +1639,7 @@
   },
   {
     "Name": "log.local.retention.ms",
-    "Desc": "The number of milliseconds to keep the local log segments before it gets eligible for deletion. Default value is -2, it represents `log.retention.ms` value is to be used. The effective value should always be less than or equal to `log.retention.ms` value.",
+    "Desc": "The number of milliseconds to keep the local log segments before it gets eligible for deletion. Default value is -2, it represents log.retention.ms value is to be used. The effective value should always be less than or equal to log.retention.ms value.",
     "Type": "long",
     "Default": "-2",
     "Valid Values": "[-2,...]",
@@ -1477,7 +1747,7 @@
   },
   {
     "Name": "num.partitions",
-    "Desc": "The default number of log partitions per topic",
+    "Desc": "The default number of log partitions per topic. This configuration affects the following paths:",
     "Type": "int",
     "Default": "1",
     "Valid Values": "[1,...]",
@@ -1513,7 +1783,7 @@
   },
   {
     "Name": "remote.fetch.max.wait.ms",
-    "Desc": "The maximum amount of time the server will wait before answering the remote fetch request",
+    "Desc": "The maximum amount of time the server will wait before answering the fetch request containing remote fetch partitions. It\u0027s important to be aware that the request will only be responded after all remote partitions have been successfully fetched, have failed, or this timeout is exceeded.",
     "Type": "int",
     "Default": "500",
     "Valid Values": "[1,...]",
@@ -1602,8 +1872,17 @@
     "Update Mode": "read-only"
   },
   {
-    "Name": "remote.log.manager.thread.pool.size",
+    "Name": "remote.log.manager.follower.thread.pool.size",
     "Desc": "Size of the thread pool used in scheduling follower tasks to read the highest-uploaded remote-offset for follower partitions.",
+    "Type": "int",
+    "Default": "2",
+    "Valid Values": "[1,...]",
+    "Importance": "medium",
+    "Update Mode": "cluster-wide"
+  },
+  {
+    "Name": "remote.log.manager.thread.pool.size",
+    "Desc": "Size of the thread pool used in scheduling follower tasks to read the highest-uploaded remote-offset for follower partitions. This config is deprecated since 4.2, please use remote.log.manager.follower.thread.pool.size instead.",
     "Type": "int",
     "Default": "2",
     "Valid Values": "[1,...]",
@@ -1612,7 +1891,7 @@
   },
   {
     "Name": "remote.log.metadata.manager.class.name",
-    "Desc": "Fully qualified class name of `RemoteLogMetadataManager` implementation.",
+    "Desc": "Fully qualified class name of RemoteLogMetadataManager implementation.",
     "Type": "string",
     "Default": "org.apache.kafka.server.log.remote.metadata.storage.TopicBasedRemoteLogMetadataManager",
     "Valid Values": "non-empty string",
@@ -1621,7 +1900,7 @@
   },
   {
     "Name": "remote.log.metadata.manager.class.path",
-    "Desc": "Class path of the `RemoteLogMetadataManager` implementation. If specified, the RemoteLogMetadataManager implementation and its dependent libraries will be loaded by a dedicated classloader which searches this class path before the Kafka broker class path. The syntax of this parameter is same as the standard Java class path string.",
+    "Desc": "Class path of the RemoteLogMetadataManager implementation. If specified, the RemoteLogMetadataManager implementation and its dependent libraries will be loaded by a dedicated classloader which searches this class path before the Kafka broker class path. The syntax of this parameter is same as the standard Java class path string.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "",
@@ -1630,7 +1909,7 @@
   },
   {
     "Name": "remote.log.metadata.manager.impl.prefix",
-    "Desc": "Prefix used for properties to be passed to RemoteLogMetadataManager implementation. For example this value can be `rlmm.config.`.",
+    "Desc": "Prefix used for properties to be passed to RemoteLogMetadataManager implementation. For example this value can be rlmm.config..",
     "Type": "string",
     "Default": "rlmm.config.",
     "Valid Values": "non-empty string",
@@ -1666,7 +1945,7 @@
   },
   {
     "Name": "remote.log.storage.manager.class.name",
-    "Desc": "Fully qualified class name of `RemoteStorageManager` implementation.",
+    "Desc": "Fully qualified class name of RemoteStorageManager implementation.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "non-empty string",
@@ -1675,7 +1954,7 @@
   },
   {
     "Name": "remote.log.storage.manager.class.path",
-    "Desc": "Class path of the `RemoteStorageManager` implementation. If specified, the RemoteStorageManager implementation and its dependent libraries will be loaded by a dedicated classloader which searches this class path before the Kafka broker class path. The syntax of this parameter is same as the standard Java class path string.",
+    "Desc": "Class path of the RemoteStorageManager implementation. If specified, the RemoteStorageManager implementation and its dependent libraries will be loaded by a dedicated classloader which searches this class path before the Kafka broker class path. The syntax of this parameter is same as the standard Java class path string.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "",
@@ -1684,7 +1963,7 @@
   },
   {
     "Name": "remote.log.storage.manager.impl.prefix",
-    "Desc": "Prefix used for properties to be passed to RemoteStorageManager implementation. For example this value can be `rsm.config.`.",
+    "Desc": "Prefix used for properties to be passed to RemoteStorageManager implementation. For example this value can be rsm.config..",
     "Type": "string",
     "Default": "rsm.config.",
     "Valid Values": "non-empty string",
@@ -1699,6 +1978,15 @@
     "Valid Values": "",
     "Importance": "medium",
     "Update Mode": "read-only"
+  },
+  {
+    "Name": "replica.alter.log.dirs.io.max.bytes.per.second",
+    "Desc": "A long representing the upper bound (bytes/sec) on disk IO used for moving replica between log directories on the same broker. This property can be only set dynamically. It is suggested that the limit be kept above 1MB/s for accurate behaviour.",
+    "Type": "long",
+    "Default": "9223372036854775807",
+    "Valid Values": "[0,...]",
+    "Importance": "medium",
+    "Update Mode": "cluster-wide"
   },
   {
     "Name": "replica.fetch.backoff.ms",
@@ -1881,6 +2169,105 @@
     "Update Mode": "per-broker"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.algorithm",
+    "Desc": "",
+    "Type": "string",
+    "Default": "RS256",
+    "Valid Values": "(case insensitive) [ES256, RS256]",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.aud",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.iss",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.jti.include",
+    "Desc": "",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.sub",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.passphrase",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.template.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.id",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.secret",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "sasl.oauthbearer.jwks.endpoint.url",
     "Desc": "The OAuth/OIDC provider URL from which the provider\u0027s JWKS (JSON Web Key Set) can be retrieved. The URL can be HTTP(S)-based or file-based. If the URL is HTTP(S)-based, the JWKS data will be retrieved from the OAuth/OIDC provider via the configured URL on broker startup. All then-current keys will be cached on the broker for incoming requests. If an authentication request is received for a JWT that includes a \"kid\" header claim value that isn\u0027t yet in the cache, the JWKS endpoint will be queried again on demand. However, the broker polls the URL every sasl.oauthbearer.jwks.endpoint.refresh.ms milliseconds to refresh the cache with any forthcoming keys before any JWT requests that include them are received. If the URL is file-based, the broker will load the JWKS file from a configured location on startup. In the event that the JWT includes a \"kid\" header value that isn\u0027t in the JWKS file, the broker will reject the JWT and authentication will fail.",
     "Type": "string",
@@ -1890,8 +2277,35 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "sasl.oauthbearer.jwt.retriever.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtRetriever",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.jwt.validator.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtValidator",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.scope",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "sasl.oauthbearer.token.endpoint.url",
-    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.jaas.config. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
+    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.oauthbearer.jwt.retriever.class. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "",
@@ -1927,19 +2341,28 @@
   },
   {
     "Name": "share.coordinator.append.linger.ms",
-    "Desc": "The duration in milliseconds that the share coordinator will wait for writes to accumulate before flushing them to disk.",
+    "Desc": "The duration in milliseconds that the share coordinator will wait for writes to accumulate before flushing them to disk. Set to -1 for an adaptive linger time that minimizes latency based on the workload.",
     "Type": "int",
-    "Default": "10",
-    "Valid Values": "[0,...]",
+    "Default": "-1",
+    "Valid Values": "[-1,...]",
     "Importance": "medium",
     "Update Mode": "read-only"
+  },
+  {
+    "Name": "share.coordinator.cached.buffer.max.bytes",
+    "Desc": "The maximum buffer size that the ShareCoordinator will retain for reuse. Note: Setting this larger than the maximum message size is not recommended. In this case, every write buffer will be eligible for recycling, which renders this configuration ineffective as a size limit.",
+    "Type": "int",
+    "Default": "1048588",
+    "Valid Values": "[524288,...]",
+    "Importance": "medium",
+    "Update Mode": "cluster-wide"
   },
   {
     "Name": "share.coordinator.snapshot.update.records.per.snapshot",
     "Desc": "The number of update records the share coordinator writes between snapshot records.",
     "Type": "int",
     "Default": "500",
-    "Valid Values": "[0,...]",
+    "Valid Values": "[0,...,500]",
     "Importance": "medium",
     "Update Mode": "read-only"
   },
@@ -2008,7 +2431,7 @@
   },
   {
     "Name": "ssl.enabled.protocols",
-    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. Also see the config documentation for `ssl.protocol` to understand how it can impact the TLS version negotiation behavior.",
+    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. If this configuration is set to an empty list, Kafka will use the protocols enabled by default in the underlying SSLEngine, which may include additional protocols depending on the JVM version. Also see the config documentation for ssl.protocol to understand how it can impact the TLS version negotiation behavior.",
     "Type": "list",
     "Default": "TLSv1.2,TLSv1.3",
     "Valid Values": "",
@@ -2071,7 +2494,7 @@
   },
   {
     "Name": "ssl.keystore.type",
-    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -2080,7 +2503,7 @@
   },
   {
     "Name": "ssl.protocol",
-    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in `ssl.enabled.protocols` and the server only supports \u0027TLSv1.3\u0027.",
+    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
     "Type": "string",
     "Default": "TLSv1.3",
     "Valid Values": "",
@@ -2134,7 +2557,7 @@
   },
   {
     "Name": "ssl.truststore.type",
-    "Desc": "The file format of the trust store file. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the trust store file. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -2179,12 +2602,21 @@
   },
   {
     "Name": "client.quota.callback.class",
-    "Desc": "The fully qualified name of a class that implements the ClientQuotaCallback interface, which is used to determine quota limits applied to client requests. For any given request, the most specific quota that matches the user principal of the session and the client-id of the request is applied.",
+    "Desc": "The fully qualified name of a class that implements the ClientQuotaCallback interface, which is used to determine quota limits applied to client requests. By default, the \u003cuser\u003e and \u003cclient-id\u003e quotas that are stored and applied. For any given request, the most specific quota that matches the user principal of the session and the client-id of the request is applied.",
     "Type": "class",
     "Default": "null",
     "Valid Values": "",
     "Importance": "low",
     "Update Mode": "read-only"
+  },
+  {
+    "Name": "config.providers",
+    "Desc": "Comma-separated alias names for classes implementing the ConfigProvider interface. This enables loading configuration data (such as passwords, API keys, and other credentials) from external sources. For example, see Configuration Providers.",
+    "Type": "list",
+    "Default": "\"\"",
+    "Valid Values": "",
+    "Importance": "low",
+    "Update Mode": "cluster-wide"
   },
   {
     "Name": "connection.failed.authentication.delay.ms",
@@ -2196,11 +2628,38 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "controller.quorum.auto.join.enable",
+    "Desc": "Controls whether a KRaft controller should automatically join the cluster metadata partition for its cluster id.",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "low",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "controller.quorum.fetch.max.bytes",
+    "Desc": "Maximum amount of data to retrieve for each Fetch request. Always returns at least one batch even if it is greater than controller.quorum.fetch.max.bytes.",
+    "Type": "int",
+    "Default": "1048576 (1 mebibyte)",
+    "Valid Values": "[1,...]",
+    "Importance": "low",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "controller.quorum.fetch.snapshot.max.bytes",
+    "Desc": "Maximum amount of data to retrieve for each FetchSnapshot request to the controller.",
+    "Type": "int",
+    "Default": "1048576 (1 mebibyte)",
+    "Valid Values": "[1,...]",
+    "Importance": "low",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "controller.quorum.retry.backoff.ms",
     "Desc": "The amount of time to wait before attempting to retry a failed request to a given topic partition. This avoids repeatedly sending requests in a tight loop under some failure scenarios. This value is the initial backoff value and will increase exponentially for each failed request, up to the retry.backoff.max.ms value.",
     "Type": "int",
     "Default": "20",
-    "Valid Values": "",
+    "Valid Values": "[0,...]",
     "Importance": "low",
     "Update Mode": "read-only"
   },
@@ -2287,7 +2746,7 @@
   },
   {
     "Name": "metric.reporters",
-    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation.",
+    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation. When custom reporters are set and org.apache.kafka.common.metrics.JmxReporter is needed, it has to be explicitly added to the list.",
     "Type": "list",
     "Default": "org.apache.kafka.common.metrics.JmxReporter",
     "Valid Values": "",
@@ -2430,6 +2889,24 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.claim.exp.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "300",
+    "Valid Values": "[0,...,86400]",
+    "Importance": "low",
+    "Update Mode": "read-only"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.nbf.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "60",
+    "Valid Values": "[0,...,3600]",
+    "Importance": "low",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "sasl.oauthbearer.clock.skew.seconds",
     "Desc": "The (optional) value in seconds to allow for differences between the time of the OAuth/OIDC identity provider and the broker.",
     "Type": "int",
@@ -2442,7 +2919,7 @@
     "Name": "sasl.oauthbearer.expected.audience",
     "Desc": "The (optional) comma-delimited setting for the broker to use to verify that the JWT was issued for one of the expected audiences. The JWT will be inspected for the standard OAuth \"aud\" claim and if this value is set, the broker will match the value from JWT\u0027s \"aud\" claim to see if there is an exact match. If there is no match, the broker will reject the JWT and authentication will fail.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low",
     "Update Mode": "read-only"
@@ -2601,8 +3078,17 @@
     "Update Mode": "read-only"
   },
   {
+    "Name": "transaction.two.phase.commit.enable",
+    "Desc": "Allow participation in Two-Phase Commit (2PC) transactions with an external transaction coordinator",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "low",
+    "Update Mode": "read-only"
+  },
+  {
     "Name": "cleanup.policy",
-    "Desc": "This config designates the retention policy to use on log segments. The \"delete\" policy (which is the default) will discard old segments when their retention time or size limit has been reached. The \"compact\" policy will enable log compaction, which retains the latest value for each key. It is also possible to specify both policies in a comma-separated list (e.g. \"delete,compact\"). In this case, old segments will be discarded per the retention time and size configuration, while retained segments will be compacted.",
+    "Desc": "This config designates the retention policy to use on log segments. The \"delete\" policy (which is the default) will discard old segments when their retention time or size limit has been reached. The \"compact\" policy will enable log compaction, which retains the latest value for each key. It is also possible to specify both policies in a comma-separated list (e.g. \"delete,compact\"). In this case, old segments will be discarded per the retention time and size configuration, while retained segments will be compacted. An empty list means infinite retention - no cleanup policies will be applied and log segments will be retained indefinitely. Note that with remote storage enabled, local retention limits (log.local.retention.ms and log.local.retention.bytes) are still applied to local segments.",
     "Type": "list",
     "Default": "delete",
     "Valid Values": "[compact, delete]",
@@ -2674,7 +3160,7 @@
   },
   {
     "Name": "flush.ms",
-    "Desc": "This setting allows specifying a time interval at which we will force an fsync of data written to the log. For example if this was set to 1000 we would fsync after 1000 ms had passed. In general we recommend you not set this and use replication for durability and allow the operating system\u0027s background flush capabilities as it is more efficient.",
+    "Desc": "This setting allows specifying a time interval at which we will force an fsync of data written to the log. For example if this was set to 1000 we would fsync after 1000 ms had passed. Note that this setting depends on the broker-level configuration log.flush.scheduler.interval.ms, which controls how frequently the flush check occurs. In general we recommend you not set this and use replication for durability and allow the operating system\u0027s background flush capabilities as it is more efficient.",
     "Type": "long",
     "Default": "9223372036854775807",
     "Valid Values": "[0,...]",
@@ -2692,7 +3178,7 @@
   },
   {
     "Name": "index.interval.bytes",
-    "Desc": "This setting controls how frequently Kafka adds an index entry to its offset index. The default setting ensures that we index a message roughly every 4096 bytes. More indexing allows reads to jump closer to the exact position in the log but makes the index larger. You probably don\u0027t need to change this.",
+    "Desc": "This setting controls how frequently Kafka adds entries to its offset index and, conditionally, to its time index. The default setting ensures that we index a message roughly every 4096 bytes. More frequent indexing allows reads to jump closer to the exact position in the log but results in larger index files. You probably don\u0027t need to change this.",
     "Type": "int",
     "Default": "4096 (4 kibibytes)",
     "Valid Values": "[0,...]",
@@ -2710,7 +3196,7 @@
   },
   {
     "Name": "local.retention.bytes",
-    "Desc": "The maximum size of local log segments that can grow for a partition before it deletes the old segments. Default value is -2, it represents `retention.bytes` value to be used. The effective value should always be less than or equal to `retention.bytes` value.",
+    "Desc": "The maximum size of local log segments that can grow for a partition before it deletes the old segments. Default value is -2, it represents retention.bytes value to be used. The effective value should always be less than or equal to retention.bytes value.",
     "Type": "long",
     "Default": "-2",
     "Valid Values": "[-2,...]",
@@ -2719,7 +3205,7 @@
   },
   {
     "Name": "local.retention.ms",
-    "Desc": "The number of milliseconds to keep the local log segment before it gets deleted. Default value is -2, it represents `retention.ms` value is to be used. The effective value should always be less than or equal to `retention.ms` value.",
+    "Desc": "The number of milliseconds to keep the local log segment before it gets deleted. Default value is -2, it represents retention.ms value is to be used. The effective value should always be less than or equal to retention.ms value.",
     "Type": "long",
     "Default": "-2",
     "Valid Values": "[-2,...]",
@@ -2737,7 +3223,7 @@
   },
   {
     "Name": "max.message.bytes",
-    "Desc": "The largest record batch size allowed by Kafka (after compression if compression is enabled). If this is increased and there are consumers older than 0.10.2, the consumers\u0027 fetch size must also be increased so that they can fetch record batches this large. In the latest message format version, records are always grouped into batches for efficiency. In previous message format versions, uncompressed records are not grouped into batches and this limit only applies to a single record in that case.",
+    "Desc": "The largest record batch size allowed by Kafka (after compression if compression is enabled).",
     "Type": "int",
     "Default": "1048588",
     "Valid Values": "[0,...]",
@@ -2791,7 +3277,7 @@
   },
   {
     "Name": "min.insync.replicas",
-    "Desc": "When a producer sets acks to \"all\" (or \"-1\"), this configuration specifies the minimum number of replicas that must acknowledge a write for the write to be considered successful. If this minimum cannot be met, then the producer will raise an exception (either NotEnoughReplicas or NotEnoughReplicasAfterAppend). Regardless of the acks setting, the messages will not be visible to the consumers until they are replicated to all in-sync replicas and the min.insync.replicas condition is met. When used together, min.insync.replicas and acks allow you to enforce greater durability guarantees. A typical scenario would be to create a topic with a replication factor of 3, set min.insync.replicas to 2, and produce with acks of \"all\". This will ensure that a majority of replicas must persist a write before it\u0027s considered successful by the producer and it\u0027s visible to consumers.",
+    "Desc": "Specifies the minimum number of in-sync replicas (including the leader) required for a write to succeed when a producer sets acks to \"all\" (or \"-1\"). In the acks\u003dall case, every in-sync replica must acknowledge a write for it to be considered successful. E.g., if a topic has replication.factor of 3 and the ISR set includes all three replicas, then all three replicas must acknowledge an acks\u003dall write for it to succeed, even if min.insync.replicas happens to be less than 3. If acks\u003dall and the current ISR set contains fewer than min.insync.replicas members, then the producer will raise an exception (either NotEnoughReplicas or NotEnoughReplicasAfterAppend). Regardless of the acks setting, the messages will not be visible to the consumers until they are replicated to all in-sync replicas and the min.insync.replicas condition is met. When used together, min.insync.replicas and acks allow you to enforce greater durability guarantees. A typical scenario would be to create a topic with a replication factor of 3, set min.insync.replicas to 2, and produce with acks of \"all\". This ensures that a majority of replicas must persist a write before it\u0027s considered successful by the producer and it\u0027s visible to consumers.",
     "Type": "int",
     "Default": "1",
     "Valid Values": "[1,...]",
@@ -2818,7 +3304,7 @@
   },
   {
     "Name": "remote.log.delete.on.disable",
-    "Desc": "Determines whether tiered data for a topic should be deleted after tiered storage is disabled on a topic. This configuration should be enabled when trying to set `remote.storage.enable` from true to false",
+    "Desc": "Determines whether tiered data for a topic should be deleted after tiered storage is disabled on a topic. This configuration should be enabled when trying to set remote.storage.enable from true to false",
     "Type": "boolean",
     "Default": "false",
     "Valid Values": "",
@@ -2827,7 +3313,7 @@
   },
   {
     "Name": "remote.storage.enable",
-    "Desc": "To enable tiered storage for a topic, set this configuration as true. You can not disable this config once it is enabled. It will be provided in future versions.",
+    "Desc": "To enable tiered storage for a topic, set this configuration to true. To disable tiered storage for a topic that has it enabled, set this configuration to false. When disabling, you must also set remote.log.delete.on.disable to true.",
     "Type": "boolean",
     "Default": "false",
     "Valid Values": "",
@@ -2857,7 +3343,7 @@
     "Desc": "This configuration controls the segment file size for the log. Retention and cleaning is always done a file at a time so a larger segment size means fewer files but less granular control over retention.",
     "Type": "int",
     "Default": "1073741824 (1 gibibyte)",
-    "Valid Values": "[14,...]",
+    "Valid Values": "[1048576,...]",
     "Server Default Property": "log.segment.bytes",
     "Importance": "medium"
   },
@@ -2898,6 +3384,150 @@
     "Importance": "medium"
   },
   {
+    "Name": "consumer.assignment.interval.ms",
+    "Desc": "The interval between assignment updates for a consumer group.",
+    "Type": "int",
+    "Default": "1000 (1 second)",
+    "Valid Values": "[0,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "consumer.heartbeat.interval.ms",
+    "Desc": "The heartbeat interval given to the members of a consumer group.",
+    "Type": "int",
+    "Default": "5000 (5 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "consumer.session.timeout.ms",
+    "Desc": "The timeout to detect client failures when using the consumer group protocol.",
+    "Type": "int",
+    "Default": "45000 (45 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "share.assignment.interval.ms",
+    "Desc": "The interval between assignment updates for a share group.",
+    "Type": "int",
+    "Default": "1000 (1 second)",
+    "Valid Values": "[0,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "share.auto.offset.reset",
+    "Desc": "The strategy to initialize the share-partition start offset.",
+    "Type": "string",
+    "Default": "latest",
+    "Valid Values": "[latest, earliest, by_duration:PnDTnHnMn.nS]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "share.delivery.count.limit",
+    "Desc": "The maximum number of delivery attempts for a record delivered to a share group.",
+    "Type": "int",
+    "Default": "5",
+    "Valid Values": "[2,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "share.heartbeat.interval.ms",
+    "Desc": "The heartbeat interval given to the members of a share group.",
+    "Type": "int",
+    "Default": "5000 (5 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "share.isolation.level",
+    "Desc": "Controls how to read records written transactionally. If set to \"read_committed\", the share group will only deliver transactional records which have been committed. If set to \"read_uncommitted\", the share group will return all messages, even transactional messages which have been aborted. Non-transactional records will be returned unconditionally in either mode.",
+    "Type": "string",
+    "Default": "read_uncommitted",
+    "Valid Values": "[read_committed, read_uncommitted]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "share.partition.max.record.locks",
+    "Desc": "Share-group record lock limit per share-partition.",
+    "Type": "int",
+    "Default": "2000",
+    "Valid Values": "[100,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "share.record.lock.duration.ms",
+    "Desc": "The record acquisition lock duration in milliseconds for share groups.",
+    "Type": "int",
+    "Default": "30000 (30 seconds)",
+    "Valid Values": "[1000,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "share.renew.acknowledge.enable",
+    "Desc": "Whether the renew acknowledge type is enabled for the share group.",
+    "Type": "boolean",
+    "Default": "true",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "share.session.timeout.ms",
+    "Desc": "The timeout to detect client failures when using the share group protocol.",
+    "Type": "int",
+    "Default": "45000 (45 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "streams.assignment.interval.ms",
+    "Desc": "The interval between assignment updates for a streams group.",
+    "Type": "int",
+    "Default": "1000 (1 second)",
+    "Valid Values": "[0,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "streams.heartbeat.interval.ms",
+    "Desc": "The heartbeat interval given to the members.",
+    "Type": "int",
+    "Default": "5000 (5 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "streams.initial.rebalance.delay.ms",
+    "Desc": "The amount of time the group coordinator will wait for more streams clients to join a new group before performing the first rebalance. A longer delay means potentially fewer rebalances.",
+    "Type": "int",
+    "Default": "3000 (3 seconds)",
+    "Valid Values": "[0,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "streams.num.standby.replicas",
+    "Desc": "The number of standby replicas for each task.",
+    "Type": "int",
+    "Default": "0",
+    "Valid Values": "[0,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "streams.session.timeout.ms",
+    "Desc": "The timeout to detect client failures when using the streams group protocol.",
+    "Type": "int",
+    "Default": "45000 (45 seconds)",
+    "Valid Values": "[1,...]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "bootstrap.servers",
+    "Desc": "A list of host/port pairs used to establish the initial connection to the Kafka cluster. Clients use this list to bootstrap and discover the full set of Kafka brokers. While the order of servers in the list does not matter, we recommend including more than one server to ensure resilience if any servers are down. This list does not need to contain the entire set of brokers, as Kafka clients automatically manage and update connections to the cluster efficiently. This list must be in the form host1:port1,host2:port2,....",
+    "Type": "list",
+    "Default": "",
+    "Valid Values": "",
+    "Importance": "high"
+  },
+  {
     "Name": "key.serializer",
     "Desc": "Serializer class for key that implements the org.apache.kafka.common.serialization.Serializer interface.",
     "Type": "class",
@@ -2914,16 +3544,8 @@
     "Importance": "high"
   },
   {
-    "Name": "bootstrap.servers",
-    "Desc": "A list of host/port pairs used to establish the initial connection to the Kafka cluster. Clients use this list to bootstrap and discover the full set of Kafka brokers. While the order of servers in the list does not matter, we recommend including more than one server to ensure resilience if any servers are down. This list does not need to contain the entire set of brokers, as Kafka clients automatically manage and update connections to the cluster efficiently. This list must be in the form host1:port1,host2:port2,....",
-    "Type": "list",
-    "Default": "\"\"",
-    "Valid Values": "non-null string",
-    "Importance": "high"
-  },
-  {
     "Name": "buffer.memory",
-    "Desc": "The total bytes of memory the producer can use to buffer records waiting to be sent to the server. If records are sent faster than they can be delivered to the server the producer will block for max.block.ms after which it will throw an exception.",
+    "Desc": "The total bytes of memory the producer can use to buffer records waiting to be sent to the server. If records are sent faster than they can be delivered to the server the producer will block for max.block.ms after which it will fail with an exception.",
     "Type": "long",
     "Default": "33554432",
     "Valid Values": "[0,...]",
@@ -2939,7 +3561,7 @@
   },
   {
     "Name": "retries",
-    "Desc": "Setting a value greater than zero will cause the client to resend any record whose send fails with a potentially transient error. Note that this retry is no different than if the client resent the record upon receiving the error. Produce requests will be failed before the number of retries has been exhausted if the timeout configured by delivery.timeout.ms expires first before successful acknowledgement. Users should generally prefer to leave this config unset and instead use delivery.timeout.ms to control retry behavior.",
+    "Desc": "Number of times to retry a request that fails with a transient error. Setting a value greater than zero will cause the client to resend any record whose send fails with a potentially transient error. Requests will be retried this many times until they succeed, fail with a non-transient error, or the delivery.timeout.ms expires. Note that this automatic retry will simply resend the same record upon receiving the error. Setting a value of zero will disable this automatic retry behaviour, so that the transient errors will be propagated to the application to be handled. Users should generally prefer to leave this config unset and instead use delivery.timeout.ms to control retry behavior.",
     "Type": "int",
     "Default": "2147483647",
     "Valid Values": "[0,...,2147483647]",
@@ -3178,6 +3800,94 @@
     "Importance": "medium"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.algorithm",
+    "Desc": "",
+    "Type": "string",
+    "Default": "RS256",
+    "Valid Values": "(case insensitive) [ES256, RS256]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.aud",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.iss",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.jti.include",
+    "Desc": "",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.sub",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.passphrase",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.template.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.id",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.secret",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
     "Name": "sasl.oauthbearer.jwks.endpoint.url",
     "Desc": "The OAuth/OIDC provider URL from which the provider\u0027s JWKS (JSON Web Key Set) can be retrieved. The URL can be HTTP(S)-based or file-based. If the URL is HTTP(S)-based, the JWKS data will be retrieved from the OAuth/OIDC provider via the configured URL on broker startup. All then-current keys will be cached on the broker for incoming requests. If an authentication request is received for a JWT that includes a \"kid\" header claim value that isn\u0027t yet in the cache, the JWKS endpoint will be queried again on demand. However, the broker polls the URL every sasl.oauthbearer.jwks.endpoint.refresh.ms milliseconds to refresh the cache with any forthcoming keys before any JWT requests that include them are received. If the URL is file-based, the broker will load the JWKS file from a configured location on startup. In the event that the JWT includes a \"kid\" header value that isn\u0027t in the JWKS file, the broker will reject the JWT and authentication will fail.",
     "Type": "string",
@@ -3186,8 +3896,32 @@
     "Importance": "medium"
   },
   {
+    "Name": "sasl.oauthbearer.jwt.retriever.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtRetriever",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.jwt.validator.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtValidator",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.scope",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
     "Name": "sasl.oauthbearer.token.endpoint.url",
-    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.jaas.config. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
+    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.oauthbearer.jwt.retriever.class. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "",
@@ -3227,7 +3961,7 @@
   },
   {
     "Name": "ssl.enabled.protocols",
-    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. Also see the config documentation for `ssl.protocol` to understand how it can impact the TLS version negotiation behavior.",
+    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. If this configuration is set to an empty list, Kafka will use the protocols enabled by default in the underlying SSLEngine, which may include additional protocols depending on the JVM version. Also see the config documentation for ssl.protocol to understand how it can impact the TLS version negotiation behavior.",
     "Type": "list",
     "Default": "TLSv1.2,TLSv1.3",
     "Valid Values": "",
@@ -3235,7 +3969,7 @@
   },
   {
     "Name": "ssl.keystore.type",
-    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -3243,7 +3977,7 @@
   },
   {
     "Name": "ssl.protocol",
-    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in `ssl.enabled.protocols` and the server only supports \u0027TLSv1.3\u0027.",
+    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
     "Type": "string",
     "Default": "TLSv1.3",
     "Valid Values": "",
@@ -3259,7 +3993,7 @@
   },
   {
     "Name": "ssl.truststore.type",
-    "Desc": "The file format of the trust store file. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the trust store file. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -3271,6 +4005,14 @@
     "Type": "string",
     "Default": "all",
     "Valid Values": "[all, -1, 0, 1]",
+    "Importance": "low"
+  },
+  {
+    "Name": "config.providers",
+    "Desc": "Comma-separated alias names for classes implementing the ConfigProvider interface. This enables loading configuration data (such as passwords, API keys, and other credentials) from external sources. For example, see Configuration Providers.",
+    "Type": "list",
+    "Default": "\"\"",
+    "Valid Values": "",
     "Importance": "low"
   },
   {
@@ -3294,7 +4036,7 @@
     "Desc": "A list of classes to use as interceptors. Implementing the org.apache.kafka.clients.producer.ProducerInterceptor interface allows you to intercept (and possibly mutate) the records received by the producer before they are published to the Kafka cluster. By default, there are no interceptors.",
     "Type": "list",
     "Default": "\"\"",
-    "Valid Values": "non-null string",
+    "Valid Values": "",
     "Importance": "low"
   },
   {
@@ -3339,10 +4081,10 @@
   },
   {
     "Name": "metric.reporters",
-    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation.",
+    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation. When custom reporters are set and org.apache.kafka.common.metrics.JmxReporter is needed, it has to be explicitly added to the list.",
     "Type": "list",
     "Default": "org.apache.kafka.common.metrics.JmxReporter",
-    "Valid Values": "non-null string",
+    "Valid Values": "",
     "Importance": "low"
   },
   {
@@ -3371,7 +4113,7 @@
   },
   {
     "Name": "partitioner.adaptive.partitioning.enable",
-    "Desc": "When set to \u0027true\u0027, the producer will try to adapt to broker performance and produce more messages to partitions hosted on faster brokers. If \u0027false\u0027, producer will try to distribute messages uniformly. Note: this setting has no effect if a custom partitioner is used",
+    "Desc": "When set to \u0027true\u0027, the producer will try to adapt to broker performance and produce more messages to partitions hosted on faster brokers. If \u0027false\u0027, the producer will try to distribute messages uniformly. Note: this setting has no effect if a custom partitioner is used.",
     "Type": "boolean",
     "Default": "true",
     "Valid Values": "",
@@ -3379,7 +4121,7 @@
   },
   {
     "Name": "partitioner.availability.timeout.ms",
-    "Desc": "If a broker cannot process produce requests from a partition for partitioner.availability.timeout.ms time, the partitioner treats that partition as not available. If the value is 0, this logic is disabled. Note: this setting has no effect if a custom partitioner is used or partitioner.adaptive.partitioning.enable is set to \u0027false\u0027",
+    "Desc": "If a broker cannot process produce requests from a partition for partitioner.availability.timeout.ms time, the partitioner treats that partition as not available. If the value is 0, this logic is disabled. Note: this setting has no effect if a custom partitioner is used or partitioner.adaptive.partitioning.enable is set to \u0027false\u0027.",
     "Type": "long",
     "Default": "0",
     "Valid Values": "[0,...]",
@@ -3514,6 +4256,22 @@
     "Importance": "low"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.claim.exp.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "300",
+    "Valid Values": "[0,...,86400]",
+    "Importance": "low"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.nbf.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "60",
+    "Valid Values": "[0,...,3600]",
+    "Importance": "low"
+  },
+  {
     "Name": "sasl.oauthbearer.clock.skew.seconds",
     "Desc": "The (optional) value in seconds to allow for differences between the time of the OAuth/OIDC identity provider and the broker.",
     "Type": "int",
@@ -3525,7 +4283,7 @@
     "Name": "sasl.oauthbearer.expected.audience",
     "Desc": "The (optional) comma-delimited setting for the broker to use to verify that the JWT was issued for one of the expected audiences. The JWT will be inspected for the standard OAuth \"aud\" claim and if this value is set, the broker will match the value from JWT\u0027s \"aud\" claim to see if there is an exact match. If there is no match, the broker will reject the JWT and authentication will fail.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -3597,7 +4355,7 @@
     "Name": "ssl.cipher.suites",
     "Desc": "A list of cipher suites. This is a named combination of authentication, encryption, MAC and key exchange algorithm used to negotiate the security settings for a network connection using TLS or SSL network protocol. By default all the available cipher suites are supported.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -3650,12 +4408,28 @@
     "Importance": "low"
   },
   {
+    "Name": "transaction.two.phase.commit.enable",
+    "Desc": "If set to true, then the broker is informed that the client is participating in two phase commit protocol and transactions that this client starts never expire.",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "low"
+  },
+  {
     "Name": "transactional.id",
     "Desc": "The TransactionalId to use for transactional delivery. This enables reliability semantics which span multiple producer sessions since it allows the client to guarantee that transactions using the same TransactionalId have been completed prior to starting any new transactions. If no TransactionalId is provided, then the producer is limited to idempotent delivery. If a TransactionalId is configured, enable.idempotence is implied. By default the TransactionId is not configured, which means transactions cannot be used. Note that, by default, transactions require a cluster of at least three brokers which is the recommended setting for production; for development you can change this, by adjusting broker setting transaction.state.log.replication.factor.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "non-empty string",
     "Importance": "low"
+  },
+  {
+    "Name": "bootstrap.servers",
+    "Desc": "A list of host/port pairs used to establish the initial connection to the Kafka cluster. Clients use this list to bootstrap and discover the full set of Kafka brokers. While the order of servers in the list does not matter, we recommend including more than one server to ensure resilience if any servers are down. This list does not need to contain the entire set of brokers, as Kafka clients automatically manage and update connections to the cluster efficiently. This list must be in the form host1:port1,host2:port2,....",
+    "Type": "list",
+    "Default": "",
+    "Valid Values": "",
+    "Importance": "high"
   },
   {
     "Name": "key.deserializer",
@@ -3674,16 +4448,8 @@
     "Importance": "high"
   },
   {
-    "Name": "bootstrap.servers",
-    "Desc": "A list of host/port pairs used to establish the initial connection to the Kafka cluster. Clients use this list to bootstrap and discover the full set of Kafka brokers. While the order of servers in the list does not matter, we recommend including more than one server to ensure resilience if any servers are down. This list does not need to contain the entire set of brokers, as Kafka clients automatically manage and update connections to the cluster efficiently. This list must be in the form host1:port1,host2:port2,....",
-    "Type": "list",
-    "Default": "\"\"",
-    "Valid Values": "non-null string",
-    "Importance": "high"
-  },
-  {
     "Name": "fetch.min.bytes",
-    "Desc": "The minimum amount of data the server should return for a fetch request. If insufficient data is available the request will wait for that much data to accumulate before answering the request. The default setting of 1 byte means that fetch requests are answered as soon as that many byte(s) of data is available or the fetch request times out waiting for data to arrive. Setting this to a larger value will cause the server to wait for larger amounts of data to accumulate which can improve server throughput a bit at the cost of some additional latency.",
+    "Desc": "The minimum amount of data the server should return for a fetch request. If insufficient data is available the request will wait for that much data to accumulate before answering the request. The default setting of 1 byte means that fetch requests are answered as soon as that many byte(s) of data is available or the fetch request times out waiting for data to arrive. Setting this to a larger value will cause the server to wait for larger amounts of data to accumulate which can improve server throughput a bit at the cost of some additional latency. Even if the total data available in the broker exceeds fetch.min.bytes, the actual returned size may still be less than this value due to per-partition limits max.partition.fetch.bytes and max returned limits fetch.max.bytes.",
     "Type": "int",
     "Default": "1",
     "Valid Values": "[0,...]",
@@ -3699,7 +4465,7 @@
   },
   {
     "Name": "group.protocol",
-    "Desc": "The group protocol consumer should use. We currently support \"classic\" or \"consumer\". If \"consumer\" is specified, then the consumer group protocol will be used. Otherwise, the classic group protocol will be used.",
+    "Desc": "The group protocol that the consumer uses. The supported values are classic or consumer. The default value is classic.",
     "Type": "string",
     "Default": "classic",
     "Valid Values": "(case insensitive) [CONSUMER, CLASSIC]",
@@ -3707,7 +4473,7 @@
   },
   {
     "Name": "heartbeat.interval.ms",
-    "Desc": "The expected time between heartbeats to the consumer coordinator when using Kafka\u0027s group management facilities. Heartbeats are used to ensure that the consumer\u0027s session stays active and to facilitate rebalancing when new consumers join or leave the group. The value must be set lower than session.timeout.ms, but typically should be set no higher than 1/3 of that value. It can be adjusted even lower to control the expected time for normal rebalances.",
+    "Desc": "The expected time between heartbeats to the consumer coordinator when using Kafka\u0027s group management facilities. Heartbeats are used to ensure that the consumer\u0027s session stays active and to facilitate rebalancing when new consumers join or leave the group. This config is only supported if group.protocol is set to \"classic\". In that case, the value must be set lower than session.timeout.ms, but typically should be set no higher than 1/3 of that value. It can be adjusted even lower to control the expected time for normal rebalances.If group.protocol is set to \"consumer\", this config is not supported, as the heartbeat interval is controlled by the broker with group.consumer.heartbeat.interval.ms.",
     "Type": "int",
     "Default": "3000 (3 seconds)",
     "Valid Values": "",
@@ -3723,7 +4489,7 @@
   },
   {
     "Name": "session.timeout.ms",
-    "Desc": "The timeout used to detect client failures when using Kafka\u0027s group management facility. The client sends periodic heartbeats to indicate its liveness to the broker. If no heartbeats are received by the broker before the expiration of this session timeout, then the broker will remove this client from the group and initiate a rebalance. Note that the value must be in the allowable range as configured in the broker configuration by group.min.session.timeout.ms and group.max.session.timeout.ms. Note that this configuration is not supported when group.protocol is set to \"consumer\".",
+    "Desc": "The timeout used to detect client failures when using Kafka\u0027s group management facility. The client sends periodic heartbeats to indicate its liveness to the broker. If no heartbeats are received by the broker before the expiration of this session timeout, then the broker will remove this client from the group and initiate a rebalance. Note that the value must be in the allowable range as configured in the broker configuration by group.min.session.timeout.ms and group.max.session.timeout.ms. Note that this client configuration is not supported when group.protocol is set to \"consumer\". In that case, session timeout is controlled by the broker config group.consumer.session.timeout.ms.",
     "Type": "int",
     "Default": "45000 (45 seconds)",
     "Valid Values": "",
@@ -3795,7 +4561,7 @@
   },
   {
     "Name": "allow.auto.create.topics",
-    "Desc": "Allow automatic topic creation on the broker when subscribing to or assigning a topic. A topic being subscribed to will be automatically created only if the broker allows for it using `auto.create.topics.enable` broker configuration. This configuration must be set to `true` when using brokers older than 0.11.0",
+    "Desc": "Allow automatic topic creation on the broker when subscribing to or assigning a topic. A topic being subscribed to will be automatically created only if the broker allows for it using auto.create.topics.enable broker configuration.",
     "Type": "boolean",
     "Default": "true",
     "Valid Values": "",
@@ -3851,7 +4617,7 @@
   },
   {
     "Name": "fetch.max.bytes",
-    "Desc": "The maximum amount of data the server should return for a fetch request. Records are fetched in batches by the consumer, and if the first record batch in the first non-empty partition of the fetch is larger than this value, the record batch will still be returned to ensure that the consumer can make progress. As such, this is not a absolute maximum. The maximum record batch size accepted by the broker is defined via message.max.bytes (broker config) or max.message.bytes (topic config). Note that the consumer performs multiple fetches in parallel.",
+    "Desc": "The maximum amount of data the server should return for a fetch request. Records are fetched in batches by the consumer, and if the first record batch in the first non-empty partition of the fetch is larger than this value, the record batch will still be returned to ensure that the consumer can make progress. As such, this is not a absolute maximum. The maximum record batch size accepted by the broker is defined via message.max.bytes (broker config) or max.message.bytes (topic config). A fetch request consists of many partitions, and there is another setting that controls how much data is returned for each partition in a fetch request - see max.partition.fetch.bytes. Note that the consumer performs multiple fetches in parallel.",
     "Type": "int",
     "Default": "52428800 (50 mebibytes)",
     "Valid Values": "[0,...]",
@@ -3883,7 +4649,7 @@
   },
   {
     "Name": "max.poll.interval.ms",
-    "Desc": "The maximum delay between invocations of poll() when using consumer group management. This places an upper bound on the amount of time that the consumer can be idle before fetching more records. If poll() is not called before expiration of this timeout, then the consumer is considered failed and the group will rebalance in order to reassign the partitions to another member. For consumers using a non-null group.instance.id which reach this timeout, partitions will not be immediately reassigned. Instead, the consumer will stop sending heartbeats and partitions will be reassigned after expiration of session.timeout.ms. This mirrors the behavior of a static consumer which has shutdown.",
+    "Desc": "The maximum delay between invocations of poll() when using consumer group management. This places an upper bound on the amount of time that the consumer can be idle before fetching more records. If poll() is not called before expiration of this timeout, then the consumer is considered failed and the group will rebalance in order to reassign the partitions to another member. For consumers using a non-null group.instance.id which reach this timeout, partitions will not be immediately reassigned. Instead, the consumer will stop sending heartbeats and partitions will be reassigned after expiration of the session timeout (defined by the client config session.timeout.ms if using the Classic rebalance protocol, or by the broker config group.consumer.session.timeout.ms if using the Consumer protocol). This mirrors the behavior of a static consumer which has shutdown.",
     "Type": "int",
     "Default": "300000 (5 minutes)",
     "Valid Values": "[1,...]",
@@ -3902,7 +4668,7 @@
     "Desc": "A list of class names or class types, ordered by preference, of supported partition assignment strategies that the client will use to distribute partition ownership amongst consumer instances when group management is used. Available options are:",
     "Type": "list",
     "Default": "class org.apache.kafka.clients.consumer.RangeAssignor,class org.apache.kafka.clients.consumer.CooperativeStickyAssignor",
-    "Valid Values": "non-null string",
+    "Valid Values": "",
     "Importance": "medium"
   },
   {
@@ -3970,6 +4736,94 @@
     "Importance": "medium"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.algorithm",
+    "Desc": "",
+    "Type": "string",
+    "Default": "RS256",
+    "Valid Values": "(case insensitive) [ES256, RS256]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.aud",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.iss",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.jti.include",
+    "Desc": "",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.sub",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.passphrase",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.template.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.id",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.secret",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
     "Name": "sasl.oauthbearer.jwks.endpoint.url",
     "Desc": "The OAuth/OIDC provider URL from which the provider\u0027s JWKS (JSON Web Key Set) can be retrieved. The URL can be HTTP(S)-based or file-based. If the URL is HTTP(S)-based, the JWKS data will be retrieved from the OAuth/OIDC provider via the configured URL on broker startup. All then-current keys will be cached on the broker for incoming requests. If an authentication request is received for a JWT that includes a \"kid\" header claim value that isn\u0027t yet in the cache, the JWKS endpoint will be queried again on demand. However, the broker polls the URL every sasl.oauthbearer.jwks.endpoint.refresh.ms milliseconds to refresh the cache with any forthcoming keys before any JWT requests that include them are received. If the URL is file-based, the broker will load the JWKS file from a configured location on startup. In the event that the JWT includes a \"kid\" header value that isn\u0027t in the JWKS file, the broker will reject the JWT and authentication will fail.",
     "Type": "string",
@@ -3978,8 +4832,32 @@
     "Importance": "medium"
   },
   {
+    "Name": "sasl.oauthbearer.jwt.retriever.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtRetriever",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.jwt.validator.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtValidator",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.scope",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
     "Name": "sasl.oauthbearer.token.endpoint.url",
-    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.jaas.config. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
+    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.oauthbearer.jwt.retriever.class. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "",
@@ -4002,6 +4880,22 @@
     "Importance": "medium"
   },
   {
+    "Name": "share.acknowledgement.mode",
+    "Desc": "Controls the acknowledgement mode for a share consumer. If set to implicit, the acknowledgement mode of the consumer is implicit and it must not use org.apache.kafka.clients.consumer.ShareConsumer.acknowledge() to acknowledge delivery of records. Instead, delivery is acknowledged implicitly on the next call to poll or commit. If set to explicit, the acknowledgement mode of the consumer is explicit and it must use org.apache.kafka.clients.consumer.ShareConsumer.acknowledge() to acknowledge delivery of records.",
+    "Type": "string",
+    "Default": "implicit",
+    "Valid Values": "[implicit, explicit]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "share.acquire.mode",
+    "Desc": "Controls the acquire mode for a share consumer. If set to record_limit, the number of records returned in each poll() will not exceed the value of max.poll.records. If set to batch_optimized, the number of records returned in each poll() call may exceed max.poll.records to align with batch boundaries for optimization.",
+    "Type": "string",
+    "Default": "BATCH_OPTIMIZED",
+    "Valid Values": "[batch_optimized, record_limit]",
+    "Importance": "medium"
+  },
+  {
     "Name": "socket.connection.setup.timeout.max.ms",
     "Desc": "The maximum amount of time the client will wait for the socket connection to be established. The connection setup timeout will increase exponentially for each consecutive connection failure up to this maximum. To avoid connection storms, a randomization factor of 0.2 will be applied to the timeout resulting in a random range between 20% below and 20% above the computed value.",
     "Type": "long",
@@ -4019,7 +4913,7 @@
   },
   {
     "Name": "ssl.enabled.protocols",
-    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. Also see the config documentation for `ssl.protocol` to understand how it can impact the TLS version negotiation behavior.",
+    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. If this configuration is set to an empty list, Kafka will use the protocols enabled by default in the underlying SSLEngine, which may include additional protocols depending on the JVM version. Also see the config documentation for ssl.protocol to understand how it can impact the TLS version negotiation behavior.",
     "Type": "list",
     "Default": "TLSv1.2,TLSv1.3",
     "Valid Values": "",
@@ -4027,7 +4921,7 @@
   },
   {
     "Name": "ssl.keystore.type",
-    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -4035,7 +4929,7 @@
   },
   {
     "Name": "ssl.protocol",
-    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in `ssl.enabled.protocols` and the server only supports \u0027TLSv1.3\u0027.",
+    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
     "Type": "string",
     "Default": "TLSv1.3",
     "Valid Values": "",
@@ -4051,7 +4945,7 @@
   },
   {
     "Name": "ssl.truststore.type",
-    "Desc": "The file format of the trust store file. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the trust store file. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -4090,6 +4984,14 @@
     "Importance": "low"
   },
   {
+    "Name": "config.providers",
+    "Desc": "Comma-separated alias names for classes implementing the ConfigProvider interface. This enables loading configuration data (such as passwords, API keys, and other credentials) from external sources. For example, see Configuration Providers.",
+    "Type": "list",
+    "Default": "\"\"",
+    "Valid Values": "",
+    "Importance": "low"
+  },
+  {
     "Name": "enable.metrics.push",
     "Desc": "Whether to enable pushing of client metrics to the cluster, if the cluster has a client metrics subscription which matches this client.",
     "Type": "boolean",
@@ -4110,7 +5012,7 @@
     "Desc": "A list of classes to use as interceptors. Implementing the org.apache.kafka.clients.consumer.ConsumerInterceptor interface allows you to intercept (and possibly mutate) records received by the consumer. By default, there are no interceptors.",
     "Type": "list",
     "Default": "\"\"",
-    "Valid Values": "non-null string",
+    "Valid Values": "",
     "Importance": "low"
   },
   {
@@ -4139,10 +5041,10 @@
   },
   {
     "Name": "metric.reporters",
-    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation.",
+    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation. When custom reporters are set and org.apache.kafka.common.metrics.JmxReporter is needed, it has to be explicitly added to the list.",
     "Type": "list",
     "Default": "org.apache.kafka.common.metrics.JmxReporter",
-    "Valid Values": "non-null string",
+    "Valid Values": "",
     "Importance": "low"
   },
   {
@@ -4298,6 +5200,22 @@
     "Importance": "low"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.claim.exp.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "300",
+    "Valid Values": "[0,...,86400]",
+    "Importance": "low"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.nbf.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "60",
+    "Valid Values": "[0,...,3600]",
+    "Importance": "low"
+  },
+  {
     "Name": "sasl.oauthbearer.clock.skew.seconds",
     "Desc": "The (optional) value in seconds to allow for differences between the time of the OAuth/OIDC identity provider and the broker.",
     "Type": "int",
@@ -4309,7 +5227,7 @@
     "Name": "sasl.oauthbearer.expected.audience",
     "Desc": "The (optional) comma-delimited setting for the broker to use to verify that the JWT was issued for one of the expected audiences. The JWT will be inspected for the standard OAuth \"aud\" claim and if this value is set, the broker will match the value from JWT\u0027s \"aud\" claim to see if there is an exact match. If there is no match, the broker will reject the JWT and authentication will fail.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -4381,7 +5299,7 @@
     "Name": "ssl.cipher.suites",
     "Desc": "A list of cipher suites. This is a named combination of authentication, encryption, MAC and key exchange algorithm used to negotiate the security settings for a network connection using TLS or SSL network protocol. By default all the available cipher suites are supported.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -4424,6 +5342,14 @@
     "Default": "PKIX",
     "Valid Values": "",
     "Importance": "low"
+  },
+  {
+    "Name": "bootstrap.servers",
+    "Desc": "A list of host/port pairs used to establish the initial connection to the Kafka cluster. Clients use this list to bootstrap and discover the full set of Kafka brokers. While the order of servers in the list does not matter, we recommend including more than one server to ensure resilience if any servers are down. This list does not need to contain the entire set of brokers, as Kafka clients automatically manage and update connections to the cluster efficiently. This list must be in the form host1:port1,host2:port2,....",
+    "Type": "list",
+    "Default": "",
+    "Valid Values": "",
+    "Importance": "high"
   },
   {
     "Name": "config.storage.topic",
@@ -4470,14 +5396,6 @@
     "Desc": "Converter class used to convert between Kafka Connect format and the serialized form that is written to Kafka. This controls the format of the values in messages written to or read from Kafka, and since this is independent of connectors it allows any connector to work with any serialization format. Examples of common formats include JSON and Avro.",
     "Type": "class",
     "Default": "",
-    "Valid Values": "",
-    "Importance": "high"
-  },
-  {
-    "Name": "bootstrap.servers",
-    "Desc": "A list of host/port pairs used to establish the initial connection to the Kafka cluster. Clients use this list to bootstrap and discover the full set of Kafka brokers. While the order of servers in the list does not matter, we recommend including more than one server to ensure resilience if any servers are down. This list does not need to contain the entire set of brokers, as Kafka clients automatically manage and update connections to the cluster efficiently. This list must be in the form host1:port1,host2:port2,....",
-    "Type": "list",
-    "Default": "localhost:9092",
     "Valid Values": "",
     "Importance": "high"
   },
@@ -4595,7 +5513,7 @@
   },
   {
     "Name": "connector.client.config.override.policy",
-    "Desc": "Class name or alias of implementation of ConnectorClientConfigOverridePolicy. Defines what client configurations can be overridden by the connector. The default implementation is `All`, meaning connector configurations can override all client properties. The other possible policies in the framework include `None` to disallow connectors from overriding client properties, and `Principal` to allow connectors to override only client principals.",
+    "Desc": "Class name or alias of implementation of ConnectorClientConfigOverridePolicy. Defines what client configurations can be overridden by the connector. The default policy is All, meaning connector configurations can override all client properties. The other possible policies in the framework include Allowlist to specify allowed configurations via connector.client.config.override.allowlist, None to disallow connectors from overriding client properties, and Principal (now deprecated) to allow connectors to override only client principals.",
     "Type": "string",
     "Default": "All",
     "Valid Values": "",
@@ -4666,6 +5584,94 @@
     "Importance": "medium"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.algorithm",
+    "Desc": "",
+    "Type": "string",
+    "Default": "RS256",
+    "Valid Values": "(case insensitive) [ES256, RS256]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.aud",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.iss",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.jti.include",
+    "Desc": "",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.sub",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.passphrase",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.template.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.id",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.secret",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
     "Name": "sasl.oauthbearer.jwks.endpoint.url",
     "Desc": "The OAuth/OIDC provider URL from which the provider\u0027s JWKS (JSON Web Key Set) can be retrieved. The URL can be HTTP(S)-based or file-based. If the URL is HTTP(S)-based, the JWKS data will be retrieved from the OAuth/OIDC provider via the configured URL on broker startup. All then-current keys will be cached on the broker for incoming requests. If an authentication request is received for a JWT that includes a \"kid\" header claim value that isn\u0027t yet in the cache, the JWKS endpoint will be queried again on demand. However, the broker polls the URL every sasl.oauthbearer.jwks.endpoint.refresh.ms milliseconds to refresh the cache with any forthcoming keys before any JWT requests that include them are received. If the URL is file-based, the broker will load the JWKS file from a configured location on startup. In the event that the JWT includes a \"kid\" header value that isn\u0027t in the JWKS file, the broker will reject the JWT and authentication will fail.",
     "Type": "string",
@@ -4674,8 +5680,32 @@
     "Importance": "medium"
   },
   {
+    "Name": "sasl.oauthbearer.jwt.retriever.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtRetriever",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.jwt.validator.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtValidator",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.scope",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
     "Name": "sasl.oauthbearer.token.endpoint.url",
-    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.jaas.config. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
+    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.oauthbearer.jwt.retriever.class. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "",
@@ -4699,7 +5729,7 @@
   },
   {
     "Name": "ssl.enabled.protocols",
-    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. Also see the config documentation for `ssl.protocol` to understand how it can impact the TLS version negotiation behavior.",
+    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. If this configuration is set to an empty list, Kafka will use the protocols enabled by default in the underlying SSLEngine, which may include additional protocols depending on the JVM version. Also see the config documentation for ssl.protocol to understand how it can impact the TLS version negotiation behavior.",
     "Type": "list",
     "Default": "TLSv1.2,TLSv1.3",
     "Valid Values": "",
@@ -4707,7 +5737,7 @@
   },
   {
     "Name": "ssl.keystore.type",
-    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -4715,7 +5745,7 @@
   },
   {
     "Name": "ssl.protocol",
-    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in `ssl.enabled.protocols` and the server only supports \u0027TLSv1.3\u0027.",
+    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
     "Type": "string",
     "Default": "TLSv1.3",
     "Valid Values": "",
@@ -4731,7 +5761,7 @@
   },
   {
     "Name": "ssl.truststore.type",
-    "Desc": "The file format of the trust store file. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the trust store file. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -4747,7 +5777,7 @@
   },
   {
     "Name": "worker.unsync.backoff.ms",
-    "Desc": "When the worker is out of sync with other workers and fails to catch up within worker.sync.timeout.ms, leave the Connect cluster for this long before rejoining.",
+    "Desc": "When the worker is out of sync with other workers and fails to catch up within the worker.sync.timeout.ms, leave the Connect cluster for this long before rejoining.",
     "Type": "int",
     "Default": "300000 (5 minutes)",
     "Valid Values": "",
@@ -4771,10 +5801,10 @@
   },
   {
     "Name": "admin.listeners",
-    "Desc": "List of comma-separated URIs the Admin REST API will listen on. The supported protocols are HTTP and HTTPS. An empty or blank string will disable this feature. The default behavior is to use the regular listener (specified by the \u0027listeners\u0027 property).",
+    "Desc": "List of comma-separated URIs the Admin REST API will listen on. The supported protocols are HTTP and HTTPS. An empty or blank string will disable this feature. The default behavior is to use the regular listener (specified by the \u0027listeners\u0027 property). A comma-separated list of valid URLs, e.g., http://localhost:8080,https://localhost:8443.",
     "Type": "list",
     "Default": "null",
-    "Valid Values": "List of comma-separated URLs, ex: http://localhost:8080,https://localhost:8443.",
+    "Valid Values": "",
     "Importance": "low"
   },
   {
@@ -4787,7 +5817,7 @@
   },
   {
     "Name": "config.providers",
-    "Desc": "Comma-separated names of ConfigProvider classes, loaded and used in the order specified. Implementing the interface ConfigProvider allows you to replace variable references in connector configurations, such as for externalized secrets.",
+    "Desc": "Comma-separated alias names for classes implementing the ConfigProvider interface. This enables loading configuration data (such as passwords, API keys, and other credentials) from external sources. For example, see Configuration Providers.",
     "Type": "list",
     "Default": "\"\"",
     "Valid Values": "",
@@ -4818,6 +5848,14 @@
     "Importance": "low"
   },
   {
+    "Name": "header.converter.plugin.version",
+    "Desc": "Version of the header converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "low"
+  },
+  {
     "Name": "inter.worker.key.generation.algorithm",
     "Desc": "The algorithm to use for generating internal request keys. The algorithm \u0027HmacSHA256\u0027 will be used as a default on JVMs that support it; on other JVMs, no default is used and a value for this property must be manually specified in the worker config.",
     "Type": "string",
@@ -4843,7 +5881,7 @@
   },
   {
     "Name": "inter.worker.signature.algorithm",
-    "Desc": "The algorithm used to sign internal requestsThe algorithm \u0027inter.worker.signature.algorithm\u0027 will be used as a default on JVMs that support it; on other JVMs, no default is used and a value for this property must be manually specified in the worker config.",
+    "Desc": "The algorithm used to sign internal requests. The algorithm \u0027HmacSHA256\u0027 will be used as a default on JVMs that support it; on other JVMs, no default is used and a value for this property must be manually specified in the worker config.",
     "Type": "string",
     "Default": "HmacSHA256",
     "Valid Values": "Any MAC algorithm supported by the worker JVM",
@@ -4855,6 +5893,14 @@
     "Type": "list",
     "Default": "HmacSHA256",
     "Valid Values": "A list of one or more MAC algorithms, each supported by the worker JVM",
+    "Importance": "low"
+  },
+  {
+    "Name": "key.converter.plugin.version",
+    "Desc": "Version of the key converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
     "Importance": "low"
   },
   {
@@ -4891,7 +5937,7 @@
   },
   {
     "Name": "metric.reporters",
-    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation.",
+    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation. When custom reporters are set and org.apache.kafka.common.metrics.JmxReporter is needed, it has to be explicitly added to the list.",
     "Type": "list",
     "Default": "org.apache.kafka.common.metrics.JmxReporter",
     "Valid Values": "",
@@ -5138,6 +6184,22 @@
     "Importance": "low"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.claim.exp.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "300",
+    "Valid Values": "[0,...,86400]",
+    "Importance": "low"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.nbf.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "60",
+    "Valid Values": "[0,...,3600]",
+    "Importance": "low"
+  },
+  {
     "Name": "sasl.oauthbearer.clock.skew.seconds",
     "Desc": "The (optional) value in seconds to allow for differences between the time of the OAuth/OIDC identity provider and the broker.",
     "Type": "int",
@@ -5149,7 +6211,7 @@
     "Name": "sasl.oauthbearer.expected.audience",
     "Desc": "The (optional) comma-delimited setting for the broker to use to verify that the JWT was issued for one of the expected audiences. The JWT will be inspected for the standard OAuth \"aud\" claim and if this value is set, the broker will match the value from JWT\u0027s \"aud\" claim to see if there is an exact match. If there is no match, the broker will reject the JWT and authentication will fail.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -5237,7 +6299,7 @@
     "Name": "ssl.cipher.suites",
     "Desc": "A list of cipher suites. This is a named combination of authentication, encryption, MAC and key exchange algorithm used to negotiate the security settings for a network connection using TLS or SSL network protocol. By default all the available cipher suites are supported.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -5315,7 +6377,7 @@
   },
   {
     "Name": "topic.creation.enable",
-    "Desc": "Whether to allow automatic creation of topics used by source connectors, when source connectors are configured with `topic.creation.` properties. Each task will use an admin client to create its topics and will not depend on the Kafka brokers to create topics automatically.",
+    "Desc": "Whether to allow automatic creation of topics used by source connectors, when source connectors are configured with topic.creation. properties. Each task will use an admin client to create its topics and will not depend on the Kafka brokers to create topics automatically.",
     "Type": "boolean",
     "Default": "true",
     "Valid Values": "",
@@ -5338,6 +6400,14 @@
     "Importance": "low"
   },
   {
+    "Name": "value.converter.plugin.version",
+    "Desc": "Version of the value converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "low"
+  },
+  {
     "Name": "name",
     "Desc": "Globally unique name to use for this connector.",
     "Type": "string",
@@ -5352,6 +6422,14 @@
     "Default": "",
     "Valid Values": "",
     "Importance": "high"
+  },
+  {
+    "Name": "connector.plugin.version",
+    "Desc": "Version of the connector.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@4b1c1ea0",
+    "Importance": "medium"
   },
   {
     "Name": "tasks.max",
@@ -5378,6 +6456,14 @@
     "Importance": "low"
   },
   {
+    "Name": "key.converter.plugin.version",
+    "Desc": "Version of the key converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@17579e0f",
+    "Importance": "low"
+  },
+  {
     "Name": "value.converter",
     "Desc": "Converter class used to convert between Kafka Connect format and the serialized form that is written to Kafka. This controls the format of the values in messages written to or read from Kafka, and since this is independent of connectors it allows any connector to work with any serialization format. Examples of common formats include JSON and Avro.",
     "Type": "class",
@@ -5386,11 +6472,27 @@
     "Importance": "low"
   },
   {
+    "Name": "value.converter.plugin.version",
+    "Desc": "Version of the value converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@4d41cee",
+    "Importance": "low"
+  },
+  {
     "Name": "header.converter",
     "Desc": "HeaderConverter class used to convert between Kafka Connect format and the serialized form that is written to Kafka. This controls the format of the header values in messages written to or read from Kafka, and since this is independent of connectors it allows any connector to work with any serialization format. Examples of common formats include JSON and Avro. By default, the SimpleHeaderConverter is used to serialize header values to strings and deserialize them by inferring the schemas.",
     "Type": "class",
     "Default": "null",
     "Valid Values": "A concrete subclass of org.apache.kafka.connect.storage.HeaderConverter, A class with a public, no-argument constructor",
+    "Importance": "low"
+  },
+  {
+    "Name": "header.converter.plugin.version",
+    "Desc": "Version of the header converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@3712b94",
     "Importance": "low"
   },
   {
@@ -5514,6 +6616,14 @@
     "Importance": "high"
   },
   {
+    "Name": "connector.plugin.version",
+    "Desc": "Version of the connector.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@7fac631b",
+    "Importance": "medium"
+  },
+  {
     "Name": "tasks.max",
     "Desc": "Maximum number of tasks to use for this connector.",
     "Type": "int",
@@ -5554,6 +6664,14 @@
     "Importance": "low"
   },
   {
+    "Name": "key.converter.plugin.version",
+    "Desc": "Version of the key converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@9660f4e",
+    "Importance": "low"
+  },
+  {
     "Name": "value.converter",
     "Desc": "Converter class used to convert between Kafka Connect format and the serialized form that is written to Kafka. This controls the format of the values in messages written to or read from Kafka, and since this is independent of connectors it allows any connector to work with any serialization format. Examples of common formats include JSON and Avro.",
     "Type": "class",
@@ -5562,11 +6680,27 @@
     "Importance": "low"
   },
   {
+    "Name": "value.converter.plugin.version",
+    "Desc": "Version of the value converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@5a8806ef",
+    "Importance": "low"
+  },
+  {
     "Name": "header.converter",
     "Desc": "HeaderConverter class used to convert between Kafka Connect format and the serialized form that is written to Kafka. This controls the format of the header values in messages written to or read from Kafka, and since this is independent of connectors it allows any connector to work with any serialization format. Examples of common formats include JSON and Avro. By default, the SimpleHeaderConverter is used to serialize header values to strings and deserialize them by inferring the schemas.",
     "Type": "class",
     "Default": "null",
     "Valid Values": "A concrete subclass of org.apache.kafka.connect.storage.HeaderConverter, A class with a public, no-argument constructor",
+    "Importance": "low"
+  },
+  {
+    "Name": "header.converter.plugin.version",
+    "Desc": "Version of the header converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@6c49835d",
     "Importance": "low"
   },
   {
@@ -5674,10 +6808,26 @@
     "Importance": "high"
   },
   {
+    "Name": "ensure.explicit.internal.resource.naming",
+    "Desc": "Whether to enforce explicit naming for all internal resources of the topology, including internal topics (e.g., changelog and repartition topics) and their associated state stores. When enabled, the application will refuse to start if any internal resource has an auto-generated name.",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "high"
+  },
+  {
     "Name": "num.standby.replicas",
     "Desc": "The number of standby replicas for each task.",
     "Type": "int",
     "Default": "0",
+    "Valid Values": "",
+    "Importance": "high"
+  },
+  {
+    "Name": "processing.exception.handler.global.enabled",
+    "Desc": "Whether to use the configured processing.exception.handler during global store/KTable processing. Disabled by default. This config will be removed in Kafka Streams 5.0, where global exception handling will be enabled by default",
+    "Type": "boolean",
+    "Default": "false",
     "Valid Values": "",
     "Importance": "high"
   },
@@ -5794,6 +6944,22 @@
     "Importance": "medium"
   },
   {
+    "Name": "errors.dead.letter.queue.topic.name",
+    "Desc": "If not null, the default exception handler will build and send a Dead Letter Queue record to the topic with the provided name if an error occurs. If a custom deserialization/production or processing exception handler is set, this parameter is ignored for this handler. Note: This configuration applies only to regular stream processing tasks. It does not apply to global state store updates (global threads).",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "group.protocol",
+    "Desc": "The group protocol streams should use. We currently support \"classic\" or \"streams\". If \"streams\" is specified, then the streams rebalance protocol will be used. Otherwise, the classic group protocol will be used.",
+    "Type": "string",
+    "Default": "classic",
+    "Valid Values": "(case insensitive) [STREAMS, CLASSIC]",
+    "Importance": "medium"
+  },
+  {
     "Name": "max.task.idle.ms",
     "Desc": "This config controls whether joins and merges may produce out-of-order results. The config value is the maximum amount of time in milliseconds a stream task will stay idle when it is fully caught up on some (but not all) input partitions to wait for producers to send additional records and avoid potential out-of-order record processing across multiple input streams. The default (zero) does not wait for producers to send more records, but it does wait to fetch data that is already present on the brokers. This default means that for records that are already present on the brokers, Streams will process them in timestamp order. Set to -1 to disable idling entirely and process any locally available data, even though doing so may produce out-of-order processing.",
     "Type": "long",
@@ -5803,7 +6969,7 @@
   },
   {
     "Name": "max.warmup.replicas",
-    "Desc": "The maximum number of warmup replicas (extra standbys beyond the configured num.standbys) that can be assigned at once for the purpose of keeping the task available on one instance while it is warming up on another instance it has been reassigned to. Used to throttle how much extra broker traffic and cluster state can be used for high availability. Must be at least 1.Note that one warmup replica corresponds to one Stream Task. Furthermore, note that each warmup replica can only be promoted to an active task during a rebalance (normally during a so-called probing rebalance, which occur at a frequency specified by the `probing.rebalance.interval.ms` config). This means that the maximum rate at which active tasks can be migrated from one Kafka Streams Instance to another instance can be determined by (`max.warmup.replicas` / `probing.rebalance.interval.ms`).",
+    "Desc": "The maximum number of warmup replicas (extra standbys beyond the configured num.standbys) that can be assigned at once for the purpose of keeping the task available on one instance while it is warming up on another instance it has been reassigned to. Used to throttle how much extra broker traffic and cluster state can be used for high availability. Must be at least 1.Note that one warmup replica corresponds to one Stream Task. Furthermore, note that each warmup replica can only be promoted to an active task during a rebalance (normally during a so-called probing rebalance, which occur at a frequency specified by the probing.rebalance.interval.ms config). This means that the maximum rate at which active tasks can be migrated from one Kafka Streams Instance to another instance can be determined by (max.warmup.replicas / probing.rebalance.interval.ms).",
     "Type": "int",
     "Default": "2",
     "Valid Values": "[1,...]",
@@ -5819,7 +6985,7 @@
   },
   {
     "Name": "processing.exception.handler",
-    "Desc": "Exception handling class that implements the org.apache.kafka.streams.errors.ProcessingExceptionHandler interface.",
+    "Desc": "Exception handling class that implements the org.apache.kafka.streams.errors.ProcessingExceptionHandler interface. Note: This handler applies only to regular stream processing tasks. It does not apply to global state store updates (global threads). Exceptions occurring in global threads will bubble up to the configured uncaught exception handler.",
     "Type": "class",
     "Default": "org.apache.kafka.streams.errors.LogAndFailProcessingExceptionHandler",
     "Valid Values": "",
@@ -5883,11 +7049,19 @@
   },
   {
     "Name": "topology.optimization",
-    "Desc": "A configuration telling Kafka Streams if it should optimize the topology and what optimizations to apply. Acceptable values are: \"+NO_OPTIMIZATION+\", \"+OPTIMIZE+\", or a comma separated list of specific optimizations: (\"+REUSE_KTABLE_SOURCE_TOPICS+\", \"+MERGE_REPARTITION_TOPICS+\" + \"SINGLE_STORE_SELF_JOIN+\").\"NO_OPTIMIZATION\" by default.",
+    "Desc": "A configuration telling Kafka Streams if it should optimize the topology and what optimizations to apply. Acceptable values are: \"+NO_OPTIMIZATION+\", \"+OPTIMIZE+\", or a comma separated list of specific optimizations: (\"+REUSE_KTABLE_SOURCE_TOPICS+\", \"+MERGE_REPARTITION_TOPICS+\" + \"SINGLE_STORE_SELF_JOIN+\").\"NO_OPTIMIZATION\" by default. Note: this config must also be passed to StreamsBuilder#build(Properties) for optimizations to take effect.",
     "Type": "string",
     "Default": "none",
     "Valid Values": "[all, none, reuse.ktable.source.topics, merge.repartition.topics, single.store.self.join]",
     "Importance": "medium"
+  },
+  {
+    "Name": "allow.os.group.write.access",
+    "Desc": "Allows state store directories created by Kafka Streams to have write access for the OS group. Default is false",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "low"
   },
   {
     "Name": "application.server",
@@ -5922,6 +7096,14 @@
     "Importance": "low"
   },
   {
+    "Name": "config.providers",
+    "Desc": "Comma-separated alias names for classes implementing the ConfigProvider interface. This enables loading configuration data (such as passwords, API keys, and other credentials) from external sources. For example, see Configuration Providers.",
+    "Type": "list",
+    "Default": "\"\"",
+    "Valid Values": "",
+    "Importance": "low"
+  },
+  {
     "Name": "connections.max.idle.ms",
     "Desc": "Close idle connections after the number of milliseconds specified by this config.",
     "Type": "long",
@@ -5943,6 +7125,14 @@
     "Type": "string",
     "Default": "rocksDB",
     "Valid Values": "[rocksDB, in_memory]",
+    "Importance": "low"
+  },
+  {
+    "Name": "dsl.store.format",
+    "Desc": "Specifies the state store format for DSL operators. \u0027DEFAULT\u0027 creates either timestamped or plain state stores, depending on context. \u0027HEADERS\u0027 creates headers-aware stores that preserve record headers.",
+    "Type": "string",
+    "Default": "DEFAULT",
+    "Valid Values": "(case insensitive) [HEADERS, DEFAULT]",
     "Importance": "low"
   },
   {
@@ -5995,7 +7185,7 @@
   },
   {
     "Name": "metric.reporters",
-    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation.",
+    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation. When custom reporters are set and org.apache.kafka.common.metrics.JmxReporter is needed, it has to be explicitly added to the list.",
     "Type": "list",
     "Default": "org.apache.kafka.common.metrics.JmxReporter",
     "Valid Values": "",
@@ -6154,11 +7344,19 @@
     "Importance": "low"
   },
   {
+    "Name": "state.cleanup.dir.max.age.ms",
+    "Desc": "Time-based threshold for purging local state directories and checkpoint files during application startup. State directories that have not been modified for at least state.cleanup.dir.max.age.ms will be removed.",
+    "Type": "long",
+    "Default": "-1",
+    "Valid Values": "",
+    "Importance": "low"
+  },
+  {
     "Name": "upgrade.from",
-    "Desc": "Allows live upgrading (and downgrading in some cases -- see upgrade guide) in a backward compatible way. Default is `null`. Please refer to the Kafka Streams upgrade guide for instructions on how and when to use this config. Note that when upgrading from 3.5 to a newer version it is never required to specify this config, while upgrading live directly to 4.0+ from 2.3 or below is no longer supported even with this config. Accepted values are \"2.4\", \"2.5\", \"2.6\", \"2.7\", \"2.8\", \"3.0\", \"3.1\", \"3.2\", \"3.3\", \"3.4\", \"3.5\", \"3.6\", \"3.7\", \"3.8\", \"3.9\", \"(for upgrading from the corresponding old version).",
+    "Desc": "Allows live upgrading (and downgrading in some cases -- see upgrade guide) in a backward compatible way. Default is null. Please refer to the Kafka Streams upgrade guide for instructions on how and when to use this config. Note that when upgrading from 3.5 to a newer version it is never required to specify this config, while upgrading live directly to 4.0+ from 2.3 or below is no longer supported even with this config.",
     "Type": "string",
     "Default": "null",
-    "Valid Values": "[null, 0.10.0, 0.10.1, 0.10.2, 0.11.0, 1.0, 1.1, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9]",
+    "Valid Values": "[null, 2.4, 2.5, 2.6, 2.7, 2.8, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0, 4.1, 4.2]",
     "Importance": "low"
   },
   {
@@ -6362,6 +7560,94 @@
     "Importance": "medium"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.algorithm",
+    "Desc": "",
+    "Type": "string",
+    "Default": "RS256",
+    "Valid Values": "(case insensitive) [ES256, RS256]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.aud",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.iss",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.jti.include",
+    "Desc": "",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.sub",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.passphrase",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.template.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.id",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.secret",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
     "Name": "sasl.oauthbearer.jwks.endpoint.url",
     "Desc": "The OAuth/OIDC provider URL from which the provider\u0027s JWKS (JSON Web Key Set) can be retrieved. The URL can be HTTP(S)-based or file-based. If the URL is HTTP(S)-based, the JWKS data will be retrieved from the OAuth/OIDC provider via the configured URL on broker startup. All then-current keys will be cached on the broker for incoming requests. If an authentication request is received for a JWT that includes a \"kid\" header claim value that isn\u0027t yet in the cache, the JWKS endpoint will be queried again on demand. However, the broker polls the URL every sasl.oauthbearer.jwks.endpoint.refresh.ms milliseconds to refresh the cache with any forthcoming keys before any JWT requests that include them are received. If the URL is file-based, the broker will load the JWKS file from a configured location on startup. In the event that the JWT includes a \"kid\" header value that isn\u0027t in the JWKS file, the broker will reject the JWT and authentication will fail.",
     "Type": "string",
@@ -6370,8 +7656,32 @@
     "Importance": "medium"
   },
   {
+    "Name": "sasl.oauthbearer.jwt.retriever.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtRetriever",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.jwt.validator.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtValidator",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.scope",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
     "Name": "sasl.oauthbearer.token.endpoint.url",
-    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.jaas.config. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
+    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.oauthbearer.jwt.retriever.class. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "",
@@ -6411,7 +7721,7 @@
   },
   {
     "Name": "ssl.enabled.protocols",
-    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. Also see the config documentation for `ssl.protocol` to understand how it can impact the TLS version negotiation behavior.",
+    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. If this configuration is set to an empty list, Kafka will use the protocols enabled by default in the underlying SSLEngine, which may include additional protocols depending on the JVM version. Also see the config documentation for ssl.protocol to understand how it can impact the TLS version negotiation behavior.",
     "Type": "list",
     "Default": "TLSv1.2,TLSv1.3",
     "Valid Values": "",
@@ -6419,7 +7729,7 @@
   },
   {
     "Name": "ssl.keystore.type",
-    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -6427,7 +7737,7 @@
   },
   {
     "Name": "ssl.protocol",
-    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in `ssl.enabled.protocols` and the server only supports \u0027TLSv1.3\u0027.",
+    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
     "Type": "string",
     "Default": "TLSv1.3",
     "Valid Values": "",
@@ -6443,11 +7753,19 @@
   },
   {
     "Name": "ssl.truststore.type",
-    "Desc": "The file format of the trust store file. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the trust store file. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
     "Importance": "medium"
+  },
+  {
+    "Name": "config.providers",
+    "Desc": "Comma-separated alias names for classes implementing the ConfigProvider interface. This enables loading configuration data (such as passwords, API keys, and other credentials) from external sources. For example, see Configuration Providers.",
+    "Type": "list",
+    "Default": "\"\"",
+    "Valid Values": "",
+    "Importance": "low"
   },
   {
     "Name": "enable.metrics.push",
@@ -6483,7 +7801,7 @@
   },
   {
     "Name": "metric.reporters",
-    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation.",
+    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation. When custom reporters are set and org.apache.kafka.common.metrics.JmxReporter is needed, it has to be explicitly added to the list.",
     "Type": "list",
     "Default": "org.apache.kafka.common.metrics.JmxReporter",
     "Valid Values": "",
@@ -6531,7 +7849,7 @@
   },
   {
     "Name": "retries",
-    "Desc": "Setting a value greater than zero will cause the client to resend any request that fails with a potentially transient error. It is recommended to set the value to either zero or `MAX_VALUE` and use corresponding timeout parameters to control how long a client should retry a request.",
+    "Desc": "It is recommended to set the value to either MAX_VALUE or zero, and use corresponding timeout parameters to control how long a client should retry a request. Setting a value greater than zero will cause the client to resend any request that fails with a potentially transient error. Setting a value of zero will lead to transient errors not being retried, and they will be propagated to the application to be handled.",
     "Type": "int",
     "Default": "2147483647",
     "Valid Values": "[0,...,2147483647]",
@@ -6650,6 +7968,22 @@
     "Importance": "low"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.claim.exp.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "300",
+    "Valid Values": "[0,...,86400]",
+    "Importance": "low"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.nbf.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "60",
+    "Valid Values": "[0,...,3600]",
+    "Importance": "low"
+  },
+  {
     "Name": "sasl.oauthbearer.clock.skew.seconds",
     "Desc": "The (optional) value in seconds to allow for differences between the time of the OAuth/OIDC identity provider and the broker.",
     "Type": "int",
@@ -6661,7 +7995,7 @@
     "Name": "sasl.oauthbearer.expected.audience",
     "Desc": "The (optional) comma-delimited setting for the broker to use to verify that the JWT was issued for one of the expected audiences. The JWT will be inspected for the standard OAuth \"aud\" claim and if this value is set, the broker will match the value from JWT\u0027s \"aud\" claim to see if there is an exact match. If there is no match, the broker will reject the JWT and authentication will fail.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -6733,7 +8067,7 @@
     "Name": "ssl.cipher.suites",
     "Desc": "A list of cipher suites. This is a named combination of authentication, encryption, MAC and key exchange algorithm used to negotiate the security settings for a network connection using TLS or SSL network protocol. By default all the available cipher suites are supported.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -6906,6 +8240,94 @@
     "Importance": "medium"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.algorithm",
+    "Desc": "",
+    "Type": "string",
+    "Default": "RS256",
+    "Valid Values": "(case insensitive) [ES256, RS256]",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.aud",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.iss",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.jti.include",
+    "Desc": "",
+    "Type": "boolean",
+    "Default": "false",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.sub",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.private.key.passphrase",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.template.file",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.id",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.client.credentials.client.secret",
+    "Desc": "",
+    "Type": "password",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
     "Name": "sasl.oauthbearer.jwks.endpoint.url",
     "Desc": "The OAuth/OIDC provider URL from which the provider\u0027s JWKS (JSON Web Key Set) can be retrieved. The URL can be HTTP(S)-based or file-based. If the URL is HTTP(S)-based, the JWKS data will be retrieved from the OAuth/OIDC provider via the configured URL on broker startup. All then-current keys will be cached on the broker for incoming requests. If an authentication request is received for a JWT that includes a \"kid\" header claim value that isn\u0027t yet in the cache, the JWKS endpoint will be queried again on demand. However, the broker polls the URL every sasl.oauthbearer.jwks.endpoint.refresh.ms milliseconds to refresh the cache with any forthcoming keys before any JWT requests that include them are received. If the URL is file-based, the broker will load the JWKS file from a configured location on startup. In the event that the JWT includes a \"kid\" header value that isn\u0027t in the JWKS file, the broker will reject the JWT and authentication will fail.",
     "Type": "string",
@@ -6914,8 +8336,32 @@
     "Importance": "medium"
   },
   {
+    "Name": "sasl.oauthbearer.jwt.retriever.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtRetriever",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.jwt.validator.class",
+    "Desc": "",
+    "Type": "class",
+    "Default": "org.apache.kafka.common.security.oauthbearer.DefaultJwtValidator",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
+    "Name": "sasl.oauthbearer.scope",
+    "Desc": "",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "",
+    "Importance": "medium"
+  },
+  {
     "Name": "sasl.oauthbearer.token.endpoint.url",
-    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.jaas.config. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
+    "Desc": "The URL for the OAuth/OIDC identity provider. If the URL is HTTP(S)-based, it is the issuer\u0027s token endpoint URL to which requests will be made to login based on the configuration in sasl.oauthbearer.jwt.retriever.class. If the URL is file-based, it specifies a file containing an access token (in JWT serialized form) issued by the OAuth/OIDC identity provider to use for authorization.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "",
@@ -6931,7 +8377,7 @@
   },
   {
     "Name": "ssl.enabled.protocols",
-    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. Also see the config documentation for `ssl.protocol` to understand how it can impact the TLS version negotiation behavior.",
+    "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027. This means that clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most use cases. If this configuration is set to an empty list, Kafka will use the protocols enabled by default in the underlying SSLEngine, which may include additional protocols depending on the JVM version. Also see the config documentation for ssl.protocol to understand how it can impact the TLS version negotiation behavior.",
     "Type": "list",
     "Default": "TLSv1.2,TLSv1.3",
     "Valid Values": "",
@@ -6939,7 +8385,7 @@
   },
   {
     "Name": "ssl.keystore.type",
-    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the key store file. This is optional for client. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -6947,7 +8393,7 @@
   },
   {
     "Name": "ssl.protocol",
-    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in `ssl.enabled.protocols` and the server only supports \u0027TLSv1.3\u0027.",
+    "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027, which should be fine for most use cases. A typical alternative to the default is \u0027TLSv1.2\u0027. Allowed values for this config are dependent on the JVM. Clients using the defaults for this config and \u0027ssl.enabled.protocols\u0027 will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, however, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
     "Type": "string",
     "Default": "TLSv1.3",
     "Valid Values": "",
@@ -6963,7 +8409,7 @@
   },
   {
     "Name": "ssl.truststore.type",
-    "Desc": "The file format of the trust store file. The values currently supported by the default `ssl.engine.factory.class` are [JKS, PKCS12, PEM].",
+    "Desc": "The file format of the trust store file. The values currently supported by the default ssl.engine.factory.class are [JKS, PKCS12, PEM].",
     "Type": "string",
     "Default": "JKS",
     "Valid Values": "",
@@ -6974,6 +8420,14 @@
     "Desc": "Timeout for administrative tasks, e.g. detecting new topics.",
     "Type": "long",
     "Default": "60000 (1 minute)",
+    "Valid Values": "",
+    "Importance": "low"
+  },
+  {
+    "Name": "config.providers",
+    "Desc": "Comma-separated alias names for classes implementing the ConfigProvider interface. This enables loading configuration data (such as passwords, API keys, and other credentials) from external sources. For example, see Configuration Providers.",
+    "Type": "list",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -6995,7 +8449,7 @@
   },
   {
     "Name": "metric.reporters",
-    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation.",
+    "Desc": "A list of classes to use as metrics reporters. Implementing the org.apache.kafka.common.metrics.MetricsReporter interface allows plugging in classes that will be notified of new metric creation. When custom reporters are set and org.apache.kafka.common.metrics.JmxReporter is needed, it has to be explicitly added to the list.",
     "Type": "list",
     "Default": "org.apache.kafka.common.metrics.JmxReporter",
     "Valid Values": "",
@@ -7122,6 +8576,22 @@
     "Importance": "low"
   },
   {
+    "Name": "sasl.oauthbearer.assertion.claim.exp.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "300",
+    "Valid Values": "[0,...,86400]",
+    "Importance": "low"
+  },
+  {
+    "Name": "sasl.oauthbearer.assertion.claim.nbf.seconds",
+    "Desc": "",
+    "Type": "int",
+    "Default": "60",
+    "Valid Values": "[0,...,3600]",
+    "Importance": "low"
+  },
+  {
     "Name": "sasl.oauthbearer.clock.skew.seconds",
     "Desc": "The (optional) value in seconds to allow for differences between the time of the OAuth/OIDC identity provider and the broker.",
     "Type": "int",
@@ -7133,7 +8603,7 @@
     "Name": "sasl.oauthbearer.expected.audience",
     "Desc": "The (optional) comma-delimited setting for the broker to use to verify that the JWT was issued for one of the expected audiences. The JWT will be inspected for the standard OAuth \"aud\" claim and if this value is set, the broker will match the value from JWT\u0027s \"aud\" claim to see if there is an exact match. If there is no match, the broker will reject the JWT and authentication will fail.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -7197,7 +8667,7 @@
     "Name": "ssl.cipher.suites",
     "Desc": "A list of cipher suites. This is a named combination of authentication, encryption, MAC and key exchange algorithm used to negotiate the security settings for a network connection using TLS or SSL network protocol. By default all the available cipher suites are supported.",
     "Type": "list",
-    "Default": "null",
+    "Default": "\"\"",
     "Valid Values": "",
     "Importance": "low"
   },
@@ -7258,6 +8728,14 @@
     "Importance": "high"
   },
   {
+    "Name": "connector.plugin.version",
+    "Desc": "Version of the connector.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@4a87761d",
+    "Importance": "medium"
+  },
+  {
     "Name": "tasks.max",
     "Desc": "Maximum number of tasks to use for this connector.",
     "Type": "int",
@@ -7282,6 +8760,14 @@
     "Importance": "low"
   },
   {
+    "Name": "key.converter.plugin.version",
+    "Desc": "Version of the key converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@66d1af89",
+    "Importance": "low"
+  },
+  {
     "Name": "value.converter",
     "Desc": "Converter class used to convert between Kafka Connect format and the serialized form that is written to Kafka. This controls the format of the values in messages written to or read from Kafka, and since this is independent of connectors it allows any connector to work with any serialization format. Examples of common formats include JSON and Avro.",
     "Type": "class",
@@ -7290,11 +8776,27 @@
     "Importance": "low"
   },
   {
+    "Name": "value.converter.plugin.version",
+    "Desc": "Version of the value converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@8646db9",
+    "Importance": "low"
+  },
+  {
     "Name": "header.converter",
     "Desc": "HeaderConverter class used to convert between Kafka Connect format and the serialized form that is written to Kafka. This controls the format of the header values in messages written to or read from Kafka, and since this is independent of connectors it allows any connector to work with any serialization format. Examples of common formats include JSON and Avro. By default, the SimpleHeaderConverter is used to serialize header values to strings and deserialize them by inferring the schemas.",
     "Type": "class",
     "Default": "null",
     "Valid Values": "A concrete subclass of org.apache.kafka.connect.storage.HeaderConverter, A class with a public, no-argument constructor",
+    "Importance": "low"
+  },
+  {
+    "Name": "header.converter.plugin.version",
+    "Desc": "Version of the header converter.",
+    "Type": "string",
+    "Default": "null",
+    "Valid Values": "org.apache.kafka.connect.runtime.ConnectorConfig$PluginVersionValidator@37374a5e",
     "Importance": "low"
   },
   {
@@ -7365,7 +8867,7 @@
     "Name": "config.properties.exclude",
     "Desc": "Topic config properties that should not be replicated. Supports comma-separated property names and regexes.",
     "Type": "list",
-    "Default": "follower\\.replication\\.throttled\\.replicas,leader\\.replication\\.throttled\\.replicas,message\\.timestamp\\.difference\\.max\\.ms,message\\.timestamp\\.type,unclean\\.leader\\.election\\.enable,min\\.insync\\.replicas",
+    "Default": "follower.replication.throttled.replicas,leader.replication.throttled.replicas,message.timestamp.difference.max.ms,log.message.timestamp.before.max.ms,log.message.timestamp.after.max.ms,message.timestamp.type,unclean.leader.election.enable,min.insync.replicas",
     "Valid Values": "",
     "Importance": "high"
   },
@@ -7415,6 +8917,14 @@
     "Type": "boolean",
     "Default": "true",
     "Valid Values": "",
+    "Importance": "low"
+  },
+  {
+    "Name": "metric.names.formats",
+    "Desc": "Deprecated. The formats in which metrics are emitted. Valid values are legacy and new. When set to legacy, the metrics have the following name \"kafka.connect.mirror:type\u003dMirrorSourceConnector,source\u003d{SOURCE},target\u003d{TARGET},topic\u003d{TOPIC},partition\u003d{PARTITION}\". When set to new, the metrics have the following name \"kafka.connect:type\u003dplugins,connector\u003d{CONNECTOR},task\u003d{TASK},source\u003d{SOURCE},target\u003d{TARGET},topic\u003d{TOPIC},partition\u003d{PARTITION}\". When set to \"legacy,new\" the connector will emit metrics with both names, this can be useful when migrating to the new format but it doubles the amount of metrics that are emitted. In Kafka 5.0 the legacy format and this configuration will be removed and the metrics will always use the new names.",
+    "Type": "list",
+    "Default": "legacy",
+    "Valid Values": "[legacy, new]",
     "Importance": "low"
   },
   {
@@ -7562,6 +9072,14 @@
     "Importance": "low"
   },
   {
+    "Name": "metric.names.formats",
+    "Desc": "Deprecated. The formats in which metrics are emitted. Valid values are legacy and new. When set to legacy, the metrics have the following name \"kafka.connect.mirror:type\u003dMirrorCheckpointConnector,source\u003d{SOURCE},target\u003d{TARGET},group\u003d{GROUP},topic\u003d{TOPIC},partition\u003d{PARTITION}\". When set to new, the metrics have the following name \"kafka.connect:type\u003dplugins,connector\u003d{CONNECTOR},task\u003d{TASK},source\u003d{SOURCE},target\u003d{TARGET},group\u003d{GROUP},topic\u003d{TOPIC},partition\u003d{PARTITION}\". When set to \"legacy,new\" the connector will emit metrics with both names, this can be useful when migrating to the new format but it doubles the amount of metrics that are emitted. In Kafka 5.0 the legacy format and this configuration will be removed and the metrics will always use the new names.",
+    "Type": "list",
+    "Default": "legacy",
+    "Valid Values": "[legacy, new]",
+    "Importance": "low"
+  },
+  {
     "Name": "offset-syncs.topic.location",
     "Desc": "The location (source/target) of the offset-syncs topic.",
     "Type": "string",
@@ -7634,6 +9152,12 @@
     "Importance": "low"
   },
   {
+    "Name": "org.apache.kafka.sasl.oauthbearer.allowed.files",
+    "Desc": "This system property is used to determine which files, if any, are allowed to be read by the SASL OAUTHBEARER plugin. This property accepts comma-separated list of files. By default the value is an empty list.",
+    "Since": "4.1.0",
+    "Default Value": ""
+  },
+  {
     "Name": "org.apache.kafka.sasl.oauthbearer.allowed.urls",
     "Desc": "This system property is used to set the allowed URLs as SASL OAUTHBEARER token or jwks endpoints. This property accepts comma-separated list of URLs. By default the value is an empty list.",
     "Since": "4.0.0",
@@ -7641,19 +9165,25 @@
   },
   {
     "Name": "org.apache.kafka.disallowed.login.modules",
-    "Desc": "This system property is used to disable the problematic login modules usage in SASL JAAS configuration. This property accepts comma-separated list of loginModule names. By default com.sun.security.auth.module.JndiLoginModule loginModule is disabled.",
+    "Desc": "This system property is used to disable the problematic login modules usage in SASL JAAS configuration. This property accepts comma-separated list of loginModule names. By default com.sun.security.auth.module.JndiLoginModule and com.sun.security.auth.module.LdapLoginModule loginModule is disabled.",
     "Since": "3.4.0",
-    "Default Value": "com.sun.security.auth.module.JndiLoginModule"
+    "Deprecated": "4.2.0",
+    "Default Value": "com.sun.security.auth.module.JndiLoginModule,com.sun.security.auth.module.LdapLoginModule"
+  },
+  {
+    "Name": "org.apache.kafka.allowed.login.modules",
+    "Desc": "This system property is used to explicitly allow specific login modules in SASL JAAS configuration. It accepts a comma-separated list of login module class names. This property provides a stricter, allowed-list-based alternative to the deprecated org.apache.kafka.disallowed.login.modules property. It is recommended to use this property to improve the security of JAAS configurations.",
+    "Since": "4.2.0"
   },
   {
     "Name": "org.apache.kafka.automatic.config.providers",
-    "Desc": "This system property controls the automatic loading of ConfigProvider implementations in Apache Kafka. ConfigProviders are used to dynamically supply configuration values from sources such as files, directories, or environment variables. This property accepts a comma-separated list of ConfigProvider names. By default, all built-in ConfigProviders are enabled, including FileConfigProvider, DirectoryConfigProvider, and EnvVarConfigProvider.",
+    "Desc": "This system property controls the automatic loading of ConfigProvider implementations in Apache Kafka. ConfigProviders are used to dynamically supply configuration values from sources such as files, directories, or environment variables. This property accepts a comma-separated list of ConfigProvider names. By default, all built-in ConfigProviders are enabled, including FileConfigProvider , DirectoryConfigProvider , and EnvVarConfigProvider.",
     "Since": "3.8.0",
     "Default Value": "All built-in ConfigProviders are enabled"
   },
   {
     "Name": "log.local.retention.bytes",
-    "Desc": "The maximum size of local log segments that can grow for a partition before it gets eligible for deletion. Default value is -2, it represents `log.retention.bytes` value to be used. The effective value should always be less than or equal to `log.retention.bytes` value.",
+    "Desc": "The maximum size of local log segments that can grow for a partition before it gets eligible for deletion. Default value is -2, it represents log.retention.bytes value to be used. The effective value should always be less than or equal to log.retention.bytes value.",
     "Type": "long",
     "Default": "-2",
     "Valid Values": "[-2,...]",
@@ -7661,7 +9191,7 @@
   },
   {
     "Name": "log.local.retention.ms",
-    "Desc": "The number of milliseconds to keep the local log segments before it gets eligible for deletion. Default value is -2, it represents `log.retention.ms` value is to be used. The effective value should always be less than or equal to `log.retention.ms` value.",
+    "Desc": "The number of milliseconds to keep the local log segments before it gets eligible for deletion. Default value is -2, it represents log.retention.ms value is to be used. The effective value should always be less than or equal to log.retention.ms value.",
     "Type": "long",
     "Default": "-2",
     "Valid Values": "[-2,...]",
@@ -7669,7 +9199,7 @@
   },
   {
     "Name": "remote.fetch.max.wait.ms",
-    "Desc": "The maximum amount of time the server will wait before answering the remote fetch request",
+    "Desc": "The maximum amount of time the server will wait before answering the fetch request containing remote fetch partitions. It\u0027s important to be aware that the request will only be responded after all remote partitions have been successfully fetched, have failed, or this timeout is exceeded.",
     "Type": "int",
     "Default": "500",
     "Valid Values": "[1,...]",
@@ -7748,7 +9278,7 @@
     "Importance": "medium"
   },
   {
-    "Name": "remote.log.manager.thread.pool.size",
+    "Name": "remote.log.manager.follower.thread.pool.size",
     "Desc": "Size of the thread pool used in scheduling follower tasks to read the highest-uploaded remote-offset for follower partitions.",
     "Type": "int",
     "Default": "2",
@@ -7756,8 +9286,16 @@
     "Importance": "medium"
   },
   {
+    "Name": "remote.log.manager.thread.pool.size",
+    "Desc": "Size of the thread pool used in scheduling follower tasks to read the highest-uploaded remote-offset for follower partitions. This config is deprecated since 4.2, please use remote.log.manager.follower.thread.pool.size instead.",
+    "Type": "int",
+    "Default": "2",
+    "Valid Values": "[1,...]",
+    "Importance": "medium"
+  },
+  {
     "Name": "remote.log.metadata.manager.class.name",
-    "Desc": "Fully qualified class name of `RemoteLogMetadataManager` implementation.",
+    "Desc": "Fully qualified class name of RemoteLogMetadataManager implementation.",
     "Type": "string",
     "Default": "org.apache.kafka.server.log.remote.metadata.storage.TopicBasedRemoteLogMetadataManager",
     "Valid Values": "non-empty string",
@@ -7765,7 +9303,7 @@
   },
   {
     "Name": "remote.log.metadata.manager.class.path",
-    "Desc": "Class path of the `RemoteLogMetadataManager` implementation. If specified, the RemoteLogMetadataManager implementation and its dependent libraries will be loaded by a dedicated classloader which searches this class path before the Kafka broker class path. The syntax of this parameter is same as the standard Java class path string.",
+    "Desc": "Class path of the RemoteLogMetadataManager implementation. If specified, the RemoteLogMetadataManager implementation and its dependent libraries will be loaded by a dedicated classloader which searches this class path before the Kafka broker class path. The syntax of this parameter is same as the standard Java class path string.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "",
@@ -7773,7 +9311,7 @@
   },
   {
     "Name": "remote.log.metadata.manager.impl.prefix",
-    "Desc": "Prefix used for properties to be passed to RemoteLogMetadataManager implementation. For example this value can be `rlmm.config.`.",
+    "Desc": "Prefix used for properties to be passed to RemoteLogMetadataManager implementation. For example this value can be rlmm.config..",
     "Type": "string",
     "Default": "rlmm.config.",
     "Valid Values": "non-empty string",
@@ -7805,7 +9343,7 @@
   },
   {
     "Name": "remote.log.storage.manager.class.name",
-    "Desc": "Fully qualified class name of `RemoteStorageManager` implementation.",
+    "Desc": "Fully qualified class name of RemoteStorageManager implementation.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "non-empty string",
@@ -7813,7 +9351,7 @@
   },
   {
     "Name": "remote.log.storage.manager.class.path",
-    "Desc": "Class path of the `RemoteStorageManager` implementation. If specified, the RemoteStorageManager implementation and its dependent libraries will be loaded by a dedicated classloader which searches this class path before the Kafka broker class path. The syntax of this parameter is same as the standard Java class path string.",
+    "Desc": "Class path of the RemoteStorageManager implementation. If specified, the RemoteStorageManager implementation and its dependent libraries will be loaded by a dedicated classloader which searches this class path before the Kafka broker class path. The syntax of this parameter is same as the standard Java class path string.",
     "Type": "string",
     "Default": "null",
     "Valid Values": "",
@@ -7821,7 +9359,7 @@
   },
   {
     "Name": "remote.log.storage.manager.impl.prefix",
-    "Desc": "Prefix used for properties to be passed to RemoteStorageManager implementation. For example this value can be `rsm.config.`.",
+    "Desc": "Prefix used for properties to be passed to RemoteStorageManager implementation. For example this value can be rsm.config..",
     "Type": "string",
     "Default": "rsm.config.",
     "Valid Values": "non-empty string",
@@ -7877,10 +9415,18 @@
   },
   {
     "Name": "remote.log.metadata.initialization.retry.max.timeout.ms",
-    "Desc": "The maximum amount of time in milliseconds for retrying RemoteLogMetadataManager resources initialization. When total retry intervals reach this timeout, initialization is considered as failed and broker starts shutting down.",
+    "Desc": "The maximum amount of time in milliseconds for retrying RemoteLogMetadataManager resources initialization. For TopicBasedRemoteLogMetadataManager\u0027s initialization, the timer starts after this local broker is ready to process requests (primarily for ensuring the local cluster is ready when metadata is stored locally as an internal topic). If initialization fails within this timeout, this broker process will terminate.",
     "Type": "long",
     "Default": "120000 (2 minutes)",
     "Valid Values": "[0,...]",
+    "Importance": "low"
+  },
+  {
+    "Name": "remote.log.metadata.topic.min.isr",
+    "Desc": "The minimum number of replicas that must acknowledge a write to remote log metadata topic.",
+    "Type": "short",
+    "Default": "2",
+    "Valid Values": "[1,...]",
     "Importance": "low"
   },
   {

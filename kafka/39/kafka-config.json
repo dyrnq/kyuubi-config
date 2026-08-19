@@ -1,6 +1,6 @@
 [
   {
-    "name": "3.1 Broker Configs",
+    "name": "Broker Configs",
     "list": [
       {
         "Name": "advertised.listeners",
@@ -58,7 +58,7 @@
       },
       {
         "Name": "control.plane.listener.name",
-        "Desc": "Name of listener used for communication between controller and brokers. A broker will use the control.plane.listener.name to locate the endpoint in listeners list, to listen for connections from the controller. For example, if a broker\u0027s config is: listeners \u003d INTERNAL://192.1.1.8:9092, EXTERNAL://10.1.1.5:9093, CONTROLLER://192.1.1.8:9094 listener.security.protocol.map \u003d INTERNAL:PLAINTEXT, EXTERNAL:SSL, CONTROLLER:SSL control.plane.listener.name \u003d CONTROLLER On startup, the broker will start listening on \"192.1.1.8:9094\" with security protocol \"SSL\". On the controller side, when it discovers a broker\u0027s published endpoints through ZooKeeper, it will use the control.plane.listener.name to find the endpoint, which it will use to establish connection to the broker. For example, if the broker\u0027s published endpoints on ZooKeeper are: \"endpoints\" : [\"INTERNAL://broker1.example.com:9092\",\"EXTERNAL://broker1.example.com:9093\",\"CONTROLLER://broker1.example.com:9094\"] and the controller\u0027s config is: listener.security.protocol.map \u003d INTERNAL:PLAINTEXT, EXTERNAL:SSL, CONTROLLER:SSL control.plane.listener.name \u003d CONTROLLER then the controller will use \"broker1.example.com:9094\" with security protocol \"SSL\" to connect to the broker. If not explicitly configured, the default value will be null and there will be no dedicated endpoints for controller connections. If explicitly configured, the value cannot be the same as the value of inter.broker.listener.name.",
+        "Desc": "Name of listener used for communication between controller and brokers. A broker will use the control.plane.listener.name to locate the endpoint in listeners list, to listen for connections from the controller. For example, if a broker\u0027s config is: listeners \u003d INTERNAL://192.1.1.8:9092, EXTERNAL://10.1.1.5:9093, CONTROLLER://192.1.1.8:9094listener.security.protocol.map \u003d INTERNAL:PLAINTEXT, EXTERNAL:SSL, CONTROLLER:SSLcontrol.plane.listener.name \u003d CONTROLLER On startup, the broker will start listening on \"192.1.1.8:9094\" with security protocol \"SSL\". On the controller side, when it discovers a broker\u0027s published endpoints through ZooKeeper, it will use the control.plane.listener.name to find the endpoint, which it will use to establish connection to the broker. For example, if the broker\u0027s published endpoints on ZooKeeper are: \"endpoints\" : [\"INTERNAL://broker1.example.com:9092\",\"EXTERNAL://broker1.example.com:9093\",\"CONTROLLER://broker1.example.com:9094\"] and the controller\u0027s config is: listener.security.protocol.map \u003d INTERNAL:PLAINTEXT, EXTERNAL:SSL, CONTROLLER:SSLcontrol.plane.listener.name \u003d CONTROLLER then the controller will use \"broker1.example.com:9094\" with security protocol \"SSL\" to connect to the broker. If not explicitly configured, the default value will be null and there will be no dedicated endpoints for controller connections. If explicitly configured, the value cannot be the same as the value of inter.broker.listener.name.",
         "Type": "string",
         "Default": "null",
         "Valid Values": "",
@@ -1084,10 +1084,10 @@
       },
       {
         "Name": "group.coordinator.rebalance.protocols",
-        "Desc": "The list of enabled rebalance protocols. The consumer and share rebalance protocol are in early access and therefore must not be used in production.",
+        "Desc": "The list of enabled rebalance protocols. Supported protocols: consumer,classic,share,unknown. The consumer rebalance protocol is in early access and therefore must not be used in production.",
         "Type": "list",
         "Default": "classic",
-        "Valid Values": "[consumer, classic, share]",
+        "Valid Values": "[consumer, classic, share, unknown]",
         "Importance": "medium",
         "Update Mode": "read-only"
       },
@@ -2058,7 +2058,7 @@
         "Name": "ssl.enabled.protocols",
         "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. With the default value for Java 11, clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most cases. Also see the config documentation for `ssl.protocol`.",
         "Type": "list",
-        "Default": "TLSv1.2,TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium",
         "Update Mode": "per-broker"
@@ -2130,7 +2130,7 @@
         "Name": "ssl.protocol",
         "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. This value should be fine for most use cases. Allowed values in recent JVMs are \u0027TLSv1.2\u0027 and \u0027TLSv1.3\u0027. \u0027TLS\u0027, \u0027TLSv1.1\u0027, \u0027SSL\u0027, \u0027SSLv2\u0027 and \u0027SSLv3\u0027 may be supported in older JVMs, but their usage is discouraged due to known security vulnerabilities. With the default value for this config and \u0027ssl.enabled.protocols\u0027, clients will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
         "Type": "string",
-        "Default": "TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium",
         "Update Mode": "per-broker"
@@ -2266,6 +2266,15 @@
         "Desc": "The alter configs policy class that should be used for validation. The class should implement the org.apache.kafka.server.policy.AlterConfigPolicy interface.",
         "Type": "class",
         "Default": "null",
+        "Valid Values": "",
+        "Importance": "low",
+        "Update Mode": "read-only"
+      },
+      {
+        "Name": "alter.config.policy.kraft.compatibility.enable",
+        "Desc": "This configuration controls whether for incremental alter config operations of type SUBTRACT or DELETE on a config entry of type LIST, an incremental alter config policy will invoked consistently regardless of whether Kafka is running in KRaft or Zookeeper mode.",
+        "Type": "boolean",
+        "Default": "false",
         "Valid Values": "",
         "Importance": "low",
         "Update Mode": "read-only"
@@ -2831,7 +2840,7 @@
     ]
   },
   {
-    "name": "3.2 Topic-Level Configs",
+    "name": "Topic-Level Configs",
     "list": [
       {
         "Name": "cleanup.policy",
@@ -3160,7 +3169,7 @@
     ]
   },
   {
-    "name": "3.3 Producer Configs",
+    "name": "Producer Configs",
     "list": [
       {
         "Name": "key.serializer",
@@ -3494,7 +3503,7 @@
         "Name": "ssl.enabled.protocols",
         "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. With the default value for Java 11, clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most cases. Also see the config documentation for `ssl.protocol`.",
         "Type": "list",
-        "Default": "TLSv1.2,TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium"
       },
@@ -3510,7 +3519,7 @@
         "Name": "ssl.protocol",
         "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. This value should be fine for most use cases. Allowed values in recent JVMs are \u0027TLSv1.2\u0027 and \u0027TLSv1.3\u0027. \u0027TLS\u0027, \u0027TLSv1.1\u0027, \u0027SSL\u0027, \u0027SSLv2\u0027 and \u0027SSLv3\u0027 may be supported in older JVMs, but their usage is discouraged due to known security vulnerabilities. With the default value for this config and \u0027ssl.enabled.protocols\u0027, clients will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
         "Type": "string",
-        "Default": "TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium"
       },
@@ -3925,7 +3934,7 @@
     ]
   },
   {
-    "name": "3.4 Consumer Configs",
+    "name": "Consumer Configs",
     "list": [
       {
         "Name": "key.deserializer",
@@ -4291,7 +4300,7 @@
         "Name": "ssl.enabled.protocols",
         "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. With the default value for Java 11, clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most cases. Also see the config documentation for `ssl.protocol`.",
         "Type": "list",
-        "Default": "TLSv1.2,TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium"
       },
@@ -4307,7 +4316,7 @@
         "Name": "ssl.protocol",
         "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. This value should be fine for most use cases. Allowed values in recent JVMs are \u0027TLSv1.2\u0027 and \u0027TLSv1.3\u0027. \u0027TLS\u0027, \u0027TLSv1.1\u0027, \u0027SSL\u0027, \u0027SSLv2\u0027 and \u0027SSLv3\u0027 may be supported in older JVMs, but their usage is discouraged due to known security vulnerabilities. With the default value for this config and \u0027ssl.enabled.protocols\u0027, clients will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
         "Type": "string",
-        "Default": "TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium"
       },
@@ -4698,7 +4707,7 @@
     ]
   },
   {
-    "name": "3.5 Kafka Connect Configs",
+    "name": "Kafka Connect Configs",
     "list": [
       {
         "Name": "config.storage.topic",
@@ -4976,7 +4985,7 @@
         "Name": "ssl.enabled.protocols",
         "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. With the default value for Java 11, clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most cases. Also see the config documentation for `ssl.protocol`.",
         "Type": "list",
-        "Default": "TLSv1.2,TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium"
       },
@@ -4992,7 +5001,7 @@
         "Name": "ssl.protocol",
         "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. This value should be fine for most use cases. Allowed values in recent JVMs are \u0027TLSv1.2\u0027 and \u0027TLSv1.3\u0027. \u0027TLS\u0027, \u0027TLSv1.1\u0027, \u0027SSL\u0027, \u0027SSLv2\u0027 and \u0027SSLv3\u0027 may be supported in older JVMs, but their usage is discouraged due to known security vulnerabilities. With the default value for this config and \u0027ssl.enabled.protocols\u0027, clients will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
         "Type": "string",
-        "Default": "TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium"
       },
@@ -5935,7 +5944,7 @@
     ]
   },
   {
-    "name": "3.6 Kafka Streams Configs",
+    "name": "Kafka Streams Configs",
     "list": [
       {
         "Name": "application.id",
@@ -6091,7 +6100,7 @@
       },
       {
         "Name": "processing.exception.handler",
-        "Desc": "Exception handling class that implements the org.apache.kafka.streams.errors.ProcessingExceptionHandler interface.",
+        "Desc": "Exception handling class that implements the org.apache.kafka.streams.errors.ProcessingExceptionHandler interface. Note: This handler applies only to regular stream processing tasks. It does not apply to global state store updates (global threads). Exceptions occurring in global threads will bubble up to the configured uncaught exception handler.",
         "Type": "class",
         "Default": "org.apache.kafka.streams.errors.LogAndFailProcessingExceptionHandler",
         "Valid Values": "",
@@ -6444,7 +6453,7 @@
     ]
   },
   {
-    "name": "3.7 Admin Configs",
+    "name": "Admin Configs",
     "list": [
       {
         "Name": "bootstrap.controllers",
@@ -6674,7 +6683,7 @@
         "Name": "ssl.enabled.protocols",
         "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. With the default value for Java 11, clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most cases. Also see the config documentation for `ssl.protocol`.",
         "Type": "list",
-        "Default": "TLSv1.2,TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium"
       },
@@ -6690,7 +6699,7 @@
         "Name": "ssl.protocol",
         "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. This value should be fine for most use cases. Allowed values in recent JVMs are \u0027TLSv1.2\u0027 and \u0027TLSv1.3\u0027. \u0027TLS\u0027, \u0027TLSv1.1\u0027, \u0027SSL\u0027, \u0027SSLv2\u0027 and \u0027SSLv3\u0027 may be supported in older JVMs, but their usage is discouraged due to known security vulnerabilities. With the default value for this config and \u0027ssl.enabled.protocols\u0027, clients will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
         "Type": "string",
-        "Default": "TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium"
       },
@@ -7041,7 +7050,7 @@
     ]
   },
   {
-    "name": "3.8 MirrorMaker Configs",
+    "name": "MirrorMaker Configs",
     "list": [
       {
         "Name": "source.cluster.alias",
@@ -7199,7 +7208,7 @@
         "Name": "ssl.enabled.protocols",
         "Desc": "The list of protocols enabled for SSL connections. The default is \u0027TLSv1.2,TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. With the default value for Java 11, clients and servers will prefer TLSv1.3 if both support it and fallback to TLSv1.2 otherwise (assuming both support at least TLSv1.2). This default should be fine for most cases. Also see the config documentation for `ssl.protocol`.",
         "Type": "list",
-        "Default": "TLSv1.2,TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium"
       },
@@ -7215,7 +7224,7 @@
         "Name": "ssl.protocol",
         "Desc": "The SSL protocol used to generate the SSLContext. The default is \u0027TLSv1.3\u0027 when running with Java 11 or newer, \u0027TLSv1.2\u0027 otherwise. This value should be fine for most use cases. Allowed values in recent JVMs are \u0027TLSv1.2\u0027 and \u0027TLSv1.3\u0027. \u0027TLS\u0027, \u0027TLSv1.1\u0027, \u0027SSL\u0027, \u0027SSLv2\u0027 and \u0027SSLv3\u0027 may be supported in older JVMs, but their usage is discouraged due to known security vulnerabilities. With the default value for this config and \u0027ssl.enabled.protocols\u0027, clients will downgrade to \u0027TLSv1.2\u0027 if the server does not support \u0027TLSv1.3\u0027. If this config is set to \u0027TLSv1.2\u0027, clients will not use \u0027TLSv1.3\u0027 even if it is one of the values in ssl.enabled.protocols and the server only supports \u0027TLSv1.3\u0027.",
         "Type": "string",
-        "Default": "TLSv1.3",
+        "Default": "TLSv1.2",
         "Valid Values": "",
         "Importance": "medium"
       },
@@ -7942,30 +7951,18 @@
     ]
   },
   {
-    "name": "3.9 System Properties",
+    "name": "System Properties",
     "list": [
       {
         "Name": "org.apache.kafka.sasl.oauthbearer.allowed.urls",
         "Desc": "This system property is used to set the allowed URLs as SASL OAUTHBEARER token or jwks endpoints. This property accepts comma-separated list of URLs. By default all URLs are allowed.",
         "Since": "3.9.1",
         "Default Value": "All URLs are allowed"
-      },
-      {
-        "Name": "org.apache.kafka.disallowed.login.modules",
-        "Desc": "This system property is used to disable the problematic login modules usage in SASL JAAS configuration. This property accepts comma-separated list of loginModule names. By default com.sun.security.auth.module.JndiLoginModule loginModule is disabled.",
-        "Since": "3.4.0",
-        "Default Value": "com.sun.security.auth.module.JndiLoginModule"
-      },
-      {
-        "Name": "org.apache.kafka.automatic.config.providers",
-        "Desc": "This system property controls the automatic loading of ConfigProvider implementations in Apache Kafka. ConfigProviders are used to dynamically supply configuration values from sources such as files, directories, or environment variables. This property accepts a comma-separated list of ConfigProvider names. By default, all built-in ConfigProviders are enabled, including FileConfigProvider, DirectoryConfigProvider, and EnvVarConfigProvider.",
-        "Since": "3.8.0",
-        "Default Value": "All built-in ConfigProviders are enabled"
       }
     ]
   },
   {
-    "name": "3.10 Tiered Storage Configs",
+    "name": "Tiered Storage Configs",
     "list": [
       {
         "Name": "log.local.retention.bytes",
@@ -8216,9 +8213,5 @@
         "Importance": "low"
       }
     ]
-  },
-  {
-    "name": "3.11 Configuration Providers",
-    "list": []
   }
 ]
