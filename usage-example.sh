@@ -103,7 +103,7 @@ atomic_write kyuubi/$kv/kyuubi-config-no-section.json   java -jar target/kyuubi-
 atomic_write kyuubi/$kv/kyuubi-config.conf              java -jar target/kyuubi-config.jar kyuubi -ver $kv --format conf $PROXY_ARGS $PROXY_TYPE_ARGS
 
 
-for kv in "v1.10.1" "v1.10.2" "v1.11.0" "v1.9.1" "v1.9.2" "v1.9.3" "v1.9.4" "v1.8.3" "master"; do
+for kv in "v1.10.1" "v1.10.2" "v1.11.0" "v1.11.1" "v1.12.0" "v1.9.1" "v1.9.2" "v1.9.3" "v1.9.4" "v1.8.3" "master"; do
 mkdir -p kyuubi/$kv
 atomic_write kyuubi/$kv/kyuubi-config.json              java -jar target/kyuubi-config.jar kyuubi -ver $kv --format json $PROXY_ARGS $PROXY_TYPE_ARGS
 atomic_write kyuubi/$kv/kyuubi-config-no-section.json   java -jar target/kyuubi-config.jar kyuubi -ver $kv --format json --no-section $PROXY_ARGS $PROXY_TYPE_ARGS
