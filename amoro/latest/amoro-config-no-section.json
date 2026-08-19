@@ -5,14 +5,19 @@
     "Description": "Enables Self-optimizing"
   },
   {
+    "Key": "self-optimizing.allow-partial-commit",
+    "Default": "false",
+    "Description": "Whether to allow partial commit when self-optimizing fails or process is cancelled"
+  },
+  {
     "Key": "self-optimizing.group",
     "Default": "default",
     "Description": "Optimizer group for Self-optimizing"
   },
   {
     "Key": "self-optimizing.quota",
-    "Default": "0.1",
-    "Description": "Quota for Self-optimizing, indicating the CPU resource the table can take up"
+    "Default": "0.5",
+    "Description": "Quota for Self-optimizing, indicating the optimizer resources the table can take up"
   },
   {
     "Key": "self-optimizing.execute.num-retries",
@@ -80,6 +85,26 @@
     "Description": "Filter conditions for self-optimizing, using SQL conditional expressions, without supporting any functions. For the timestamp column condition, the ISO date-time formatter must be used. For example: op_time \u003e ‘2007-12-03T10:15:30’."
   },
   {
+    "Key": "self-optimizing.refresh-table.adaptive.max-interval-ms",
+    "Default": "0",
+    "Description": "The maximum time interval in milliseconds to refresh table metadata. 0 means disable adaptive refresh. When enabled, the value must be greater than ‘refresh-tables.interval’ and may exceed ‘self-optimizing.minor.trigger.interval’ * 4/5; if not, adaptive refresh will be automatically disabled."
+  },
+  {
+    "Key": "self-optimizing.refresh-table.adaptive.increase-step-ms",
+    "Default": "30000(30s)",
+    "Description": "The time interval increase step in milliseconds to refresh table metadata"
+  },
+  {
+    "Key": "self-optimizing.rewrite.use-parquet-row-group-merge.enabled",
+    "Default": "false",
+    "Description": "Whether to enable parquet row-group merge for eligible Iceberg V2 table rewrites of Parquet files without delete files, bloom filters, sort order, schema incompatibilities, or spec mismatches; otherwise falls back to row-based rewrite."
+  },
+  {
+    "Key": "self-optimizing.rewrite.use-parquet-row-group-merge.min-avg-row-group-size-bytes",
+    "Default": "8388608(8MB)",
+    "Description": "The minimum average row-group size (in bytes) of input files for parquet row-group merge. If the average row-group size across all input files is below this threshold, it will fall back to row-level rewrite."
+  },
+  {
     "Key": "table-expire.enabled",
     "Default": "true",
     "Description": "Enables periodically expire table"
@@ -98,6 +123,11 @@
     "Key": "snapshot.keep.min-count",
     "Default": "1",
     "Description": "Minimum number of snapshots retained for table expiration"
+  },
+  {
+    "Key": "snapshot.keep.flink.checkpoint-retention",
+    "Default": "7d(7 days)",
+    "Description": "The retention period for snapshots created by Flink checkpoints. Snapshots older than this duration may be cleaned up. The value should be specified as a duration string (e.g., “7d”, “168h”, “10080min”)"
   },
   {
     "Key": "clean-orphan-file.enabled",
@@ -157,7 +187,7 @@
   {
     "Key": "tag.auto-create.trigger.period",
     "Default": "daily",
-    "Description": "Period of creating tags, support daily,hourly now"
+    "Description": "Period of creating tags, support daily,hourly,monthly now"
   },
   {
     "Key": "tag.auto-create.trigger.offset.minutes",
@@ -171,7 +201,7 @@
   },
   {
     "Key": "tag.auto-create.tag-format",
-    "Default": "’tag-‘yyyyMMdd for daily and ’tag-‘yyyyMMddHH for hourly periods",
+    "Default": "’tag-‘yyyyMMdd for daily, ’tag-‘yyyyMMddHH for hourly and ’tag-‘yyyyMM for monthly periods",
     "Description": "The format of the name for tag. Modifying this configuration will not take effect on old tags"
   },
   {
