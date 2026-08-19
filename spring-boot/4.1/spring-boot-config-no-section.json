@@ -962,7 +962,7 @@
   {
     "Name": "management.httpexchanges.recording.include",
     "Description": "Items to be included in the exchange recording. Defaults to request headers (excluding Authorization and Cookie), response headers (excluding Set-Cookie), and time taken.",
-    "Default Value": "[request-headers, response-headers, errors]"
+    "Default Value": "[time-taken, request-headers, response-headers]"
   },
   {
     "Name": "management.humio.metrics.export.api-token",
@@ -1246,12 +1246,12 @@
   },
   {
     "Name": "management.metrics.distribution.maximum-expected-value.*",
-    "Description": "Maximum value that meter IDs starting with the specified name are expected to observe. The longest match wins. Values can be specified as a double or as a Duration value (for timer meters, defaulting to ms if no unit specified).",
+    "Description": "Maximum value that meter IDs starting with the specified name are expected to observe. The longest match wins. Values can be specified as a double or, for timer and long-task timer meters, as a Duration value defaulting to ms if no unit specified.",
     "Default Value": ""
   },
   {
     "Name": "management.metrics.distribution.minimum-expected-value.*",
-    "Description": "Minimum value that meter IDs starting with the specified name are expected to observe. The longest match wins. Values can be specified as a double or as a Duration value (for timer meters, defaulting to ms if no unit specified).",
+    "Description": "Minimum value that meter IDs starting with the specified name are expected to observe. The longest match wins. Values can be specified as a double or, for timer and long-task timer meters, as a Duration value defaulting to ms if no unit specified.",
     "Default Value": ""
   },
   {
@@ -1266,7 +1266,7 @@
   },
   {
     "Name": "management.metrics.distribution.slo.*",
-    "Description": "Specific service-level objective boundaries for meter IDs starting with the specified name. The longest match wins. Counters will be published for each specified boundary. Values can be specified as a double or as a Duration value (for timer meters, defaulting to ms if no unit specified).",
+    "Description": "Specific service-level objective boundaries for meter IDs starting with the specified name. The longest match wins. Counters will be published for each specified boundary. Values can be specified as a double or, for timer and long-task timer meters, as a Duration value defaulting to ms if no unit specified.",
     "Default Value": ""
   },
   {
@@ -1468,6 +1468,11 @@
     "Name": "management.opentelemetry.logging.limits.max-attributes",
     "Description": "Maximum number of attributes per log record.",
     "Default Value": "128"
+  },
+  {
+    "Name": "management.opentelemetry.map-environment-variables",
+    "Description": "Whether to map OpenTelemetry SDK environment variables to Spring Boot configuration properties.",
+    "Default Value": "true"
   },
   {
     "Name": "management.opentelemetry.resource-attributes.*",
@@ -3470,6 +3475,11 @@
     "Default Value": ""
   },
   {
+    "Name": "spring.cassandra.ssl.verify-hostname",
+    "Description": "Whether to perform hostname verification.",
+    "Default Value": "true"
+  },
+  {
     "Name": "spring.cassandra.username",
     "Description": "Login user of the server.",
     "Default Value": ""
@@ -3810,6 +3820,41 @@
     "Default Value": "100ms"
   },
   {
+    "Name": "spring.data.redis.listener.auto-startup",
+    "Description": "Whether to start the container automatically on startup.",
+    "Default Value": "true"
+  },
+  {
+    "Name": "spring.data.redis.listener.recovery.delay",
+    "Description": "Base delay for a recovery attempt. Can be combined with a \"multiplier\" to use an exponential back off strategy.",
+    "Default Value": "5s"
+  },
+  {
+    "Name": "spring.data.redis.listener.recovery.jitter",
+    "Description": "Jitter value for the base retry attempt, randomly subtracted or added to the calculated delay, resulting in a value between \u0027delay - jitter\u0027 and \u0027delay + jitter\u0027 but never below the base delay or above the max delay.",
+    "Default Value": "0"
+  },
+  {
+    "Name": "spring.data.redis.listener.recovery.max-delay",
+    "Description": "Maximum delay for any retry attempt, limiting how far jitter and the multiplier can increase the delay.",
+    "Default Value": "30s"
+  },
+  {
+    "Name": "spring.data.redis.listener.recovery.max-retries",
+    "Description": "Maximum number of recovery attempts.",
+    "Default Value": ""
+  },
+  {
+    "Name": "spring.data.redis.listener.recovery.multiplier",
+    "Description": "Multiplier for a delay for the next retry attempt, applied to the previous delay, starting with the initial delay as well as to the applicable jitter for each attempt. Fixed delay by default.",
+    "Default Value": "1"
+  },
+  {
+    "Name": "spring.data.redis.listener.subscription-registration-timeout",
+    "Description": "Maximum amount of time to wait for the subscription to become active.",
+    "Default Value": "2s"
+  },
+  {
     "Name": "spring.data.redis.masterreplica.nodes",
     "Description": "Static list of \"host:port\" pairs to use, at least one entry is required.",
     "Default Value": ""
@@ -3980,6 +4025,11 @@
     "Default Value": "sort"
   },
   {
+    "Name": "spring.datasource.connection-fetch",
+    "Description": "Whether the auto-configured DataSource should be wrapped in a proxy that fetches JDBC connections as late as possible.",
+    "Default Value": "eager"
+  },
+  {
     "Name": "spring.datasource.dbcp2.abandoned-usage-tracking spring.datasource.dbcp2.access-to-underlying-connection-allowed spring.datasource.dbcp2.auto-commit-on-return spring.datasource.dbcp2.cache-state spring.datasource.dbcp2.clear-statement-pool-on-return spring.datasource.dbcp2.connection-factory-class-name spring.datasource.dbcp2.connection-init-sqls spring.datasource.dbcp2.default-auto-commit spring.datasource.dbcp2.default-catalog spring.datasource.dbcp2.default-read-only spring.datasource.dbcp2.default-schema spring.datasource.dbcp2.default-transaction-isolation spring.datasource.dbcp2.disconnection-ignore-sql-codes spring.datasource.dbcp2.disconnection-sql-codes spring.datasource.dbcp2.driver-class-name spring.datasource.dbcp2.duration-between-eviction-runs spring.datasource.dbcp2.eviction-policy-class-name spring.datasource.dbcp2.fast-fail-validation spring.datasource.dbcp2.initial-size spring.datasource.dbcp2.jmx-name spring.datasource.dbcp2.lifo spring.datasource.dbcp2.log-abandoned spring.datasource.dbcp2.log-expired-connections spring.datasource.dbcp2.login-timeout spring.datasource.dbcp2.max-idle spring.datasource.dbcp2.max-open-prepared-statements spring.datasource.dbcp2.max-total spring.datasource.dbcp2.min-idle spring.datasource.dbcp2.num-tests-per-eviction-run spring.datasource.dbcp2.password spring.datasource.dbcp2.pool-prepared-statements spring.datasource.dbcp2.remove-abandoned-on-borrow spring.datasource.dbcp2.remove-abandoned-on-maintenance spring.datasource.dbcp2.rollback-on-return spring.datasource.dbcp2.test-on-borrow spring.datasource.dbcp2.test-on-create spring.datasource.dbcp2.test-on-return spring.datasource.dbcp2.test-while-idle spring.datasource.dbcp2.url spring.datasource.dbcp2.username spring.datasource.dbcp2.validation-query",
     "Description": "Commons DBCP2 specific settings bound to an instance of DBCP2\u0027s BasicDataSource",
     "Default Value": ""
@@ -4015,7 +4065,7 @@
     "Default Value": ""
   },
   {
-    "Name": "spring.datasource.oracleucp.abandoned-connection-timeout spring.datasource.oracleucp.commit-on-connection-return spring.datasource.oracleucp.connection-factory-class-name spring.datasource.oracleucp.connection-factory-properties spring.datasource.oracleucp.connection-harvest-max-count spring.datasource.oracleucp.connection-harvest-trigger-count spring.datasource.oracleucp.connection-labeling-high-cost spring.datasource.oracleucp.connection-pool-name spring.datasource.oracleucp.connection-properties spring.datasource.oracleucp.connection-repurpose-threshold spring.datasource.oracleucp.connection-validation-timeout spring.datasource.oracleucp.connection-wait-duration spring.datasource.oracleucp.connection-wait-timeout-while-service-down spring.datasource.oracleucp.create-connection-in-borrow-thread spring.datasource.oracleucp.data-source-name spring.datasource.oracleucp.database-name spring.datasource.oracleucp.description spring.datasource.oracleucp.fail-fast-on-chunk-unavailable spring.datasource.oracleucp.fast-connection-failover-enabled spring.datasource.oracleucp.high-cost-connection-reuse-threshold spring.datasource.oracleucp.inactive-connection-timeout spring.datasource.oracleucp.initial-pool-size spring.datasource.oracleucp.login-timeout spring.datasource.oracleucp.max-connection-reuse-count spring.datasource.oracleucp.max-connection-reuse-time spring.datasource.oracleucp.max-connections-per-shard spring.datasource.oracleucp.max-idle-time spring.datasource.oracleucp.max-pool-size spring.datasource.oracleucp.max-statements spring.datasource.oracleucp.min-idle spring.datasource.oracleucp.min-pool-size spring.datasource.oracleucp.network-protocol spring.datasource.oracleucp.o-n-s-configuration spring.datasource.oracleucp.pdb-roles spring.datasource.oracleucp.port-number spring.datasource.oracleucp.property-cycle spring.datasource.oracleucp.query-timeout spring.datasource.oracleucp.read-only-instance-allowed spring.datasource.oracleucp.role-name spring.datasource.oracleucp.s-q-l-for-validate-connection spring.datasource.oracleucp.seconds-to-trust-idle-connection spring.datasource.oracleucp.server-name spring.datasource.oracleucp.sharding-mode spring.datasource.oracleucp.time-to-live-connection-timeout spring.datasource.oracleucp.timeout-check-interval spring.datasource.oracleucp.u-c-p-event-listener-provider spring.datasource.oracleucp.u-r-l spring.datasource.oracleucp.user spring.datasource.oracleucp.validate-connection-on-borrow",
+    "Name": "spring.datasource.oracleucp.abandoned-connection-timeout spring.datasource.oracleucp.commit-on-connection-return spring.datasource.oracleucp.connection-affinity-callback spring.datasource.oracleucp.connection-creation-consumer spring.datasource.oracleucp.connection-factory-class-name spring.datasource.oracleucp.connection-factory-properties spring.datasource.oracleucp.connection-harvest-max-count spring.datasource.oracleucp.connection-harvest-trigger-count spring.datasource.oracleucp.connection-initialization-callback spring.datasource.oracleucp.connection-labeling-callback spring.datasource.oracleucp.connection-labeling-high-cost spring.datasource.oracleucp.connection-pool-name spring.datasource.oracleucp.connection-properties spring.datasource.oracleucp.connection-repurpose-threshold spring.datasource.oracleucp.connection-validation-timeout spring.datasource.oracleucp.connection-wait-duration spring.datasource.oracleucp.connection-wait-timeout-while-service-down spring.datasource.oracleucp.create-connection-in-borrow-thread spring.datasource.oracleucp.data-source-name spring.datasource.oracleucp.database-name spring.datasource.oracleucp.description spring.datasource.oracleucp.fast-connection-failover-enabled spring.datasource.oracleucp.high-cost-connection-reuse-threshold spring.datasource.oracleucp.inactive-connection-timeout spring.datasource.oracleucp.initial-pool-size spring.datasource.oracleucp.login-timeout spring.datasource.oracleucp.max-connection-reuse-count spring.datasource.oracleucp.max-connection-reuse-time spring.datasource.oracleucp.max-connections-per-shard spring.datasource.oracleucp.max-idle-time spring.datasource.oracleucp.max-pool-size spring.datasource.oracleucp.max-statements spring.datasource.oracleucp.min-idle spring.datasource.oracleucp.min-pool-size spring.datasource.oracleucp.network-protocol spring.datasource.oracleucp.o-n-s-configuration spring.datasource.oracleucp.password spring.datasource.oracleucp.pdb-roles spring.datasource.oracleucp.port-number spring.datasource.oracleucp.property-cycle spring.datasource.oracleucp.query-timeout spring.datasource.oracleucp.read-only-instance-allowed spring.datasource.oracleucp.s-q-l-for-validate-connection spring.datasource.oracleucp.seconds-to-trust-idle-connection spring.datasource.oracleucp.server-name spring.datasource.oracleucp.sharding-mode spring.datasource.oracleucp.time-to-live-connection-timeout spring.datasource.oracleucp.timeout-check-interval spring.datasource.oracleucp.u-r-l spring.datasource.oracleucp.user spring.datasource.oracleucp.validate-connection-on-borrow",
     "Description": "Oracle UCP specific settings bound to an instance of Oracle UCP\u0027s PoolDataSource",
     "Default Value": ""
   },
@@ -4093,6 +4143,11 @@
     "Name": "spring.elasticsearch.restclient.ssl.bundle",
     "Description": "SSL bundle name.",
     "Default Value": ""
+  },
+  {
+    "Name": "spring.elasticsearch.restclient.ssl.verify-hostname",
+    "Description": "Whether to perform hostname verification.",
+    "Default Value": "true"
   },
   {
     "Name": "spring.elasticsearch.socket-keep-alive",
@@ -4183,6 +4238,11 @@
     "Name": "spring.jooq.sql-dialect",
     "Description": "SQL dialect to use. Auto-detected by default.",
     "Default Value": ""
+  },
+  {
+    "Name": "spring.jpa.bootstrap",
+    "Description": "Bootstrap method to use.",
+    "Default Value": "default"
   },
   {
     "Name": "spring.jpa.database",
@@ -4822,36 +4882,6 @@
   {
     "Name": "spring.activemq.user",
     "Description": "Login user of the broker.",
-    "Default Value": ""
-  },
-  {
-    "Name": "spring.amqp.client.completion-timeout",
-    "Description": "Maximum time to wait for request operations to complete.",
-    "Default Value": "60s"
-  },
-  {
-    "Name": "spring.amqp.client.default-to-address",
-    "Description": "Default destination address for send operations when none is specified.",
-    "Default Value": ""
-  },
-  {
-    "Name": "spring.amqp.host",
-    "Description": "AMQP broker host.",
-    "Default Value": "localhost"
-  },
-  {
-    "Name": "spring.amqp.password",
-    "Description": "Password used to authenticate to the broker.",
-    "Default Value": ""
-  },
-  {
-    "Name": "spring.amqp.port",
-    "Description": "AMQP broker port.",
-    "Default Value": "5672"
-  },
-  {
-    "Name": "spring.amqp.username",
-    "Description": "Login user to authenticate to the broker.",
     "Default Value": ""
   },
   {
@@ -5968,6 +5998,16 @@
     "Name": "spring.kafka.streams.state-store-cache-max-size",
     "Description": "Maximum size of the in-memory state store cache across all threads.",
     "Default Value": ""
+  },
+  {
+    "Name": "spring.kafka.template.allow-non-transactional",
+    "Description": "Whether to allow sending non-transactional messages.",
+    "Default Value": "false"
+  },
+  {
+    "Name": "spring.kafka.template.close-timeout",
+    "Description": "Maximum time to wait when closing a producer.",
+    "Default Value": "5s"
   },
   {
     "Name": "spring.kafka.template.default-topic",
@@ -7113,6 +7153,11 @@
     "Name": "spring.mail.ssl.enabled",
     "Description": "Whether to enable SSL support. If enabled, \u0027mail.(protocol).ssl.enable\u0027 property is set to \u0027true\u0027.",
     "Default Value": "false"
+  },
+  {
+    "Name": "spring.mail.ssl.verify-hostname",
+    "Description": "Whether to enable hostname verification.",
+    "Default Value": "true"
   },
   {
     "Name": "spring.mail.test-connection",
@@ -9372,6 +9417,11 @@
   {
     "Name": "spring.webflux.base-path",
     "Description": "Base path for all web handlers.",
+    "Default Value": ""
+  },
+  {
+    "Name": "spring.webflux.default-html-escape",
+    "Description": "Whether default HTML escaping is enabled for the web application.",
     "Default Value": ""
   },
   {

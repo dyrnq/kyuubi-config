@@ -128,6 +128,11 @@
         "Default Value": "true"
       },
       {
+        "Name": "management.brave.tracing.span-joining-supported",
+        "Description": "Whether the propagation type and tracing backend support sharing the span ID between client and server spans. Requires B3 propagation and a compatible backend.",
+        "Default Value": "false"
+      },
+      {
         "Name": "management.cloudfoundry.enabled",
         "Description": "Whether to enable extended Cloud Foundry actuator endpoints.",
         "Default Value": "true"
@@ -226,21 +231,6 @@
         "Name": "management.dynatrace.metrics.export.uri",
         "Description": "URI to ship metrics to. Should be used for SaaS, self-managed instances or to en-route through an internal proxy.",
         "Default Value": ""
-      },
-      {
-        "Name": "management.dynatrace.metrics.export.v1.device-id",
-        "Description": "ID of the custom device that is exporting metrics to Dynatrace.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.dynatrace.metrics.export.v1.group",
-        "Description": "Group for exported metrics. Used to specify custom device group name in the Dynatrace UI.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.dynatrace.metrics.export.v1.technology-type",
-        "Description": "Technology type for exported metrics. Used to group metrics under a logical technology name in the Dynatrace UI.",
-        "Default Value": "java"
       },
       {
         "Name": "management.dynatrace.metrics.export.v2.default-dimensions.*",
@@ -465,7 +455,7 @@
       {
         "Name": "management.endpoint.health.probes.enabled",
         "Description": "Whether to enable liveness and readiness probes.",
-        "Default Value": "false"
+        "Default Value": "true"
       },
       {
         "Name": "management.endpoint.health.roles",
@@ -693,8 +683,8 @@
         "Default Value": "unrestricted"
       },
       {
-        "Name": "management.endpoints.jackson.isolated-object-mapper",
-        "Description": "Whether to use an isolated object mapper to serialize endpoint JSON.",
+        "Name": "management.endpoints.jackson.isolated-json-mapper",
+        "Description": "Whether to use an isolated JsonMapper to serialize endpoint JSON.",
         "Default Value": "true"
       },
       {
@@ -908,11 +898,6 @@
         "Default Value": "true"
       },
       {
-        "Name": "management.health.influxdb.enabled",
-        "Description": "Whether to enable InfluxDB health check.",
-        "Default Value": "true"
-      },
-      {
         "Name": "management.health.jms.enabled",
         "Description": "Whether to enable JMS health check.",
         "Default Value": "true"
@@ -933,7 +918,7 @@
         "Default Value": "true"
       },
       {
-        "Name": "management.health.mongo.enabled",
+        "Name": "management.health.mongodb.enabled",
         "Description": "Whether to enable MongoDB health check.",
         "Default Value": "true"
       },
@@ -980,7 +965,7 @@
       {
         "Name": "management.httpexchanges.recording.include",
         "Description": "Items to be included in the exchange recording. Defaults to request headers (excluding Authorization and Cookie), response headers (excluding Set-Cookie), and time taken.",
-        "Default Value": "[request-headers, response-headers, errors]"
+        "Default Value": "[time-taken, request-headers, response-headers]"
       },
       {
         "Name": "management.humio.metrics.export.api-token",
@@ -1228,6 +1213,11 @@
         "Default Value": "true"
       },
       {
+        "Name": "management.logging.export.otlp.enabled",
+        "Description": "Whether auto-configuration of logging is enabled to export logs over OTLP.",
+        "Default Value": "true"
+      },
+      {
         "Name": "management.metrics.data.repository.autotime.enabled",
         "Description": "Whether to enable auto-timing.",
         "Default Value": "true"
@@ -1259,12 +1249,12 @@
       },
       {
         "Name": "management.metrics.distribution.maximum-expected-value.*",
-        "Description": "Maximum value that meter IDs starting with the specified name are expected to observe. The longest match wins. Values can be specified as a double or as a Duration value (for timer meters, defaulting to ms if no unit specified).",
+        "Description": "Maximum value that meter IDs starting with the specified name are expected to observe. The longest match wins. Values can be specified as a double or, for timer and long-task timer meters, as a Duration value defaulting to ms if no unit specified.",
         "Default Value": ""
       },
       {
         "Name": "management.metrics.distribution.minimum-expected-value.*",
-        "Description": "Minimum value that meter IDs starting with the specified name are expected to observe. The longest match wins. Values can be specified as a double or as a Duration value (for timer meters, defaulting to ms if no unit specified).",
+        "Description": "Minimum value that meter IDs starting with the specified name are expected to observe. The longest match wins. Values can be specified as a double or, for timer and long-task timer meters, as a Duration value defaulting to ms if no unit specified.",
         "Default Value": ""
       },
       {
@@ -1279,7 +1269,7 @@
       },
       {
         "Name": "management.metrics.distribution.slo.*",
-        "Description": "Specific service-level objective boundaries for meter IDs starting with the specified name. The longest match wins. Counters will be published for each specified boundary. Values can be specified as a double or as a Duration value (for timer meters, defaulting to ms if no unit specified).",
+        "Description": "Specific service-level objective boundaries for meter IDs starting with the specified name. The longest match wins. Counters will be published for each specified boundary. Values can be specified as a double or, for timer and long-task timer meters, as a Duration value defaulting to ms if no unit specified.",
         "Default Value": ""
       },
       {
@@ -1288,14 +1278,19 @@
         "Default Value": ""
       },
       {
-        "Name": "management.metrics.mongo.command.enabled",
+        "Name": "management.metrics.mongodb.command.enabled",
         "Description": "Whether to enable Mongo client command metrics.",
         "Default Value": "true"
       },
       {
-        "Name": "management.metrics.mongo.connectionpool.enabled",
+        "Name": "management.metrics.mongodb.connectionpool.enabled",
         "Description": "Whether to enable Mongo connection pool metrics.",
         "Default Value": "true"
+      },
+      {
+        "Name": "management.metrics.observations.ignored-meters",
+        "Description": "Meters that should be ignored when recoding observations.",
+        "Default Value": ""
       },
       {
         "Name": "management.metrics.system.diskspace.paths",
@@ -1403,14 +1398,84 @@
         "Default Value": ""
       },
       {
-        "Name": "management.observations.long-task-timer.enabled",
-        "Description": "Whether to create a LongTaskTimer for every observation.",
-        "Default Value": "true"
-      },
-      {
         "Name": "management.observations.r2dbc.include-parameter-values",
         "Description": "Whether to tag actual query parameter values.",
         "Default Value": "false"
+      },
+      {
+        "Name": "management.opentelemetry.enabled",
+        "Description": "Whether OpenTelemetry should be enabled. If OpenTelemetry is disabled, only propagators are configured. Metrics, traces, and logging will use no-op implementations.",
+        "Default Value": "true"
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.max-batch-size",
+        "Description": "Maximum batch size for each export. This must be less than or equal to \u0027maxQueueSize\u0027.",
+        "Default Value": "512"
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.max-queue-size",
+        "Description": "Maximum number of logs that are kept in the queue before they will be dropped.",
+        "Default Value": "2048"
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.otlp.compression",
+        "Description": "Method used to compress the payload.",
+        "Default Value": "none"
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.otlp.connect-timeout",
+        "Description": "Connect timeout for the OTel collector connection.",
+        "Default Value": "10s"
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.otlp.endpoint",
+        "Description": "URL to the OTel collector\u0027s HTTP API.",
+        "Default Value": ""
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.otlp.headers.*",
+        "Description": "Custom HTTP headers you want to pass to the collector, for example auth headers.",
+        "Default Value": ""
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.otlp.ssl.bundle",
+        "Description": "SSL bundle name.",
+        "Default Value": ""
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.otlp.timeout",
+        "Description": "Call timeout for the OTel Collector to process an exported batch of data. This timeout spans the entire call: resolving DNS, connecting, writing the request body, server processing, and reading the response body. If the call requires redirects or retries all must complete within one timeout period.",
+        "Default Value": "10s"
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.otlp.transport",
+        "Description": "Transport used to send the logs.",
+        "Default Value": "http"
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.schedule-delay",
+        "Description": "The delay interval between two consecutive exports.",
+        "Default Value": "1s"
+      },
+      {
+        "Name": "management.opentelemetry.logging.export.timeout",
+        "Description": "Maximum time an export will be allowed to run before being cancelled.",
+        "Default Value": "30s"
+      },
+      {
+        "Name": "management.opentelemetry.logging.limits.max-attribute-value-length",
+        "Description": "Maximum number of characters for string attribute values.",
+        "Default Value": ""
+      },
+      {
+        "Name": "management.opentelemetry.logging.limits.max-attributes",
+        "Description": "Maximum number of attributes per log record.",
+        "Default Value": "128"
+      },
+      {
+        "Name": "management.opentelemetry.map-environment-variables",
+        "Description": "Whether to map OpenTelemetry SDK environment variables to Spring Boot configuration properties.",
+        "Default Value": "true"
       },
       {
         "Name": "management.opentelemetry.resource-attributes.*",
@@ -1418,39 +1483,99 @@
         "Default Value": ""
       },
       {
-        "Name": "management.otlp.logging.compression",
+        "Name": "management.opentelemetry.tracing.export.include-unsampled",
+        "Description": "Whether unsampled spans should be exported.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.export.max-batch-size",
+        "Description": "Maximum batch size for each export. This must be less than or equal to \u0027maxQueueSize\u0027.",
+        "Default Value": "512"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.export.max-queue-size",
+        "Description": "Maximum number of spans that are kept in the queue before they will be dropped.",
+        "Default Value": "2048"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.export.otlp.compression",
         "Description": "Method used to compress the payload.",
         "Default Value": "none"
       },
       {
-        "Name": "management.otlp.logging.connect-timeout",
+        "Name": "management.opentelemetry.tracing.export.otlp.connect-timeout",
         "Description": "Connect timeout for the OTel collector connection.",
         "Default Value": "10s"
       },
       {
-        "Name": "management.otlp.logging.endpoint",
+        "Name": "management.opentelemetry.tracing.export.otlp.endpoint",
         "Description": "URL to the OTel collector\u0027s HTTP API.",
         "Default Value": ""
       },
       {
-        "Name": "management.otlp.logging.export.enabled",
-        "Description": "Whether auto-configuration of logging is enabled to export OTLP logs.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.otlp.logging.headers.*",
+        "Name": "management.opentelemetry.tracing.export.otlp.headers.*",
         "Description": "Custom HTTP headers you want to pass to the collector, for example auth headers.",
         "Default Value": ""
       },
       {
-        "Name": "management.otlp.logging.timeout",
+        "Name": "management.opentelemetry.tracing.export.otlp.ssl.bundle",
+        "Description": "SSL bundle name.",
+        "Default Value": ""
+      },
+      {
+        "Name": "management.opentelemetry.tracing.export.otlp.timeout",
         "Description": "Call timeout for the OTel Collector to process an exported batch of data. This timeout spans the entire call: resolving DNS, connecting, writing the request body, server processing, and reading the response body. If the call requires redirects or retries all must complete within one timeout period.",
         "Default Value": "10s"
       },
       {
-        "Name": "management.otlp.logging.transport",
-        "Description": "Transport used to send the logs.",
+        "Name": "management.opentelemetry.tracing.export.otlp.transport",
+        "Description": "Transport used to send the spans.",
         "Default Value": "http"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.export.schedule-delay",
+        "Description": "The delay interval between two consecutive exports.",
+        "Default Value": "5s"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.export.timeout",
+        "Description": "Maximum time an export will be allowed to run before being cancelled.",
+        "Default Value": "30s"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.limits.max-attribute-value-length",
+        "Description": "Maximum number of characters for string attribute values.",
+        "Default Value": ""
+      },
+      {
+        "Name": "management.opentelemetry.tracing.limits.max-attributes",
+        "Description": "Maximum number of attributes per span.",
+        "Default Value": "128"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.limits.max-attributes-per-event",
+        "Description": "Maximum number of attributes per event.",
+        "Default Value": "128"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.limits.max-attributes-per-link",
+        "Description": "Maximum number of attributes per link.",
+        "Default Value": "128"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.limits.max-events",
+        "Description": "Maximum number of events per span.",
+        "Default Value": "128"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.limits.max-links",
+        "Description": "Maximum number of links per span.",
+        "Default Value": "128"
+      },
+      {
+        "Name": "management.opentelemetry.tracing.sampler",
+        "Description": "Sampler to use.",
+        "Default Value": "parent-based-trace-id-ratio"
       },
       {
         "Name": "management.otlp.metrics.export.aggregation-temporality",
@@ -1466,6 +1591,11 @@
         "Name": "management.otlp.metrics.export.batch-size",
         "Description": "Number of measurements per request to use for this backend. If more measurements are found, then multiple requests will be made.",
         "Default Value": "10000"
+      },
+      {
+        "Name": "management.otlp.metrics.export.compression-mode",
+        "Description": "Compression mode to use when exporting metrics.",
+        "Default Value": "none"
       },
       {
         "Name": "management.otlp.metrics.export.connect-timeout",
@@ -1503,9 +1633,19 @@
         "Default Value": ""
       },
       {
+        "Name": "management.otlp.metrics.export.publish-max-gauge-for-histograms",
+        "Description": "Whether to publish a separate gauge for the max value of histogram-based meters.",
+        "Default Value": ""
+      },
+      {
         "Name": "management.otlp.metrics.export.read-timeout",
         "Description": "Read timeout for requests to this backend.",
         "Default Value": "10s"
+      },
+      {
+        "Name": "management.otlp.metrics.export.ssl.bundle",
+        "Description": "SSL bundle name.",
+        "Default Value": ""
       },
       {
         "Name": "management.otlp.metrics.export.step",
@@ -1516,41 +1656,6 @@
         "Name": "management.otlp.metrics.export.url",
         "Description": "URI of the OTLP server.",
         "Default Value": ""
-      },
-      {
-        "Name": "management.otlp.tracing.compression",
-        "Description": "Method used to compress the payload.",
-        "Default Value": "none"
-      },
-      {
-        "Name": "management.otlp.tracing.connect-timeout",
-        "Description": "Connect timeout for the OTel collector connection.",
-        "Default Value": "10s"
-      },
-      {
-        "Name": "management.otlp.tracing.endpoint",
-        "Description": "URL to the OTel collector\u0027s HTTP API.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.otlp.tracing.export.enabled",
-        "Description": "Whether auto-configuration of tracing is enabled to export OTLP traces.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.otlp.tracing.headers.*",
-        "Description": "Custom HTTP headers you want to pass to the collector, for example auth headers.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.otlp.tracing.timeout",
-        "Description": "Call timeout for the OTel Collector to process an exported batch of data. This timeout spans the entire call: resolving DNS, connecting, writing the request body, server processing, and reading the response body. If the call requires redirects or retries all must complete within one timeout period.",
-        "Default Value": "10s"
-      },
-      {
-        "Name": "management.otlp.tracing.transport",
-        "Description": "Transport used to send the spans.",
-        "Default Value": "http"
       },
       {
         "Name": "management.prometheus.metrics.export.descriptions",
@@ -1763,11 +1868,6 @@
         "Default Value": "management_"
       },
       {
-        "Name": "management.server.undertow.accesslog.prefix",
-        "Description": "Management log file name prefix.",
-        "Default Value": "management_"
-      },
-      {
         "Name": "management.simple.metrics.export.enabled",
         "Description": "Whether exporting of metrics to this backend is enabled.",
         "Default Value": "true"
@@ -1781,6 +1881,11 @@
         "Name": "management.simple.metrics.export.step",
         "Description": "Step size (i.e. reporting frequency) to use.",
         "Default Value": "1m"
+      },
+      {
+        "Name": "management.stackdriver.metrics.export.auto-create-metric-descriptors",
+        "Description": "Whether it should be attempted to create a metric descriptor before writing a time series.",
+        "Default Value": "true"
       },
       {
         "Name": "management.stackdriver.metrics.export.batch-size",
@@ -1913,39 +2018,44 @@
         "Default Value": ""
       },
       {
-        "Name": "management.tracing.brave.span-joining-supported",
-        "Description": "Whether the propagation type and tracing backend support sharing the span ID between client and server spans. Requires B3 propagation and a compatible backend.",
-        "Default Value": "false"
+        "Name": "management.tracing.exemplars.include",
+        "Description": "Traces to include as exemplars. \u0027all\u0027 is not supported when using Prometheus.",
+        "Default Value": "sampled-traces"
       },
       {
-        "Name": "management.tracing.enabled",
+        "Name": "management.tracing.export.enabled",
         "Description": "Whether auto-configuration of tracing is enabled to export and propagate traces.",
         "Default Value": "true"
       },
       {
-        "Name": "management.tracing.opentelemetry.export.include-unsampled",
-        "Description": "Whether unsampled spans should be exported.",
-        "Default Value": "false"
+        "Name": "management.tracing.export.otlp.enabled",
+        "Description": "Whether auto-configuration of tracing is enabled to export OTLP traces.",
+        "Default Value": "true"
       },
       {
-        "Name": "management.tracing.opentelemetry.export.max-batch-size",
-        "Description": "Maximum batch size for each export. This must be less than or equal to \u0027maxQueueSize\u0027.",
-        "Default Value": "512"
+        "Name": "management.tracing.export.zipkin.connect-timeout",
+        "Description": "Connection timeout for requests to Zipkin.",
+        "Default Value": "1s"
       },
       {
-        "Name": "management.tracing.opentelemetry.export.max-queue-size",
-        "Description": "Maximum number of spans that are kept in the queue before they will be dropped.",
-        "Default Value": "2048"
+        "Name": "management.tracing.export.zipkin.enabled",
+        "Description": "Whether auto-configuration of tracing is enabled to export Zipkin traces.",
+        "Default Value": "true"
       },
       {
-        "Name": "management.tracing.opentelemetry.export.schedule-delay",
-        "Description": "The delay interval between two consecutive exports.",
-        "Default Value": "5s"
+        "Name": "management.tracing.export.zipkin.encoding",
+        "Description": "How to encode the POST body to the Zipkin API.",
+        "Default Value": "json"
       },
       {
-        "Name": "management.tracing.opentelemetry.export.timeout",
-        "Description": "Maximum time an export will be allowed to run before being cancelled.",
-        "Default Value": "30s"
+        "Name": "management.tracing.export.zipkin.endpoint",
+        "Description": "URL to the Zipkin API.",
+        "Default Value": "http://localhost:9411/api/v2/spans"
+      },
+      {
+        "Name": "management.tracing.export.zipkin.read-timeout",
+        "Description": "Read timeout for requests to Zipkin.",
+        "Default Value": "10s"
       },
       {
         "Name": "management.tracing.propagation.consume",
@@ -1966,151 +2076,6 @@
         "Name": "management.tracing.sampling.probability",
         "Description": "Probability in the range from 0.0 to 1.0 that a trace will be sampled.",
         "Default Value": "0.1"
-      },
-      {
-        "Name": "management.wavefront.api-token",
-        "Description": "API token used when publishing metrics and traces directly to the Wavefront API host.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.api-token-type",
-        "Description": "Type of the API token.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.application.cluster-name",
-        "Description": "Wavefront Cluster name used in ApplicationTags.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.application.custom-tags.*",
-        "Description": "Wavefront custom tags used in ApplicationTags.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.application.name",
-        "Description": "Wavefront \u0027Application\u0027 name used in ApplicationTags.",
-        "Default Value": "unnamed_application"
-      },
-      {
-        "Name": "management.wavefront.application.service-name",
-        "Description": "Wavefront \u0027Service\u0027 name used in ApplicationTags, falling back to \u0027spring.application.name\u0027. If both are unset it defaults to \u0027unnamed_service\u0027.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.application.shard-name",
-        "Description": "Wavefront Shard name used in ApplicationTags.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.metrics.export.batch-size",
-        "Description": "Number of measurements per request to use for this backend. If more measurements are found, then multiple requests will be made.",
-        "Default Value": "10000"
-      },
-      {
-        "Name": "management.wavefront.metrics.export.connect-timeout",
-        "Description": "Connection timeout for requests to this backend.",
-        "Default Value": "1s"
-      },
-      {
-        "Name": "management.wavefront.metrics.export.enabled",
-        "Description": "Whether exporting of metrics to this backend is enabled.",
-        "Default Value": "true"
-      },
-      {
-        "Name": "management.wavefront.metrics.export.global-prefix",
-        "Description": "Global prefix to separate metrics originating from this app\u0027s instrumentation from those originating from other Wavefront integrations when viewed in the Wavefront UI.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.metrics.export.read-timeout",
-        "Description": "Read timeout for requests to this backend.",
-        "Default Value": "10s"
-      },
-      {
-        "Name": "management.wavefront.metrics.export.report-day-distribution",
-        "Description": "Whether to report histogram distributions aggregated into day intervals.",
-        "Default Value": "false"
-      },
-      {
-        "Name": "management.wavefront.metrics.export.report-hour-distribution",
-        "Description": "Whether to report histogram distributions aggregated into hour intervals.",
-        "Default Value": "false"
-      },
-      {
-        "Name": "management.wavefront.metrics.export.report-minute-distribution",
-        "Description": "Whether to report histogram distributions aggregated into minute intervals.",
-        "Default Value": "true"
-      },
-      {
-        "Name": "management.wavefront.metrics.export.step",
-        "Description": "Step size (i.e. reporting frequency) to use.",
-        "Default Value": "1m"
-      },
-      {
-        "Name": "management.wavefront.sender.batch-size",
-        "Description": "Number of measurements per request to use for Wavefront. If more measurements are found, then multiple requests will be made.",
-        "Default Value": "10000"
-      },
-      {
-        "Name": "management.wavefront.sender.flush-interval",
-        "Description": "Flush interval to send queued messages.",
-        "Default Value": "1s"
-      },
-      {
-        "Name": "management.wavefront.sender.max-queue-size",
-        "Description": "Maximum size of queued messages.",
-        "Default Value": "50000"
-      },
-      {
-        "Name": "management.wavefront.sender.message-size",
-        "Description": "Maximum size of a message.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.source",
-        "Description": "Unique identifier for the app instance that is the source of metrics and traces being published to Wavefront. Defaults to the local host name.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.trace-derived-custom-tag-keys",
-        "Description": "Customized span tags for RED metrics.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.tracing.export.enabled",
-        "Description": "Whether auto-configuration of tracing is enabled to export Wavefront traces.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.wavefront.uri",
-        "Description": "URI to ship metrics and traces to.",
-        "Default Value": "https://longboard.wavefront.com"
-      },
-      {
-        "Name": "management.zipkin.tracing.connect-timeout",
-        "Description": "Connection timeout for requests to Zipkin.",
-        "Default Value": "1s"
-      },
-      {
-        "Name": "management.zipkin.tracing.encoding",
-        "Description": "How to encode the POST body to the Zipkin API.",
-        "Default Value": "[JSON]"
-      },
-      {
-        "Name": "management.zipkin.tracing.endpoint",
-        "Description": "URL to the Zipkin API.",
-        "Default Value": "http://localhost:9411/api/v2/spans"
-      },
-      {
-        "Name": "management.zipkin.tracing.export.enabled",
-        "Description": "Whether auto-configuration of tracing is enabled to export Zipkin traces.",
-        "Default Value": ""
-      },
-      {
-        "Name": "management.zipkin.tracing.read-timeout",
-        "Description": "Read timeout for requests to Zipkin.",
-        "Default Value": "10s"
       }
     ]
   },
@@ -2208,6 +2173,11 @@
         "Default Value": ""
       },
       {
+        "Name": "logging.console.enabled",
+        "Description": "Whether to enable console-based logging.",
+        "Default Value": ""
+      },
+      {
         "Name": "logging.exception-conversion-word",
         "Description": "Conversion word used when logging exceptions.",
         "Default Value": "%wEx"
@@ -2246,6 +2216,41 @@
         "Name": "logging.log4j2.config.override",
         "Description": "Overriding configuration files used to create a composite configuration. Can be prefixed with \u0027optional:\u0027 to only load the override if it exists.",
         "Default Value": ""
+      },
+      {
+        "Name": "logging.log4j2.rollingpolicy.cron",
+        "Description": "Cron expression used when the strategy is \u0027cron\u0027.",
+        "Default Value": "0 0 0 * * ?"
+      },
+      {
+        "Name": "logging.log4j2.rollingpolicy.file-name-pattern",
+        "Description": "Pattern for rolled-over log file names.",
+        "Default Value": "${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz"
+      },
+      {
+        "Name": "logging.log4j2.rollingpolicy.max-file-size",
+        "Description": "Maximum log file size.",
+        "Default Value": "10MB"
+      },
+      {
+        "Name": "logging.log4j2.rollingpolicy.max-history",
+        "Description": "Maximum number of archive log files to keep.",
+        "Default Value": "7"
+      },
+      {
+        "Name": "logging.log4j2.rollingpolicy.strategy",
+        "Description": "Rolling policy strategy.",
+        "Default Value": "size"
+      },
+      {
+        "Name": "logging.log4j2.rollingpolicy.time-interval",
+        "Description": "Time based triggering interval when the strategy is \u0027time\u0027 or \u0027size-and-time\u0027.",
+        "Default Value": "1"
+      },
+      {
+        "Name": "logging.log4j2.rollingpolicy.time-modulate",
+        "Description": "Whether to align the next rollover time to occur at the top of the interval when the strategy is time based.",
+        "Default Value": "false"
       },
       {
         "Name": "logging.logback.rollingpolicy.clean-history-on-start",
@@ -2693,6 +2698,11 @@
         "Default Value": "[#, --]"
       },
       {
+        "Name": "spring.quartz.jdbc.continue-on-error",
+        "Description": "Whether initialization should continue when an error occurs when applying a schema script.",
+        "Default Value": "true"
+      },
+      {
         "Name": "spring.quartz.jdbc.initialize-schema",
         "Description": "Database schema initialization mode.",
         "Default Value": "embedded"
@@ -2705,7 +2715,7 @@
       {
         "Name": "spring.quartz.jdbc.schema",
         "Description": "Path to the SQL file to use to initialize the database schema.",
-        "Default Value": "classpath:org/quartz/impl/jdbcjobstore/tables_@@platform@@.sql"
+        "Default Value": ""
       },
       {
         "Name": "spring.quartz.job-store-type",
@@ -2803,6 +2813,11 @@
         "Default Value": "false"
       },
       {
+        "Name": "spring.task.execution.propagate-context",
+        "Description": "Whether to propagate the current context to task executions.",
+        "Default Value": "false"
+      },
+      {
         "Name": "spring.task.execution.shutdown.await-termination",
         "Description": "Whether the executor should wait for scheduled tasks to complete on shutdown.",
         "Default Value": "false"
@@ -2811,6 +2826,11 @@
         "Name": "spring.task.execution.shutdown.await-termination-period",
         "Description": "Maximum time the executor should wait for remaining tasks to complete.",
         "Default Value": ""
+      },
+      {
+        "Name": "spring.task.execution.simple.cancel-remaining-tasks-on-close",
+        "Description": "Whether to cancel remaining tasks on close. Only recommended if threads are commonly expected to be stuck.",
+        "Default Value": "false"
       },
       {
         "Name": "spring.task.execution.simple.concurrency-limit",
@@ -2893,6 +2913,11 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.flyway.callback-locations",
+        "Description": "Locations of callbacks. Can contain the special \"{vendor}\" placeholder to use vendor-specific callbacks. Unprefixed locations or locations starting with \"classpath:\" point to a package on the classpath and may contain both SQL and Java-based callbacks. Locations starting with \"filesystem:\" point to a directory on the filesystem, may only contain SQL callbacks.",
+        "Default Value": ""
+      },
+      {
         "Name": "spring.flyway.clean-disabled",
         "Description": "Whether to disable cleaning of the database.",
         "Default Value": "true"
@@ -2900,7 +2925,7 @@
       {
         "Name": "spring.flyway.community-db-support-enabled",
         "Description": "Whether to enable community database support.",
-        "Default Value": "false"
+        "Default Value": ""
       },
       {
         "Name": "spring.flyway.connect-retries",
@@ -2930,6 +2955,11 @@
       {
         "Name": "spring.flyway.driver-class-name",
         "Description": "Fully qualified name of the JDBC driver. Auto-detected based on the URL by default.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.flyway.dry-run-output",
+        "Description": "File to which the SQL statements of a migration dry run should be output. Requires Flyway Teams.",
         "Default Value": ""
       },
       {
@@ -2965,7 +2995,7 @@
       {
         "Name": "spring.flyway.ignore-migration-patterns",
         "Description": "List of patterns that identify migrations to ignore when performing validation.",
-        "Default Value": ""
+        "Default Value": "*:future"
       },
       {
         "Name": "spring.flyway.init-sqls",
@@ -2990,7 +3020,7 @@
       {
         "Name": "spring.flyway.locations",
         "Description": "Locations of migrations scripts. Can contain the special \"{vendor}\" placeholder to use vendor-specific locations.",
-        "Default Value": "[classpath:db/migration]"
+        "Default Value": ""
       },
       {
         "Name": "spring.flyway.lock-retry-count",
@@ -3073,6 +3103,11 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.flyway.powershell-executable",
+        "Description": "PowerShell executable to use for running PowerShell scripts. Default to \"powershell\" on Windows, \"pwsh\" on other platforms.",
+        "Default Value": ""
+      },
+      {
         "Name": "spring.flyway.repeatable-sql-migration-prefix",
         "Description": "File name prefix for repeatable SQL migrations.",
         "Default Value": "R"
@@ -3120,7 +3155,7 @@
       {
         "Name": "spring.flyway.sql-migration-suffixes",
         "Description": "File name suffix for SQL migrations.",
-        "Default Value": "[.sql]"
+        "Default Value": ""
       },
       {
         "Name": "spring.flyway.sqlserver.kerberos-login-file",
@@ -3463,6 +3498,11 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.cassandra.ssl.verify-hostname",
+        "Description": "Whether to perform hostname verification.",
+        "Default Value": "true"
+      },
+      {
         "Name": "spring.cassandra.username",
         "Description": "Login user of the server.",
         "Default Value": ""
@@ -3578,11 +3618,6 @@
         "Default Value": ""
       },
       {
-        "Name": "spring.dao.exceptiontranslation.enabled",
-        "Description": "Whether to enable the PersistenceExceptionTranslationPostProcessor.",
-        "Default Value": "true"
-      },
-      {
         "Name": "spring.data.cassandra.repositories.type",
         "Description": "Type of Cassandra repositories to enable.",
         "Default Value": "auto"
@@ -3648,23 +3683,8 @@
         "Default Value": "true"
       },
       {
-        "Name": "spring.data.mongodb.additional-hosts",
-        "Description": "Additional server hosts. Ignored if \u0027uri\u0027 is set or if \u0027host\u0027 is omitted. Additional hosts will use the default mongo port of 27017. If you want to use a different port you can use the \"host:port\" syntax.",
-        "Default Value": ""
-      },
-      {
-        "Name": "spring.data.mongodb.authentication-database",
-        "Description": "Authentication database name.",
-        "Default Value": ""
-      },
-      {
         "Name": "spring.data.mongodb.auto-index-creation",
         "Description": "Whether to enable auto-index creation.",
-        "Default Value": ""
-      },
-      {
-        "Name": "spring.data.mongodb.database",
-        "Description": "Database name. Overrides database in URI.",
         "Default Value": ""
       },
       {
@@ -3683,59 +3703,14 @@
         "Default Value": ""
       },
       {
-        "Name": "spring.data.mongodb.host",
-        "Description": "Mongo server host. Ignored if \u0027uri\u0027 is set.",
-        "Default Value": ""
-      },
-      {
-        "Name": "spring.data.mongodb.password",
-        "Description": "Login password of the mongo server. Ignored if \u0027uri\u0027 is set.",
-        "Default Value": ""
-      },
-      {
-        "Name": "spring.data.mongodb.port",
-        "Description": "Mongo server port. Ignored if \u0027uri\u0027 is set.",
-        "Default Value": ""
-      },
-      {
-        "Name": "spring.data.mongodb.protocol",
-        "Description": "Protocol to be used for the MongoDB connection. Ignored if \u0027uri\u0027 is set.",
-        "Default Value": "mongodb"
-      },
-      {
-        "Name": "spring.data.mongodb.replica-set-name",
-        "Description": "Required replica set name for the cluster. Ignored if \u0027uri\u0027 is set.",
-        "Default Value": ""
-      },
-      {
         "Name": "spring.data.mongodb.repositories.type",
         "Description": "Type of Mongo repositories to enable.",
         "Default Value": "auto"
       },
       {
-        "Name": "spring.data.mongodb.ssl.bundle",
-        "Description": "SSL bundle name.",
-        "Default Value": ""
-      },
-      {
-        "Name": "spring.data.mongodb.ssl.enabled",
-        "Description": "Whether to enable SSL support. Enabled automatically if \"bundle\" is provided unless specified otherwise.",
-        "Default Value": ""
-      },
-      {
-        "Name": "spring.data.mongodb.uri",
-        "Description": "Mongo database URI. Overrides host, port, username, and password.",
-        "Default Value": "mongodb://localhost/test"
-      },
-      {
-        "Name": "spring.data.mongodb.username",
-        "Description": "Login user of the mongo server. Ignored if \u0027uri\u0027 is set.",
-        "Default Value": ""
-      },
-      {
-        "Name": "spring.data.mongodb.uuid-representation",
-        "Description": "Representation to use when converting a UUID to a BSON binary value.",
-        "Default Value": "java-legacy"
+        "Name": "spring.data.mongodb.representation.big-decimal",
+        "Description": "Representation to use when converting a BigDecimal.",
+        "Default Value": "unspecified"
       },
       {
         "Name": "spring.data.neo4j.database",
@@ -3818,11 +3793,6 @@
         "Default Value": ""
       },
       {
-        "Name": "spring.data.redis.lettuce.cluster.refresh.adaptive",
-        "Description": "Whether adaptive topology refreshing using all available refresh triggers should be used.",
-        "Default Value": "false"
-      },
-      {
         "Name": "spring.data.redis.lettuce.cluster.refresh.dynamic-refresh-sources",
         "Description": "Whether to discover and query all cluster nodes for obtaining the cluster topology. When set to false, only the initial seed nodes are used as sources for topology discovery.",
         "Default Value": "true"
@@ -3871,6 +3841,46 @@
         "Name": "spring.data.redis.lettuce.shutdown-timeout",
         "Description": "Shutdown timeout.",
         "Default Value": "100ms"
+      },
+      {
+        "Name": "spring.data.redis.listener.auto-startup",
+        "Description": "Whether to start the container automatically on startup.",
+        "Default Value": "true"
+      },
+      {
+        "Name": "spring.data.redis.listener.recovery.delay",
+        "Description": "Base delay for a recovery attempt. Can be combined with a \"multiplier\" to use an exponential back off strategy.",
+        "Default Value": "5s"
+      },
+      {
+        "Name": "spring.data.redis.listener.recovery.jitter",
+        "Description": "Jitter value for the base retry attempt, randomly subtracted or added to the calculated delay, resulting in a value between \u0027delay - jitter\u0027 and \u0027delay + jitter\u0027 but never below the base delay or above the max delay.",
+        "Default Value": "0"
+      },
+      {
+        "Name": "spring.data.redis.listener.recovery.max-delay",
+        "Description": "Maximum delay for any retry attempt, limiting how far jitter and the multiplier can increase the delay.",
+        "Default Value": "30s"
+      },
+      {
+        "Name": "spring.data.redis.listener.recovery.max-retries",
+        "Description": "Maximum number of recovery attempts.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.data.redis.listener.recovery.multiplier",
+        "Description": "Multiplier for a delay for the next retry attempt, applied to the previous delay, starting with the initial delay as well as to the applicable jitter for each attempt. Fixed delay by default.",
+        "Default Value": "1"
+      },
+      {
+        "Name": "spring.data.redis.listener.subscription-registration-timeout",
+        "Description": "Maximum amount of time to wait for the subscription to become active.",
+        "Default Value": "2s"
+      },
+      {
+        "Name": "spring.data.redis.masterreplica.nodes",
+        "Description": "Static list of \"host:port\" pairs to use, at least one entry is required.",
+        "Default Value": ""
       },
       {
         "Name": "spring.data.redis.password",
@@ -3978,6 +3988,11 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.data.rest.return-body-on-delete",
+        "Description": "Whether to return a response body after deleting an entity.",
+        "Default Value": ""
+      },
+      {
         "Name": "spring.data.rest.return-body-on-update",
         "Description": "Whether to return a response body after updating an entity.",
         "Default Value": ""
@@ -4033,6 +4048,11 @@
         "Default Value": "sort"
       },
       {
+        "Name": "spring.datasource.connection-fetch",
+        "Description": "Whether the auto-configured DataSource should be wrapped in a proxy that fetches JDBC connections as late as possible.",
+        "Default Value": "eager"
+      },
+      {
         "Name": "spring.datasource.dbcp2.abandoned-usage-tracking spring.datasource.dbcp2.access-to-underlying-connection-allowed spring.datasource.dbcp2.auto-commit-on-return spring.datasource.dbcp2.cache-state spring.datasource.dbcp2.clear-statement-pool-on-return spring.datasource.dbcp2.connection-factory-class-name spring.datasource.dbcp2.connection-init-sqls spring.datasource.dbcp2.default-auto-commit spring.datasource.dbcp2.default-catalog spring.datasource.dbcp2.default-read-only spring.datasource.dbcp2.default-schema spring.datasource.dbcp2.default-transaction-isolation spring.datasource.dbcp2.disconnection-ignore-sql-codes spring.datasource.dbcp2.disconnection-sql-codes spring.datasource.dbcp2.driver-class-name spring.datasource.dbcp2.duration-between-eviction-runs spring.datasource.dbcp2.eviction-policy-class-name spring.datasource.dbcp2.fast-fail-validation spring.datasource.dbcp2.initial-size spring.datasource.dbcp2.jmx-name spring.datasource.dbcp2.lifo spring.datasource.dbcp2.log-abandoned spring.datasource.dbcp2.log-expired-connections spring.datasource.dbcp2.login-timeout spring.datasource.dbcp2.max-idle spring.datasource.dbcp2.max-open-prepared-statements spring.datasource.dbcp2.max-total spring.datasource.dbcp2.min-idle spring.datasource.dbcp2.num-tests-per-eviction-run spring.datasource.dbcp2.password spring.datasource.dbcp2.pool-prepared-statements spring.datasource.dbcp2.remove-abandoned-on-borrow spring.datasource.dbcp2.remove-abandoned-on-maintenance spring.datasource.dbcp2.rollback-on-return spring.datasource.dbcp2.test-on-borrow spring.datasource.dbcp2.test-on-create spring.datasource.dbcp2.test-on-return spring.datasource.dbcp2.test-while-idle spring.datasource.dbcp2.url spring.datasource.dbcp2.username spring.datasource.dbcp2.validation-query",
         "Description": "Commons DBCP2 specific settings bound to an instance of DBCP2\u0027s BasicDataSource",
         "Default Value": ""
@@ -4053,7 +4073,7 @@
         "Default Value": "true"
       },
       {
-        "Name": "spring.datasource.hikari.allow-pool-suspension spring.datasource.hikari.auto-commit spring.datasource.hikari.catalog spring.datasource.hikari.connection-init-sql spring.datasource.hikari.connection-test-query spring.datasource.hikari.connection-timeout spring.datasource.hikari.data-source-class-name spring.datasource.hikari.data-source-j-n-d-i spring.datasource.hikari.data-source-properties spring.datasource.hikari.driver-class-name spring.datasource.hikari.exception-override-class-name spring.datasource.hikari.health-check-properties spring.datasource.hikari.idle-timeout spring.datasource.hikari.initialization-fail-timeout spring.datasource.hikari.isolate-internal-queries spring.datasource.hikari.jdbc-url spring.datasource.hikari.keepalive-time spring.datasource.hikari.leak-detection-threshold spring.datasource.hikari.login-timeout spring.datasource.hikari.max-lifetime spring.datasource.hikari.maximum-pool-size spring.datasource.hikari.minimum-idle spring.datasource.hikari.password spring.datasource.hikari.pool-name spring.datasource.hikari.read-only spring.datasource.hikari.register-mbeans spring.datasource.hikari.schema spring.datasource.hikari.transaction-isolation spring.datasource.hikari.username spring.datasource.hikari.validation-timeout",
+        "Name": "spring.datasource.hikari.allow-pool-suspension spring.datasource.hikari.auto-commit spring.datasource.hikari.catalog spring.datasource.hikari.connection-init-sql spring.datasource.hikari.connection-test-query spring.datasource.hikari.connection-timeout spring.datasource.hikari.credentials-provider-class-name spring.datasource.hikari.data-source-class-name spring.datasource.hikari.data-source-j-n-d-i spring.datasource.hikari.data-source-properties spring.datasource.hikari.driver-class-name spring.datasource.hikari.exception-override-class-name spring.datasource.hikari.health-check-properties spring.datasource.hikari.idle-timeout spring.datasource.hikari.initialization-fail-timeout spring.datasource.hikari.isolate-internal-queries spring.datasource.hikari.jdbc-url spring.datasource.hikari.keepalive-time spring.datasource.hikari.leak-detection-threshold spring.datasource.hikari.login-timeout spring.datasource.hikari.max-lifetime spring.datasource.hikari.maximum-pool-size spring.datasource.hikari.minimum-idle spring.datasource.hikari.password spring.datasource.hikari.pool-name spring.datasource.hikari.read-only spring.datasource.hikari.register-mbeans spring.datasource.hikari.schema spring.datasource.hikari.transaction-isolation spring.datasource.hikari.username spring.datasource.hikari.validation-timeout",
         "Description": "Hikari specific settings bound to an instance of Hikari\u0027s HikariDataSource",
         "Default Value": ""
       },
@@ -4068,7 +4088,7 @@
         "Default Value": ""
       },
       {
-        "Name": "spring.datasource.oracleucp.abandoned-connection-timeout spring.datasource.oracleucp.commit-on-connection-return spring.datasource.oracleucp.connection-factory-class-name spring.datasource.oracleucp.connection-factory-properties spring.datasource.oracleucp.connection-harvest-max-count spring.datasource.oracleucp.connection-harvest-trigger-count spring.datasource.oracleucp.connection-labeling-high-cost spring.datasource.oracleucp.connection-pool-name spring.datasource.oracleucp.connection-properties spring.datasource.oracleucp.connection-repurpose-threshold spring.datasource.oracleucp.connection-validation-timeout spring.datasource.oracleucp.connection-wait-duration spring.datasource.oracleucp.create-connection-in-borrow-thread spring.datasource.oracleucp.data-source-name spring.datasource.oracleucp.database-name spring.datasource.oracleucp.description spring.datasource.oracleucp.fast-connection-failover-enabled spring.datasource.oracleucp.high-cost-connection-reuse-threshold spring.datasource.oracleucp.inactive-connection-timeout spring.datasource.oracleucp.initial-pool-size spring.datasource.oracleucp.login-timeout spring.datasource.oracleucp.max-connection-reuse-count spring.datasource.oracleucp.max-connection-reuse-time spring.datasource.oracleucp.max-connections-per-shard spring.datasource.oracleucp.max-idle-time spring.datasource.oracleucp.max-pool-size spring.datasource.oracleucp.max-statements spring.datasource.oracleucp.min-idle spring.datasource.oracleucp.min-pool-size spring.datasource.oracleucp.network-protocol spring.datasource.oracleucp.o-n-s-configuration spring.datasource.oracleucp.pdb-roles spring.datasource.oracleucp.port-number spring.datasource.oracleucp.property-cycle spring.datasource.oracleucp.query-timeout spring.datasource.oracleucp.read-only-instance-allowed spring.datasource.oracleucp.role-name spring.datasource.oracleucp.s-q-l-for-validate-connection spring.datasource.oracleucp.seconds-to-trust-idle-connection spring.datasource.oracleucp.server-name spring.datasource.oracleucp.sharding-mode spring.datasource.oracleucp.time-to-live-connection-timeout spring.datasource.oracleucp.timeout-check-interval spring.datasource.oracleucp.u-r-l spring.datasource.oracleucp.user spring.datasource.oracleucp.validate-connection-on-borrow",
+        "Name": "spring.datasource.oracleucp.abandoned-connection-timeout spring.datasource.oracleucp.commit-on-connection-return spring.datasource.oracleucp.connection-affinity-callback spring.datasource.oracleucp.connection-creation-consumer spring.datasource.oracleucp.connection-factory-class-name spring.datasource.oracleucp.connection-factory-properties spring.datasource.oracleucp.connection-harvest-max-count spring.datasource.oracleucp.connection-harvest-trigger-count spring.datasource.oracleucp.connection-initialization-callback spring.datasource.oracleucp.connection-labeling-callback spring.datasource.oracleucp.connection-labeling-high-cost spring.datasource.oracleucp.connection-pool-name spring.datasource.oracleucp.connection-properties spring.datasource.oracleucp.connection-repurpose-threshold spring.datasource.oracleucp.connection-validation-timeout spring.datasource.oracleucp.connection-wait-duration spring.datasource.oracleucp.connection-wait-timeout-while-service-down spring.datasource.oracleucp.create-connection-in-borrow-thread spring.datasource.oracleucp.data-source-name spring.datasource.oracleucp.database-name spring.datasource.oracleucp.description spring.datasource.oracleucp.fast-connection-failover-enabled spring.datasource.oracleucp.high-cost-connection-reuse-threshold spring.datasource.oracleucp.inactive-connection-timeout spring.datasource.oracleucp.initial-pool-size spring.datasource.oracleucp.login-timeout spring.datasource.oracleucp.max-connection-reuse-count spring.datasource.oracleucp.max-connection-reuse-time spring.datasource.oracleucp.max-connections-per-shard spring.datasource.oracleucp.max-idle-time spring.datasource.oracleucp.max-pool-size spring.datasource.oracleucp.max-statements spring.datasource.oracleucp.min-idle spring.datasource.oracleucp.min-pool-size spring.datasource.oracleucp.network-protocol spring.datasource.oracleucp.o-n-s-configuration spring.datasource.oracleucp.password spring.datasource.oracleucp.pdb-roles spring.datasource.oracleucp.port-number spring.datasource.oracleucp.property-cycle spring.datasource.oracleucp.query-timeout spring.datasource.oracleucp.read-only-instance-allowed spring.datasource.oracleucp.s-q-l-for-validate-connection spring.datasource.oracleucp.seconds-to-trust-idle-connection spring.datasource.oracleucp.server-name spring.datasource.oracleucp.sharding-mode spring.datasource.oracleucp.time-to-live-connection-timeout spring.datasource.oracleucp.timeout-check-interval spring.datasource.oracleucp.u-r-l spring.datasource.oracleucp.user spring.datasource.oracleucp.validate-connection-on-borrow",
         "Description": "Oracle UCP specific settings bound to an instance of Oracle UCP\u0027s PoolDataSource",
         "Default Value": ""
       },
@@ -4108,6 +4128,11 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.elasticsearch.api-key",
+        "Description": "API key for authentication with Elasticsearch.",
+        "Default Value": ""
+      },
+      {
         "Name": "spring.elasticsearch.connection-timeout",
         "Description": "Connection timeout used when communicating with Elasticsearch.",
         "Default Value": "1s"
@@ -4128,6 +4153,11 @@
         "Default Value": "1m"
       },
       {
+        "Name": "spring.elasticsearch.restclient.sniffer.enabled",
+        "Description": "Whether the sniffer is enabled.",
+        "Default Value": "false"
+      },
+      {
         "Name": "spring.elasticsearch.restclient.sniffer.interval",
         "Description": "Interval between consecutive ordinary sniff executions.",
         "Default Value": "5m"
@@ -4138,9 +4168,14 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.elasticsearch.restclient.ssl.verify-hostname",
+        "Description": "Whether to perform hostname verification.",
+        "Default Value": "true"
+      },
+      {
         "Name": "spring.elasticsearch.socket-keep-alive",
         "Description": "Whether to enable socket keep alive between client and Elasticsearch.",
-        "Default Value": "false"
+        "Default Value": "true"
       },
       {
         "Name": "spring.elasticsearch.socket-timeout",
@@ -4226,6 +4261,11 @@
         "Name": "spring.jooq.sql-dialect",
         "Description": "SQL dialect to use. Auto-detected by default.",
         "Default Value": ""
+      },
+      {
+        "Name": "spring.jpa.bootstrap",
+        "Description": "Bootstrap method to use.",
+        "Default Value": "default"
       },
       {
         "Name": "spring.jpa.database",
@@ -4323,6 +4363,16 @@
         "Default Value": "0"
       },
       {
+        "Name": "spring.ldap.embedded.ssl.bundle",
+        "Description": "SSL bundle name.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.ldap.embedded.ssl.enabled",
+        "Description": "Whether to enable SSL support. Enabled automatically if \"bundle\" is provided unless specified otherwise.",
+        "Default Value": ""
+      },
+      {
         "Name": "spring.ldap.embedded.validation.enabled",
         "Description": "Whether to enable LDAP schema validation.",
         "Default Value": "true"
@@ -4365,6 +4415,71 @@
       {
         "Name": "spring.ldap.username",
         "Description": "Login username of the server.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mongodb.additional-hosts",
+        "Description": "Additional server hosts. Ignored if \u0027uri\u0027 is set or if \u0027host\u0027 is omitted. Additional hosts will use the default mongo port of 27017. If you want to use a different port you can use the \"host:port\" syntax.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mongodb.authentication-database",
+        "Description": "Authentication database name.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mongodb.database",
+        "Description": "Database name. Overrides database in URI.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mongodb.host",
+        "Description": "Mongo server host. Ignored if \u0027uri\u0027 is set.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mongodb.password",
+        "Description": "Login password of the mongo server. Ignored if \u0027uri\u0027 is set.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mongodb.port",
+        "Description": "Mongo server port. Ignored if \u0027uri\u0027 is set.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mongodb.protocol",
+        "Description": "Protocol to be used for the MongoDB connection. Ignored if \u0027uri\u0027 is set.",
+        "Default Value": "mongodb"
+      },
+      {
+        "Name": "spring.mongodb.replica-set-name",
+        "Description": "Required replica set name for the cluster. Ignored if \u0027uri\u0027 is set.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mongodb.representation.uuid",
+        "Description": "Representation to use when converting a UUID to a BSON binary value.",
+        "Default Value": "unspecified"
+      },
+      {
+        "Name": "spring.mongodb.ssl.bundle",
+        "Description": "SSL bundle name.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mongodb.ssl.enabled",
+        "Description": "Whether to enable SSL support. Enabled automatically if \"bundle\" is provided unless specified otherwise.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mongodb.uri",
+        "Description": "Mongo database URI. Overrides host, port, username, and password.",
+        "Default Value": "mongodb://localhost/test"
+      },
+      {
+        "Name": "spring.mongodb.username",
+        "Description": "Login user of the mongo server. Ignored if \u0027uri\u0027 is set.",
         "Default Value": ""
       },
       {
@@ -4423,11 +4538,6 @@
         "Default Value": "100"
       },
       {
-        "Name": "spring.neo4j.pool.metrics-enabled",
-        "Description": "Whether to enable metrics.",
-        "Default Value": "false"
-      },
-      {
         "Name": "spring.neo4j.security.cert-file",
         "Description": "Path to the file that holds the trusted certificates.",
         "Default Value": ""
@@ -4451,6 +4561,11 @@
         "Name": "spring.neo4j.uri",
         "Description": "URI used by the driver.",
         "Default Value": "bolt://localhost:7687"
+      },
+      {
+        "Name": "spring.persistence.exceptiontranslation.enabled",
+        "Description": "Whether to enable the PersistenceExceptionTranslationPostProcessor.",
+        "Default Value": "true"
       },
       {
         "Name": "spring.r2dbc.generate-unique-name",
@@ -4551,16 +4666,6 @@
         "Name": "spring.devtools.add-properties",
         "Description": "Whether to enable development property defaults.",
         "Default Value": "true"
-      },
-      {
-        "Name": "spring.devtools.livereload.enabled",
-        "Description": "Whether to enable a livereload.com-compatible server.",
-        "Default Value": "true"
-      },
-      {
-        "Name": "spring.devtools.livereload.port",
-        "Description": "Server port.",
-        "Default Value": "35729"
       },
       {
         "Name": "spring.devtools.remote.context-path",
@@ -4850,7 +4955,7 @@
       {
         "Name": "spring.artemis.embedded.server-id",
         "Description": "Server ID. By default, an auto-incremented counter is used.",
-        "Default Value": "0"
+        "Default Value": ""
       },
       {
         "Name": "spring.artemis.embedded.topics",
@@ -4913,6 +5018,31 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.batch.data.mongodb.isolation-level-for-create",
+        "Description": "Transaction isolation level to use when creating job metadata for new jobs.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.batch.data.mongodb.schema.initialize",
+        "Description": "Whether to initialize the Spring Batch job repository schema in MongoDB.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.batch.data.mongodb.schema.location",
+        "Description": "Path to the newline-delimited JSON script used to create the Spring Batch job repository collections and indexes in MongoDB.",
+        "Default Value": "org/springframework/batch/core/schema-mongodb.jsonl"
+      },
+      {
+        "Name": "spring.batch.data.mongodb.validate-transaction-state",
+        "Description": "Whether to validate the transaction state.",
+        "Default Value": "true"
+      },
+      {
+        "Name": "spring.batch.jdbc.continue-on-error",
+        "Description": "Whether initialization should continue when an error occurs when applying a schema script.",
+        "Default Value": "true"
+      },
+      {
         "Name": "spring.batch.jdbc.initialize-schema",
         "Description": "Database schema initialization mode.",
         "Default Value": "embedded"
@@ -4930,7 +5060,7 @@
       {
         "Name": "spring.batch.jdbc.schema",
         "Description": "Path to the SQL file to use to initialize the database schema.",
-        "Default Value": "classpath:org/springframework/batch/core/schema-@@platform@@.sql"
+        "Default Value": ""
       },
       {
         "Name": "spring.batch.jdbc.table-prefix",
@@ -5003,6 +5133,11 @@
         "Default Value": "true"
       },
       {
+        "Name": "spring.integration.jdbc.continue-on-error",
+        "Description": "Whether initialization should continue when an error occurs when applying a schema script.",
+        "Default Value": "true"
+      },
+      {
         "Name": "spring.integration.jdbc.initialize-schema",
         "Description": "Database schema initialization mode.",
         "Default Value": "embedded"
@@ -5015,7 +5150,7 @@
       {
         "Name": "spring.integration.jdbc.schema",
         "Description": "Path to the SQL file to use to initialize the database schema.",
-        "Default Value": "classpath:org/springframework/integration/jdbc/schema-@@platform@@.sql"
+        "Default Value": ""
       },
       {
         "Name": "spring.integration.management.default-logging-enabled",
@@ -5699,23 +5834,23 @@
       },
       {
         "Name": "spring.kafka.retry.topic.backoff.delay",
-        "Description": "Canonical backoff period. Used as an initial value in the exponential case, and as a minimum value in the uniform case.",
+        "Description": "Base delay after the initial invocation. Can be combined with a \"multiplier\" to use an exponential back off strategy.",
         "Default Value": "1s"
       },
       {
-        "Name": "spring.kafka.retry.topic.backoff.max-delay",
-        "Description": "Maximum wait between retries. If less than the delay then the default of 30 seconds is applied.",
+        "Name": "spring.kafka.retry.topic.backoff.jitter",
+        "Description": "Jitter value for the base retry attempt, randomly subtracted or added to the calculated delay, resulting in a value between \u0027delay - jitter\u0027 and \u0027delay + jitter\u0027 but never below the base delay or above the max delay.",
         "Default Value": "0"
+      },
+      {
+        "Name": "spring.kafka.retry.topic.backoff.max-delay",
+        "Description": "Maximum delay for any retry attempt, limiting how far jitter and the multiplier can increase the delay.",
+        "Default Value": "30s"
       },
       {
         "Name": "spring.kafka.retry.topic.backoff.multiplier",
-        "Description": "Multiplier to use for generating the next backoff delay.",
-        "Default Value": "0"
-      },
-      {
-        "Name": "spring.kafka.retry.topic.backoff.random",
-        "Description": "Whether to have the backoff delays.",
-        "Default Value": "false"
+        "Description": "Multiplier for a delay for the next retry attempt, applied to the previous delay, starting with the initial delay as well as to the applicable jitter for each attempt. Fixed delay by default.",
+        "Default Value": "1"
       },
       {
         "Name": "spring.kafka.retry.topic.enabled",
@@ -5901,6 +6036,16 @@
         "Name": "spring.kafka.streams.state-store-cache-max-size",
         "Description": "Maximum size of the in-memory state store cache across all threads.",
         "Default Value": ""
+      },
+      {
+        "Name": "spring.kafka.template.allow-non-transactional",
+        "Description": "Whether to allow sending non-transactional messages.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kafka.template.close-timeout",
+        "Description": "Maximum time to wait when closing a producer.",
+        "Default Value": "5s"
       },
       {
         "Name": "spring.kafka.template.default-topic",
@@ -6353,14 +6498,14 @@
         "Default Value": "1000ms"
       },
       {
-        "Name": "spring.rabbitmq.listener.direct.retry.max-attempts",
-        "Description": "Maximum number of attempts to deliver a message.",
-        "Default Value": "3"
-      },
-      {
         "Name": "spring.rabbitmq.listener.direct.retry.max-interval",
         "Description": "Maximum duration between attempts.",
         "Default Value": "10000ms"
+      },
+      {
+        "Name": "spring.rabbitmq.listener.direct.retry.max-retries",
+        "Description": "Maximum number of retry attempts to deliver a message.",
+        "Default Value": "3"
       },
       {
         "Name": "spring.rabbitmq.listener.direct.retry.multiplier",
@@ -6448,14 +6593,14 @@
         "Default Value": "1000ms"
       },
       {
-        "Name": "spring.rabbitmq.listener.simple.retry.max-attempts",
-        "Description": "Maximum number of attempts to deliver a message.",
-        "Default Value": "3"
-      },
-      {
         "Name": "spring.rabbitmq.listener.simple.retry.max-interval",
         "Description": "Maximum duration between attempts.",
         "Default Value": "10000ms"
+      },
+      {
+        "Name": "spring.rabbitmq.listener.simple.retry.max-retries",
+        "Description": "Maximum number of retry attempts to deliver a message.",
+        "Default Value": "3"
       },
       {
         "Name": "spring.rabbitmq.listener.simple.retry.multiplier",
@@ -6603,6 +6748,16 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.rabbitmq.stream.ssl.bundle",
+        "Description": "SSL bundle name.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.rabbitmq.stream.ssl.enabled",
+        "Description": "Whether to enable SSL support. Enabled automatically if \"bundle\" is provided.",
+        "Default Value": ""
+      },
+      {
         "Name": "spring.rabbitmq.stream.username",
         "Description": "Login user to authenticate to the broker. When not set, spring.rabbitmq.username is used.",
         "Default Value": ""
@@ -6658,14 +6813,14 @@
         "Default Value": "1000ms"
       },
       {
-        "Name": "spring.rabbitmq.template.retry.max-attempts",
-        "Description": "Maximum number of attempts to deliver a message.",
-        "Default Value": "3"
-      },
-      {
         "Name": "spring.rabbitmq.template.retry.max-interval",
         "Description": "Maximum duration between attempts.",
         "Default Value": "10000ms"
+      },
+      {
+        "Name": "spring.rabbitmq.template.retry.max-retries",
+        "Description": "Maximum number of retry attempts to deliver a message.",
+        "Default Value": "3"
       },
       {
         "Name": "spring.rabbitmq.template.retry.multiplier",
@@ -6768,9 +6923,24 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.jackson.cbor.read.*",
+        "Description": "Jackson on/off token reader features that are specific to CBOR.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.jackson.cbor.write.*",
+        "Description": "Jackson on/off token writer features that are specific to CBOR.",
+        "Default Value": ""
+      },
+      {
         "Name": "spring.jackson.constructor-detector",
         "Description": "Strategy to use to auto-detect constructor, and in particular behavior with single-argument constructors.",
         "Default Value": "default"
+      },
+      {
+        "Name": "spring.jackson.datatype.datetime.*",
+        "Description": "Jackson on/off features for DateTimes.",
+        "Default Value": ""
       },
       {
         "Name": "spring.jackson.datatype.enum.*",
@@ -6803,8 +6973,53 @@
         "Default Value": ""
       },
       {
-        "Name": "spring.jackson.generator.*",
-        "Description": "Jackson on/off features for generators.",
+        "Name": "spring.jackson.factory.constraints.read.max-document-length",
+        "Description": "Maximum allowed document length. A value less than or equal to zero indicates that any length is acceptable.",
+        "Default Value": "-1"
+      },
+      {
+        "Name": "spring.jackson.factory.constraints.read.max-name-length",
+        "Description": "Maximum name length.",
+        "Default Value": "50000"
+      },
+      {
+        "Name": "spring.jackson.factory.constraints.read.max-nesting-depth",
+        "Description": "Maximum nesting depth. The depth is a count of objects and arrays that have not been closed.",
+        "Default Value": "500"
+      },
+      {
+        "Name": "spring.jackson.factory.constraints.read.max-number-length",
+        "Description": "Maximum number length.",
+        "Default Value": "1000"
+      },
+      {
+        "Name": "spring.jackson.factory.constraints.read.max-string-length",
+        "Description": "Maximum string length.",
+        "Default Value": "100000000"
+      },
+      {
+        "Name": "spring.jackson.factory.constraints.read.max-token-count",
+        "Description": "Maximum allowed token count. A value less than or equal to zero indicates that any count is acceptable.",
+        "Default Value": "-1"
+      },
+      {
+        "Name": "spring.jackson.factory.constraints.write.max-nesting-depth",
+        "Description": "Maximum nesting depth. The depth is a count of objects and arrays that have not been closed.",
+        "Default Value": "500"
+      },
+      {
+        "Name": "spring.jackson.find-and-add-modules",
+        "Description": "Whether to find and add modules to the auto-configured JsonMapper.Builder using MapperBuilder.findAndAddModules(ClassLoader).",
+        "Default Value": "true"
+      },
+      {
+        "Name": "spring.jackson.json.read.*",
+        "Description": "Jackson on/off token reader features that are specific to JSON.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.jackson.json.write.*",
+        "Description": "Jackson on/off token writer features that are specific to JSON.",
         "Default Value": ""
       },
       {
@@ -6818,13 +7033,13 @@
         "Default Value": ""
       },
       {
-        "Name": "spring.jackson.parser.*",
-        "Description": "Jackson on/off features for parsers.",
+        "Name": "spring.jackson.property-naming-strategy",
+        "Description": "One of the constants on Jackson\u0027s PropertyNamingStrategies. Can also be a fully-qualified class name of a PropertyNamingStrategy implementation.",
         "Default Value": ""
       },
       {
-        "Name": "spring.jackson.property-naming-strategy",
-        "Description": "One of the constants on Jackson\u0027s PropertyNamingStrategies. Can also be a fully-qualified class name of a PropertyNamingStrategy implementation.",
+        "Name": "spring.jackson.read.*",
+        "Description": "Jackson on/off token reader features common to multiple formats.",
         "Default Value": ""
       },
       {
@@ -6838,9 +7053,104 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.jackson.use-jackson2-defaults",
+        "Description": "Whether to configure Jackson 3 with the same defaults as Spring Boot previously used for Jackson 2.",
+        "Default Value": "false"
+      },
+      {
         "Name": "spring.jackson.visibility.*",
         "Description": "Jackson visibility thresholds that can be used to limit which methods (and fields) are auto-detected.",
         "Default Value": ""
+      },
+      {
+        "Name": "spring.jackson.write.*",
+        "Description": "Jackson on/off token writer features common to multiple formats.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.jackson.xml.read.*",
+        "Description": "Jackson on/off token reader features that are specific to XML.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.jackson.xml.write.*",
+        "Description": "Jackson on/off token writer features that are specific to XML.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.allow-comments",
+        "Description": "Whether to allow parser to accept C/Java-style comments in JSON input.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.allow-special-floating-point-values",
+        "Description": "Whether to remove the JSON specification restriction on special floating-point values such as \u0027NaN\u0027 and \u0027Infinity\u0027 and allow their serialization and deserialization as float literals without quotes.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.allow-structured-map-keys",
+        "Description": "Whether to allow structured objects to be serialized as map keys by changing the serialized form of the map from JSON object (key-value pairs) to flat array like [k1, v1, k2, v2].",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.allow-trailing-comma",
+        "Description": "Whether to allow parser to accept trailing commas in JSON objects and arrays.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.class-discriminator",
+        "Description": "Name of the class descriptor property for polymorphic serialization.",
+        "Default Value": "type"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.class-discriminator-mode",
+        "Description": "Defines which classes and objects should have class discriminator added to the output.",
+        "Default Value": "polymorphic"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.coerce-input-values",
+        "Description": "Whether to coerce incorrect JSON values.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.decode-enums-case-insensitive",
+        "Description": "Whether enum values are decoded in a case-insensitive manner.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.encode-defaults",
+        "Description": "Whether default values of Kotlin properties should be encoded.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.explicit-nulls",
+        "Description": "Whether null values should be encoded for nullable properties and must be present in JSON object during decoding.",
+        "Default Value": "true"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.ignore-unknown-keys",
+        "Description": "Whether encounters of unknown properties in the input JSON should be ignored instead of throwing SerializationException.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.lenient",
+        "Description": "Whether parser should operate in lenient mode, removing the JSON specification restriction (RFC-4627) and being more liberal to malformed input.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.naming-strategy",
+        "Description": "Specifies JsonNamingStrategy that should be used for all properties in classes for serialization and deserialization.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.pretty-print",
+        "Description": "Whether resulting JSON should be pretty-printed.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.kotlinx.serialization.json.use-alternative-names",
+        "Description": "Whether Json instance makes use of JsonNames annotation.",
+        "Default Value": "true"
       }
     ]
   },
@@ -6893,6 +7203,11 @@
         "Default Value": "false"
       },
       {
+        "Name": "spring.mail.ssl.verify-hostname",
+        "Description": "Whether to enable hostname verification.",
+        "Default Value": "true"
+      },
+      {
         "Name": "spring.mail.test-connection",
         "Description": "Whether to test that the mail server is available on startup.",
         "Default Value": "false"
@@ -6922,6 +7237,11 @@
   {
     "name": "RSocket Properties",
     "list": [
+      {
+        "Name": "spring.rsocket.preferred-mapper",
+        "Description": "Preferred JSON and CBOR mapper to use. By default, auto-detected according to the environment. Supported values are \u0027jackson\u0027 and \u0027jackson2\u0027 (deprecated).",
+        "Default Value": "jackson"
+      },
       {
         "Name": "spring.rsocket.server.address",
         "Description": "Network address to which the server should bind.",
@@ -7128,6 +7448,11 @@
         "Default Value": "/userinfo"
       },
       {
+        "Name": "spring.security.oauth2.authorizationserver.endpoint.pushed-authorization-request-uri",
+        "Description": "Authorization Server\u0027s OAuth 2.0 Pushed Authorization Request Endpoint.",
+        "Default Value": "/oauth2/par"
+      },
+      {
         "Name": "spring.security.oauth2.authorizationserver.endpoint.token-introspection-uri",
         "Description": "Authorization Server\u0027s OAuth 2.0 Token Introspection Endpoint.",
         "Default Value": "/oauth2/introspect"
@@ -7170,6 +7495,11 @@
       {
         "Name": "spring.security.oauth2.resourceserver.jwt.authorities-claim-delimiter",
         "Description": "Regex to use for splitting the value of the authorities claim into authorities.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.security.oauth2.resourceserver.jwt.authorities-claim-expressions",
+        "Description": "List of expressions to use to extract authorities from a JWT. Mutually exclusive with \u0027spring.security.oauth2.resourceserver.jwt.authorities-claim-name\u0027 and \u0027spring.security.oauth2.resourceserver.jwt.authorities-claim-delimiter\u0027.",
         "Default Value": ""
       },
       {
@@ -7253,6 +7583,11 @@
         "Default Value": ""
       },
       {
+        "Name": "server.compression.additional-mime-types",
+        "Description": "Comma-separated list of additional MIME types that should be compressed.",
+        "Default Value": "[]"
+      },
+      {
         "Name": "server.compression.enabled",
         "Description": "Whether response compression is enabled.",
         "Default Value": "false"
@@ -7271,41 +7606,6 @@
         "Name": "server.compression.min-response-size",
         "Description": "Minimum \"Content-Length\" value that is required for compression to be performed.",
         "Default Value": "2KB"
-      },
-      {
-        "Name": "server.error.include-binding-errors",
-        "Description": "When to include \"errors\" attribute.",
-        "Default Value": "never"
-      },
-      {
-        "Name": "server.error.include-exception",
-        "Description": "Include the \"exception\" attribute.",
-        "Default Value": "false"
-      },
-      {
-        "Name": "server.error.include-message",
-        "Description": "When to include \"message\" attribute.",
-        "Default Value": "never"
-      },
-      {
-        "Name": "server.error.include-path",
-        "Description": "When to include \"path\" attribute.",
-        "Default Value": "always"
-      },
-      {
-        "Name": "server.error.include-stacktrace",
-        "Description": "When to include the \"trace\" attribute.",
-        "Default Value": "never"
-      },
-      {
-        "Name": "server.error.path",
-        "Description": "Path of the error controller.",
-        "Default Value": "/error"
-      },
-      {
-        "Name": "server.error.whitelabel.enabled",
-        "Description": "Whether to enable the default error page displayed in browsers in case of a server error.",
-        "Default Value": "true"
       },
       {
         "Name": "server.forward-headers-strategy",
@@ -7345,7 +7645,7 @@
       {
         "Name": "server.jetty.accesslog.format",
         "Description": "Log format.",
-        "Default Value": "ncsa"
+        "Default Value": ""
       },
       {
         "Name": "server.jetty.accesslog.ignore-paths",
@@ -7380,7 +7680,7 @@
       {
         "Name": "server.jetty.max-http-response-header-size",
         "Description": "Maximum size of the HTTP response header.",
-        "Default Value": "8KB"
+        "Default Value": "16KB"
       },
       {
         "Name": "server.jetty.threads.acceptors",
@@ -7394,7 +7694,7 @@
       },
       {
         "Name": "server.jetty.threads.max",
-        "Description": "Maximum number of threads. Doesn\u0027t have an effect if virtual threads are enabled.",
+        "Description": "Maximum number of threads.",
         "Default Value": "200"
       },
       {
@@ -7528,31 +7828,6 @@
         "Default Value": ""
       },
       {
-        "Name": "server.servlet.encoding.charset",
-        "Description": "Charset of HTTP requests and responses. Added to the \"Content-Type\" header if not set explicitly.",
-        "Default Value": "UTF-8"
-      },
-      {
-        "Name": "server.servlet.encoding.enabled",
-        "Description": "Whether to enable http encoding support.",
-        "Default Value": "true"
-      },
-      {
-        "Name": "server.servlet.encoding.force",
-        "Description": "Whether to force the encoding to the configured charset on HTTP requests and responses.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.servlet.encoding.force-request",
-        "Description": "Whether to force the encoding to the configured charset on HTTP requests. Defaults to true when \"force\" has not been specified.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.servlet.encoding.force-response",
-        "Description": "Whether to force the encoding to the configured charset on HTTP responses.",
-        "Default Value": ""
-      },
-      {
         "Name": "server.servlet.encoding.mapping.*",
         "Description": "Mapping of locale to charset for response encoding.",
         "Default Value": ""
@@ -7594,7 +7869,7 @@
       },
       {
         "Name": "server.servlet.session.cookie.name",
-        "Description": "Name of the cookie.",
+        "Description": "Name for the cookie.",
         "Default Value": ""
       },
       {
@@ -7885,7 +8160,7 @@
       {
         "Name": "server.tomcat.max-parameter-count",
         "Description": "Maximum number of parameters (GET plus POST) that will be automatically parsed by the container. A value of less than 0 means no limit.",
-        "Default Value": "10000"
+        "Default Value": "1000"
       },
       {
         "Name": "server.tomcat.max-part-count",
@@ -7934,8 +8209,8 @@
       },
       {
         "Name": "server.tomcat.remoteip.internal-proxies",
-        "Description": "Regular expression that matches proxies that are to be trusted.",
-        "Default Value": "10\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|192\\\\.168\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|169\\\\.254\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|127\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|100\\\\.6[4-9]{1}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|100\\\\.[7-9]{1}\\\\d{1}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|100\\\\.1[0-1]{1}\\\\d{1}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|100\\\\.12[0-7]{1}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|172\\\\.1[6-9]{1}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|172\\\\.2[0-9]{1}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|172\\\\.3[0-1]{1}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}|0:0:0:0:0:0:0:1|::1|fe[89ab]\\\\p{XDigit}:.*|f[cd]\\\\p{XDigit}{2}:.*+"
+        "Description": "Internal proxies that are to be trusted. Can be set as a comma separate list of CIDR or as a regular expression.",
+        "Default Value": "192.168.0.0/16, 172.16.0.0/12, 169.254.0.0/16, fc00::/7, 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8, fe80::/10, ::1/128"
       },
       {
         "Name": "server.tomcat.remoteip.port-header",
@@ -7968,9 +8243,14 @@
         "Default Value": "true"
       },
       {
+        "Name": "server.tomcat.resource.cache-max-size",
+        "Description": "Maximum size of the static resource cache.",
+        "Default Value": "10MB"
+      },
+      {
         "Name": "server.tomcat.resource.cache-ttl",
         "Description": "Time-to-live of the static resource cache.",
-        "Default Value": ""
+        "Default Value": "5s"
       },
       {
         "Name": "server.tomcat.threads.max",
@@ -8001,121 +8281,6 @@
         "Name": "server.tomcat.use-relative-redirects",
         "Description": "Whether HTTP 1.1 and later location headers generated by a call to sendRedirect will use relative or absolute redirects.",
         "Default Value": "false"
-      },
-      {
-        "Name": "server.undertow.accesslog.dir",
-        "Description": "Undertow access log directory.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.accesslog.enabled",
-        "Description": "Whether to enable the access log.",
-        "Default Value": "false"
-      },
-      {
-        "Name": "server.undertow.accesslog.pattern",
-        "Description": "Format pattern for access logs.",
-        "Default Value": "common"
-      },
-      {
-        "Name": "server.undertow.accesslog.prefix",
-        "Description": "Log file name prefix.",
-        "Default Value": "access_log."
-      },
-      {
-        "Name": "server.undertow.accesslog.rotate",
-        "Description": "Whether to enable access log rotation.",
-        "Default Value": "true"
-      },
-      {
-        "Name": "server.undertow.accesslog.suffix",
-        "Description": "Log file name suffix.",
-        "Default Value": "log"
-      },
-      {
-        "Name": "server.undertow.always-set-keep-alive",
-        "Description": "Whether the \u0027Connection: keep-alive\u0027 header should be added to all responses, even if not required by the HTTP specification.",
-        "Default Value": "true"
-      },
-      {
-        "Name": "server.undertow.buffer-size",
-        "Description": "Size of each buffer. The default is derived from the maximum amount of memory that is available to the JVM.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.decode-slash",
-        "Description": "Whether encoded slash characters (%2F) should be decoded. Decoding can cause security problems if a front-end proxy does not perform the same decoding. Only enable this if you have a legacy application that requires it. When set, server.undertow.allow-encoded-slash has no effect.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.decode-url",
-        "Description": "Whether the URL should be decoded. When disabled, percent-encoded characters in the URL will be left as-is.",
-        "Default Value": "true"
-      },
-      {
-        "Name": "server.undertow.direct-buffers",
-        "Description": "Whether to allocate buffers outside the Java heap. The default is derived from the maximum amount of memory that is available to the JVM.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.eager-filter-init",
-        "Description": "Whether servlet filters should be initialized on startup.",
-        "Default Value": "true"
-      },
-      {
-        "Name": "server.undertow.max-cookies",
-        "Description": "Maximum number of cookies that are allowed. This limit exists to prevent hash collision based DOS attacks.",
-        "Default Value": "200"
-      },
-      {
-        "Name": "server.undertow.max-headers",
-        "Description": "Maximum number of headers that are allowed. This limit exists to prevent hash collision based DOS attacks.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.max-http-post-size",
-        "Description": "Maximum size of the HTTP post content. When the value is -1, the default, the size is unlimited.",
-        "Default Value": "-1B"
-      },
-      {
-        "Name": "server.undertow.max-parameters",
-        "Description": "Maximum number of query or path parameters that are allowed. This limit exists to prevent hash collision based DOS attacks.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.no-request-timeout",
-        "Description": "Amount of time a connection can sit idle without processing a request, before it is closed by the server.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.options.server.*",
-        "Description": "Server options as defined in io.undertow.UndertowOptions.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.options.socket.*",
-        "Description": "Socket options as defined in org.xnio.Options.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.preserve-path-on-forward",
-        "Description": "Whether to preserve the path of a request when it is forwarded.",
-        "Default Value": "false"
-      },
-      {
-        "Name": "server.undertow.threads.io",
-        "Description": "Number of I/O threads to create for the worker. The default is derived from the number of available processors.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.threads.worker",
-        "Description": "Number of worker threads. The default is 8 times the number of I/O threads.",
-        "Default Value": ""
-      },
-      {
-        "Name": "server.undertow.url-charset",
-        "Description": "Charset used to decode URLs.",
-        "Default Value": "UTF-8"
       }
     ]
   },
@@ -8151,11 +8316,6 @@
         "Name": "spring.freemarker.content-type",
         "Description": "Content-Type value. Only supported with Spring MVC.",
         "Default Value": "text/html"
-      },
-      {
-        "Name": "spring.freemarker.enabled",
-        "Description": "Whether to enable MVC view resolution for this technology.",
-        "Default Value": "true"
       },
       {
         "Name": "spring.freemarker.expose-request-attributes",
@@ -8268,11 +8428,6 @@
         "Default Value": ""
       },
       {
-        "Name": "spring.groovy.template.enabled",
-        "Description": "Whether to enable MVC view resolution for this technology.",
-        "Default Value": "true"
-      },
-      {
         "Name": "spring.groovy.template.expand-empty-elements",
         "Description": "Whether elements without a body should be written expanded (\u003cbr\u003e\u003c/br\u003e) or not (\u003cbr/\u003e).",
         "Default Value": "false"
@@ -8310,7 +8465,7 @@
       {
         "Name": "spring.groovy.template.request-context-attribute",
         "Description": "Name of the RequestContext attribute for all views.",
-        "Default Value": ""
+        "Default Value": "spring"
       },
       {
         "Name": "spring.groovy.template.resource-loader-path",
@@ -8340,11 +8495,6 @@
       {
         "Name": "spring.mustache.check-template-location",
         "Description": "Whether to check that the templates location exists.",
-        "Default Value": "true"
-      },
-      {
-        "Name": "spring.mustache.enabled",
-        "Description": "Whether to enable MVC view resolution for Mustache.",
         "Default Value": "true"
       },
       {
@@ -8426,11 +8576,6 @@
         "Name": "spring.thymeleaf.enable-spring-el-compiler",
         "Description": "Enable the SpringEL compiler in SpringEL expressions.",
         "Default Value": "false"
-      },
-      {
-        "Name": "spring.thymeleaf.enabled",
-        "Description": "Whether to enable Thymeleaf view resolution for Web frameworks.",
-        "Default Value": "true"
       },
       {
         "Name": "spring.thymeleaf.encoding",
@@ -8528,19 +8673,89 @@
         "Default Value": "any"
       },
       {
+        "Name": "spring.test.jsontesters.enabled",
+        "Description": "Whether auto-configuration of JSON testers is enabled.",
+        "Default Value": "true"
+      },
+      {
+        "Name": "spring.test.metrics.export",
+        "Description": "Whether metrics export should be auto-configured in tests.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.test.mockmvc.add-filters",
+        "Description": "Whether to add servlet filters.",
+        "Default Value": "true"
+      },
+      {
+        "Name": "spring.test.mockmvc.htmlunit.url",
+        "Description": "URL to use when HtmlUnit expands relative paths.",
+        "Default Value": "http://localhost"
+      },
+      {
+        "Name": "spring.test.mockmvc.htmlunit.webclient.enabled",
+        "Description": "Whether HTMLUnit\u0027s WebClient should be auto-configured when it\u0027s on the classpath.",
+        "Default Value": "true"
+      },
+      {
+        "Name": "spring.test.mockmvc.htmlunit.webdriver.enabled",
+        "Description": "Whether Selenium\u0027s WebDriver should be auto-configured when it\u0027s on the classpath.",
+        "Default Value": "true"
+      },
+      {
         "Name": "spring.test.mockmvc.print",
         "Description": "MVC Print option.",
         "Default Value": "default"
       },
       {
-        "Name": "spring.test.observability.auto-configure",
-        "Description": "Whether observability should be auto-configured in tests.",
-        "Default Value": "false"
+        "Name": "spring.test.mockmvc.print-only-on-failure",
+        "Description": "Whether to only print failed exchanges.",
+        "Default Value": "true"
       },
       {
         "Name": "spring.test.print-condition-evaluation-report",
         "Description": "Whether the condition evaluation report should be printed when the ApplicationContext fails to start.",
         "Default Value": "true"
+      },
+      {
+        "Name": "spring.test.restclient.mockrestserviceserver.enabled",
+        "Description": "Whether a MockRestServiceServer should be auto-configured.",
+        "Default Value": "true"
+      },
+      {
+        "Name": "spring.test.restdocs.uri-host",
+        "Description": "The URI host to use.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.test.restdocs.uri-port",
+        "Description": "The URI port to use.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.test.restdocs.uri-scheme",
+        "Description": "The URI scheme for to use (for example http).",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.test.tracing.export",
+        "Description": "Whether tracing export should be auto-configured in tests.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.test.webservice.client.mockserver.enabled",
+        "Description": "Whether a MockWebServiceServer should be auto-configured.",
+        "Default Value": "true"
+      },
+      {
+        "Name": "spring.test.webservice.client.register-web-service-template",
+        "Description": "Whether a WebServiceTemplate bean should be registered.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.test.webtestclient.timeout",
+        "Description": "Maximum amount of time to wait for responses.",
+        "Default Value": "5s"
       }
     ]
   },
@@ -8633,6 +8848,11 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.graphql.rsocket.preferred-json-mapper",
+        "Description": "Preferred JSON mapper to use. By default, auto-detected according to the environment. Supported values are \u0027jackson\u0027 and \u0027jackson2\u0027 (deprecated).",
+        "Default Value": "jackson"
+      },
+      {
         "Name": "spring.graphql.schema.additional-files",
         "Description": "Locations of additional, individual schema files to parse.",
         "Default Value": "[]"
@@ -8683,27 +8903,37 @@
         "Default Value": "true"
       },
       {
-        "Name": "spring.http.client.connect-timeout",
+        "Name": "spring.http.clients.connect-timeout",
         "Description": "Default connect timeout for a client HTTP request.",
         "Default Value": ""
       },
       {
-        "Name": "spring.http.client.factory",
+        "Name": "spring.http.clients.cookie-handling",
+        "Description": "Handling for HTTP cookies.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.http.clients.imperative.factory",
         "Description": "Default factory used for a client HTTP request.",
         "Default Value": ""
       },
       {
-        "Name": "spring.http.client.read-timeout",
+        "Name": "spring.http.clients.reactive.connector",
+        "Description": "Default connector used for a client HTTP request.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.http.clients.read-timeout",
         "Description": "Default read timeout for a client HTTP request.",
         "Default Value": ""
       },
       {
-        "Name": "spring.http.client.redirects",
+        "Name": "spring.http.clients.redirects",
         "Description": "Handling for HTTP redirects.",
         "Default Value": ""
       },
       {
-        "Name": "spring.http.client.ssl.bundle",
+        "Name": "spring.http.clients.ssl.bundle",
         "Description": "SSL bundle to use.",
         "Default Value": ""
       },
@@ -8718,33 +8948,23 @@
         "Default Value": ""
       },
       {
-        "Name": "spring.http.converters.preferred-json-mapper",
-        "Description": "Preferred JSON mapper to use for HTTP message conversion. By default, auto-detected according to the environment. Supported values are \u0027jackson\u0027, \u0027gson\u0027, and \u0027jsonb\u0027. When other json mapping libraries (such as kotlinx.serialization) are present, use a custom HttpMessageConverters bean to control the preferred mapper.",
+        "Name": "spring.http.codecs.preferred-json-mapper",
+        "Description": "Preferred JSON mapper to use for HTTP encoding and decoding. By default, auto-detected according to the environment. Supported values are \u0027jackson\u0027 and \u0027jackson2\u0027 (deprecated).",
         "Default Value": "jackson"
       },
       {
-        "Name": "spring.http.reactiveclient.connect-timeout",
-        "Description": "Default connect timeout for a client HTTP request.",
-        "Default Value": ""
+        "Name": "spring.http.converters.preferred-json-mapper",
+        "Description": "Preferred JSON mapper to use for HTTP message conversion. By default, auto-detected according to the environment. Supported values are \u0027jackson\u0027, \u0027jackson2\u0027 (deprecated), \u0027gson\u0027 and \u0027jsonb\u0027. When other JSON mapping libraries are present, use a custom HttpMessageConverters bean to control the preferred mapper.",
+        "Default Value": "jackson"
       },
       {
-        "Name": "spring.http.reactiveclient.connector",
-        "Description": "Default connector used for a client HTTP request.",
-        "Default Value": ""
+        "Name": "spring.http.converters.string-encoding-charset",
+        "Description": "Charset to use for String conversion.",
+        "Default Value": "UTF-8"
       },
       {
-        "Name": "spring.http.reactiveclient.read-timeout",
-        "Description": "Default read timeout for a client HTTP request.",
-        "Default Value": ""
-      },
-      {
-        "Name": "spring.http.reactiveclient.redirects",
-        "Description": "Handling for HTTP redirects.",
-        "Default Value": ""
-      },
-      {
-        "Name": "spring.http.reactiveclient.ssl.bundle",
-        "Description": "SSL bundle to use.",
+        "Name": "spring.http.serviceclient.*",
+        "Description": "HTTP Service Client definitions",
         "Default Value": ""
       },
       {
@@ -8771,6 +8991,46 @@
         "Name": "spring.jersey.type",
         "Description": "Jersey integration type.",
         "Default Value": "servlet"
+      },
+      {
+        "Name": "spring.mvc.apiversion.default",
+        "Description": "Default version that should be used for each request.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mvc.apiversion.detect-supported",
+        "Description": "Whether supported versions should be detected from controllers.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mvc.apiversion.required",
+        "Description": "Whether the API version is required with each request.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mvc.apiversion.supported",
+        "Description": "Supported versions.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mvc.apiversion.use.header",
+        "Description": "Use the HTTP header with the given name to obtain the version.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mvc.apiversion.use.media-type-parameter.*",
+        "Description": "Use the media type parameter with the given name to obtain the version.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mvc.apiversion.use.path-segment",
+        "Description": "Use the path segment at the given index to obtain the version.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.mvc.apiversion.use.query-parameter",
+        "Description": "Use the query parameter with the given name to obtain the version.",
+        "Default Value": ""
       },
       {
         "Name": "spring.mvc.async.request-timeout",
@@ -8898,6 +9158,31 @@
         "Default Value": ""
       },
       {
+        "Name": "spring.servlet.encoding.charset",
+        "Description": "Charset of HTTP requests and responses. Added to the \"Content-Type\" header if not set explicitly.",
+        "Default Value": "UTF-8"
+      },
+      {
+        "Name": "spring.servlet.encoding.enabled",
+        "Description": "Whether to enable Servlet HTTP encoding support.",
+        "Default Value": "true"
+      },
+      {
+        "Name": "spring.servlet.encoding.force",
+        "Description": "Whether to force the encoding to the configured charset on HTTP requests and responses.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.servlet.encoding.force-request",
+        "Description": "Whether to force the encoding to the configured charset on HTTP requests. Defaults to true when \"force\" has not been specified.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.servlet.encoding.force-response",
+        "Description": "Whether to force the encoding to the configured charset on HTTP responses.",
+        "Default Value": ""
+      },
+      {
         "Name": "spring.servlet.multipart.enabled",
         "Description": "Whether to enable support of multipart uploads.",
         "Default Value": "true"
@@ -8933,17 +9218,32 @@
         "Default Value": "false"
       },
       {
-        "Name": "spring.session.hazelcast.flush-mode",
-        "Description": "Sessions flush mode. Determines when session changes are written to the session store.",
+        "Name": "spring.session.data.redis.cleanup-cron",
+        "Description": "Cron expression for expired session cleanup job. Only supported when repository-type is set to indexed. Not supported with a reactive session repository.",
+        "Default Value": "0 * * * * *"
+      },
+      {
+        "Name": "spring.session.data.redis.configure-action",
+        "Description": "The configure action to apply when no user-defined ConfigureRedisAction or ConfigureReactiveRedisAction bean is present.",
+        "Default Value": "notify-keyspace-events"
+      },
+      {
+        "Name": "spring.session.data.redis.flush-mode",
+        "Description": "Sessions flush mode. Determines when session changes are written to the session store. Not supported with a reactive session repository.",
         "Default Value": "on-save"
       },
       {
-        "Name": "spring.session.hazelcast.map-name",
-        "Description": "Name of the map used to store sessions.",
-        "Default Value": "spring:session:sessions"
+        "Name": "spring.session.data.redis.namespace",
+        "Description": "Namespace for keys used to store sessions.",
+        "Default Value": "spring:session"
       },
       {
-        "Name": "spring.session.hazelcast.save-mode",
+        "Name": "spring.session.data.redis.repository-type",
+        "Description": "Type of Redis session repository to configure.",
+        "Default Value": "default"
+      },
+      {
+        "Name": "spring.session.data.redis.save-mode",
         "Description": "Sessions save mode. Determines how session changes are tracked and saved to the session store.",
         "Default Value": "on-set-attribute"
       },
@@ -8951,6 +9251,11 @@
         "Name": "spring.session.jdbc.cleanup-cron",
         "Description": "Cron expression for expired session cleanup job.",
         "Default Value": "0 * * * * *"
+      },
+      {
+        "Name": "spring.session.jdbc.continue-on-error",
+        "Description": "Whether initialization should continue when an error occurs when applying a schema script.",
+        "Default Value": "true"
       },
       {
         "Name": "spring.session.jdbc.flush-mode",
@@ -8975,47 +9280,12 @@
       {
         "Name": "spring.session.jdbc.schema",
         "Description": "Path to the SQL file to use to initialize the database schema.",
-        "Default Value": "classpath:org/springframework/session/jdbc/schema-@@platform@@.sql"
+        "Default Value": ""
       },
       {
         "Name": "spring.session.jdbc.table-name",
         "Description": "Name of the database table used to store sessions.",
         "Default Value": "SPRING_SESSION"
-      },
-      {
-        "Name": "spring.session.mongodb.collection-name",
-        "Description": "Collection name used to store sessions.",
-        "Default Value": "sessions"
-      },
-      {
-        "Name": "spring.session.redis.cleanup-cron",
-        "Description": "Cron expression for expired session cleanup job. Only supported when repository-type is set to indexed. Not supported with a reactive session repository.",
-        "Default Value": "0 * * * * *"
-      },
-      {
-        "Name": "spring.session.redis.configure-action",
-        "Description": "The configure action to apply when no user-defined ConfigureRedisAction or ConfigureReactiveRedisAction bean is present.",
-        "Default Value": "notify-keyspace-events"
-      },
-      {
-        "Name": "spring.session.redis.flush-mode",
-        "Description": "Sessions flush mode. Determines when session changes are written to the session store. Not supported with a reactive session repository.",
-        "Default Value": "on-save"
-      },
-      {
-        "Name": "spring.session.redis.namespace",
-        "Description": "Namespace for keys used to store sessions.",
-        "Default Value": "spring:session"
-      },
-      {
-        "Name": "spring.session.redis.repository-type",
-        "Description": "Type of Redis session repository to configure.",
-        "Default Value": "default"
-      },
-      {
-        "Name": "spring.session.redis.save-mode",
-        "Description": "Sessions save mode. Determines how session changes are tracked and saved to the session store.",
-        "Default Value": "on-set-attribute"
       },
       {
         "Name": "spring.session.servlet.filter-dispatcher-types",
@@ -9031,6 +9301,41 @@
         "Name": "spring.session.timeout",
         "Description": "Session timeout. If a duration suffix is not specified, seconds will be used.",
         "Default Value": ""
+      },
+      {
+        "Name": "spring.web.error.include-binding-errors",
+        "Description": "When to include \"errors\" attribute.",
+        "Default Value": "never"
+      },
+      {
+        "Name": "spring.web.error.include-exception",
+        "Description": "Include the \"exception\" attribute.",
+        "Default Value": "false"
+      },
+      {
+        "Name": "spring.web.error.include-message",
+        "Description": "When to include \"message\" attribute.",
+        "Default Value": "never"
+      },
+      {
+        "Name": "spring.web.error.include-path",
+        "Description": "When to include \"path\" attribute.",
+        "Default Value": "always"
+      },
+      {
+        "Name": "spring.web.error.include-stacktrace",
+        "Description": "When to include the \"trace\" attribute.",
+        "Default Value": "never"
+      },
+      {
+        "Name": "spring.web.error.path",
+        "Description": "Path of the error controller.",
+        "Default Value": "/error"
+      },
+      {
+        "Name": "spring.web.error.whitelabel.enabled",
+        "Description": "Whether to enable the default error page displayed in browsers in case of a server error.",
+        "Default Value": "true"
       },
       {
         "Name": "spring.web.locale",
@@ -9158,8 +9463,53 @@
         "Default Value": "[classpath:/META-INF/resources/, classpath:/resources/, classpath:/static/, classpath:/public/]"
       },
       {
+        "Name": "spring.webflux.apiversion.default",
+        "Description": "Default version that should be used for each request.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.webflux.apiversion.detect-supported",
+        "Description": "Whether supported versions should be detected from controllers.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.webflux.apiversion.required",
+        "Description": "Whether the API version is required with each request.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.webflux.apiversion.supported",
+        "Description": "Supported versions.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.webflux.apiversion.use.header",
+        "Description": "Use the HTTP header with the given name to obtain the version.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.webflux.apiversion.use.media-type-parameter.*",
+        "Description": "Use the media type parameter with the given name to obtain the version.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.webflux.apiversion.use.path-segment",
+        "Description": "Use the path segment at the given index to obtain the version.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.webflux.apiversion.use.query-parameter",
+        "Description": "Use the query parameter with the given name to obtain the version.",
+        "Default Value": ""
+      },
+      {
         "Name": "spring.webflux.base-path",
         "Description": "Base path for all web handlers.",
+        "Default Value": ""
+      },
+      {
+        "Name": "spring.webflux.default-html-escape",
+        "Description": "Whether default HTML escaping is enabled for the web application.",
         "Default Value": ""
       },
       {
@@ -9226,6 +9576,11 @@
         "Name": "spring.webflux.webjars-path-pattern",
         "Description": "Path pattern used for WebJar assets.",
         "Default Value": "/webjars/**"
+      },
+      {
+        "Name": "spring.websocket.messaging.preferred-json-mapper",
+        "Description": "Preferred JSON mapper to use for WebSocket messaging. By default, auto-detected according to the environment. Supported values are \u0027jackson\u0027 and \u0027jackson2\u0027 (deprecated).",
+        "Default Value": "jackson"
       }
     ]
   }

@@ -972,7 +972,7 @@
   {
     "Name": "management.httpexchanges.recording.include",
     "Description": "Items to be included in the exchange recording. Defaults to request headers (excluding Authorization and Cookie), response headers (excluding Set-Cookie), and time taken.",
-    "Default Value": "[request-headers, response-headers, errors]"
+    "Default Value": "[time-taken, request-headers, response-headers]"
   },
   {
     "Name": "management.humio.metrics.export.api-token",
@@ -3433,6 +3433,11 @@
     "Name": "spring.cassandra.ssl.enabled",
     "Description": "Whether to enable SSL support.",
     "Default Value": ""
+  },
+  {
+    "Name": "spring.cassandra.ssl.verify-hostname",
+    "Description": "Whether to perform hostname verification.",
+    "Default Value": "true"
   },
   {
     "Name": "spring.cassandra.username",
@@ -6838,6 +6843,11 @@
     "Name": "spring.mail.ssl.enabled",
     "Description": "Whether to enable SSL support. If enabled, \u0027mail.(protocol).ssl.enable\u0027 property is set to \u0027true\u0027.",
     "Default Value": "false"
+  },
+  {
+    "Name": "spring.mail.ssl.verify-hostname",
+    "Description": "Whether to enable hostname verification.",
+    "Default Value": "true"
   },
   {
     "Name": "spring.mail.test-connection",
