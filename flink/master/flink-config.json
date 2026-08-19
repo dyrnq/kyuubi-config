@@ -240,6 +240,12 @@
     "Description": "Option whether to discard a checkpoint\u0027s states in parallel using the ExecutorService passed into the cleaner"
   },
   {
+    "Key": "execution.checkpointing.during-recovery.enabled",
+    "Default": "false",
+    "Type": "Boolean",
+    "Description": "Whether to enable checkpointing during recovery from an unaligned checkpoint. When enabled, the job can take checkpoints while still recovering channel state (inflight data) from a previous unaligned checkpoint. This avoids the need to wait for full recovery before the first checkpoint can be triggered, which reduces the window of vulnerability to failures during recovery. This option requires execution.checkpointing.unaligned.recover-output-on-downstream.enabled to be enabled. It does not require unaligned checkpoints to be currently enabled, because a job may restore from an unaligned checkpoint while having unaligned checkpoints disabled for the new execution."
+  },
+  {
     "Key": "execution.checkpointing.incremental",
     "Default": "false",
     "Type": "Boolean",
@@ -264,6 +270,12 @@
     "Description": "The maximum number of completed checkpoints to retain."
   },
   {
+    "Key": "execution.checkpointing.unaligned.recover-output-on-downstream.enabled",
+    "Default": "false",
+    "Type": "Boolean",
+    "Description": "Whether recovering output buffers of upstream task on downstream task directly when job restores from the unaligned checkpoint."
+  },
+  {
     "Key": "high-availability.type",
     "Default": "\"NONE\"",
     "Type": "String",
@@ -282,16 +294,22 @@
     "Description": "File system path (URI) where Flink persists metadata in high-availability setups."
   },
   {
-    "Key": "job-result-store.delete-on-commit",
-    "Default": "true",
-    "Type": "Boolean",
-    "Description": "Determines whether job results should be automatically removed from the underlying job result store when the corresponding entity transitions into a clean state. If false, the cleaned job results are, instead, marked as clean to indicate their state. In this case, Flink no longer has ownership and the resources need to be cleaned up by the user."
-  },
-  {
     "Key": "job-result-store.storage-path",
     "Default": "(none)",
     "Type": "String",
     "Description": "Defines where job results should be stored. This should be an underlying file-system that provides read-after-write consistency. By default, this is {high-availability.storageDir}/job-result-store/{high-availability.cluster-id}."
+  },
+  {
+    "Key": "application-result-store.delete-on-commit",
+    "Default": "true",
+    "Type": "Boolean",
+    "Description": "Determines whether application results should be automatically removed from the underlying application result store when the corresponding entity transitions into a clean state. If false, the cleaned application results are, instead, marked as clean to indicate their state. In this case, Flink no longer has ownership and the resources need to be cleaned up by the user."
+  },
+  {
+    "Key": "application-result-store.storage-path",
+    "Default": "(none)",
+    "Type": "String",
+    "Description": "Defines where application results should be stored. This should be an underlying file-system that provides read-after-write consistency. By default, this is {high-availability.storageDir}/application-result-store/{high-availability.cluster-id}."
   },
   {
     "Key": "high-availability.zookeeper.path.root",
@@ -487,7 +505,7 @@
   },
   {
     "Key": "security.ssl.algorithms",
-    "Default": "\"TLS_RSA_WITH_AES_128_CBC_SHA\"",
+    "Default": "\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\"",
     "Type": "String",
     "Description": "The comma separated list of standard SSL algorithms to be supported. Read more here"
   },
@@ -612,10 +630,10 @@
     "Description": "The type of the truststore for Flink\u0027s external REST endpoints."
   },
   {
-    "Key": "security.ssl.verify-hostname",
-    "Default": "true",
+    "Key": "security.ssl.rest.verify-hostname",
+    "Default": "false",
     "Type": "Boolean",
-    "Description": "Flag to enable peer’s hostname verification during ssl handshake."
+    "Description": "Whether to verify the REST server\u0027s hostname against its SSL certificate."
   },
   {
     "Key": "security.delegation.tokens.enabled",
@@ -624,10 +642,16 @@
     "Description": "Indicates whether to start delegation tokens system for external services."
   },
   {
-    "Key": "security.delegation.tokens.renewal.retry.backoff",
-    "Default": "1 h",
+    "Key": "security.delegation.tokens.renewal.retry.initial.backoff",
+    "Default": "10 s",
     "Type": "Duration",
-    "Description": "The time period how long to wait before retrying to obtain new delegation tokens after a failure."
+    "Description": "Initial backoff time when retrying to obtain delegation tokens after a failure. Doubles on each subsequent failure up to security.delegation.tokens.renewal.retry.max.backoff."
+  },
+  {
+    "Key": "security.delegation.tokens.renewal.retry.max.backoff",
+    "Default": "5 min",
+    "Type": "Duration",
+    "Description": "Maximum backoff time between retries when obtaining delegation tokens fails. Retry delays start at security.delegation.tokens.renewal.retry.initial.backoff and double on each failure up to this cap."
   },
   {
     "Key": "security.delegation.tokens.renewal.time-ratio",
@@ -1108,6 +1132,18 @@
     "Default": "\"default\"",
     "Type": "String",
     "Description": "The namespace that will be used for running the jobmanager and taskmanager pods."
+  },
+  {
+    "Key": "kubernetes.persistent-volume-claim-read-only",
+    "Default": "false",
+    "Type": "Boolean",
+    "Description": "Whether to mount PersistentVolumeClaims (PVCs) as read-only. When set to true, all PVCs configured via \u0027kubernetes.persistent-volume-claims\u0027 will be mounted as read-only. This is useful for shared data that should not be modified by Flink, such as reference datasets or pre-trained models. Note: This setting applies globally to all configured PVCs."
+  },
+  {
+    "Key": "kubernetes.persistent-volume-claims",
+    "Default": "(none)",
+    "Type": "Map",
+    "Description": "The user-specified PersistentVolumeClaims (PVCs) that will be mounted into Flink containers. The value should be in the form of pvc-name:/mount/path. Multiple PVCs can be specified, for example: checkpoint-pvc:/opt/flink/checkpoints,data-pvc:/opt/flink/data. The PVCs must exist in the same namespace as the Flink cluster before deployment. For HA setups with multiple JobManagers or TaskManagers accessing the same storage, use PVCs with ReadWriteMany (RWX) or ReadOnlyMany (ROX) access modes."
   },
   {
     "Key": "kubernetes.pod-template-file.default",
@@ -1968,6 +2004,12 @@
     "Description": "Monitor the total size (bytes) of all SST files of all versions. WARNING: may slow down online queries if there are too many files."
   },
   {
+    "Key": "traces.checkpoint.span-detail-level",
+    "Default": "SPAN_PER_CHECKPOINT",
+    "Type": "Enum",
+    "Description": "Detail level for reporting checkpoint spans. Possible values: \u0027SPAN_PER_CHECKPOINT\u0027 (default): Single span per checkpoint. Aggregated sum/max for sub-metrics from all tasks and subtasks per checkpoint. \u0027SPAN_PER_CHECKPOINT_WITH_TASKS\u0027: Single span per checkpoint. Same as \u0027SPAN_PER_CHECKPOINT\u0027, plus arrays of aggregated values per task. \u0027CHILDREN_SPANS_PER_TASK\u0027: Same as \u0027SPAN_PER_CHECKPOINT\u0027 plus children spans per each task. Each task span with aggregated sum/max sub-metrics from subtasks. \u0027CHILDREN_SPANS_PER_SUBTASK\u0027: Same as \u0027CHILDREN_SPANS_PER_TASK\u0027 plus children spans per each subtask. Child spans for tasks and grand-child spans for subtasks. Possible values: \"SPAN_PER_CHECKPOINT\" \"SPAN_PER_CHECKPOINT_WITH_TASKS\" \"CHILDREN_SPANS_PER_TASK\" \"CHILDREN_SPANS_PER_SUBTASK\""
+  },
+  {
     "Key": "traces.reporter.\u003cname\u003e.\u003cparameter\u003e",
     "Default": "(none)",
     "Type": "String",
@@ -2016,10 +2058,16 @@
     "Description": "An optional list of trace reporter names. If configured, only reporters whose name matches any of the names in the list will be started. Otherwise, all reporters that could be found in the configuration will be started."
   },
   {
+    "Key": "historyserver.archive.clean-expired-applications",
+    "Default": "false",
+    "Type": "Boolean",
+    "Description": "Whether HistoryServer should cleanup applications that are no longer present in the archive directory defined by historyserver.archive.fs.dir."
+  },
+  {
     "Key": "historyserver.archive.clean-expired-jobs",
     "Default": "false",
     "Type": "Boolean",
-    "Description": "Whether HistoryServer should cleanup jobs that are no longer present `historyserver.archive.fs.dir`."
+    "Description": "Whether HistoryServer should cleanup jobs that are no longer present in the archive directory defined by historyserver.archive.fs.dir. Note: This option applies only to legacy job archives created before the introduction of application archiving (FLINK-38761)."
   },
   {
     "Key": "historyserver.archive.fs.dir",
@@ -2034,10 +2082,46 @@
     "Description": "Interval for refreshing the archived job directories."
   },
   {
+    "Key": "historyserver.archive.load.mode",
+    "Default": "EAGER",
+    "Type": "Enum",
+    "Description": "The mode that HistoryServer loads archives. Possible values: \"EAGER\" \"LAZY\""
+  },
+  {
+    "Key": "historyserver.archive.retained-applications",
+    "Default": "-1",
+    "Type": "Integer",
+    "Description": "The maximum number of applications to retain in each archive directory defined by historyserver.archive.fs.dir. This option works together with the TTL (see historyserver.archive.retained-ttl). Archived entities will be removed if their TTL has expired or the retention count limit has been reached. If set to -1 (default), there is no limit to the number of archives. If set to 0 or less than -1, HistoryServer will throw an IllegalConfigurationException. Note, when there are multiple history server instances, two recommended approaches when using this option are: Specify the option in only one HistoryServer instance to avoid errors caused by multiple instances simultaneously cleaning up remote files, Or you can keep the value of this configuration consistent across them."
+  },
+  {
     "Key": "historyserver.archive.retained-jobs",
     "Default": "-1",
     "Type": "Integer",
-    "Description": "The maximum number of jobs to retain in each archive directory defined by `historyserver.archive.fs.dir`. If set to `-1`(default), there is no limit to the number of archives. If set to `0` or less than `-1` HistoryServer will throw an IllegalConfigurationException."
+    "Description": "The maximum number of jobs to retain in each archive directory defined by historyserver.archive.fs.dir. If the option is not specified as a positive number without specifying historyserver.archive.retained-ttl, all of the jobs archives will be retained. If the option is specified as a positive number without specifying a value of historyserver.archive.retained-ttl, the jobs archive whose order index based modification time is equals to or less than the value will be retained. If this option is specified as a positive number together with the specified historyserver.archive.retained-ttl option, the job archive will be removed if its TTL has expired or the retained job count has been reached. If set to 0 or less than -1, HistoryServer will throw an IllegalConfigurationException. Note, when there are multiple history server instances, two recommended approaches when using this option are: Specify the option in only one HistoryServer instance to avoid errors caused by multiple instances simultaneously cleaning up remote files, Or you can keep the value of this configuration consistent across them. Note: This option applies only to legacy job archives created before the introduction of application archiving (FLINK-38761)."
+  },
+  {
+    "Key": "historyserver.archive.retained-ttl",
+    "Default": "(none)",
+    "Type": "Duration",
+    "Description": "The time-to-live duration to retain the archived entities (jobs and applications) in each archive directory defined by historyserver.archive.fs.dir. This option works together with the retention count limits (see historyserver.archive.retained-applications and historyserver.archive.retained-jobs). Archived entities will be removed if their TTL has expired or the retention count limit has been reached. If set to equal to or less than 0 milliseconds, HistoryServer will throw an IllegalConfigurationException. Note, when there are multiple history server instances, two recommended approaches when using this option are: Specify the option in only one HistoryServer instance to avoid errors caused by multiple instances simultaneously cleaning up remote files, Or you can keep the value of this configuration consistent across them."
+  },
+  {
+    "Key": "historyserver.archive.storage.type",
+    "Default": "FILE",
+    "Type": "Enum",
+    "Description": "The type of archive storage. Possible values: \"FILE\" \"ROCKSDB\""
+  },
+  {
+    "Key": "historyserver.lazy.fetch.executor.common.pool-size",
+    "Default": "4",
+    "Type": "Integer",
+    "Description": "The size of the common pool for archive fetching."
+  },
+  {
+    "Key": "historyserver.lazy.fetch.executor.individual.pool-size",
+    "Default": "4",
+    "Type": "Integer",
+    "Description": "The size of the individual pool for archive fetching."
   },
   {
     "Key": "historyserver.log.jobmanager.url-pattern",
@@ -2172,16 +2256,16 @@
     "Description": "If the job is submitted in attached mode, perform a best-effort cluster shutdown when the CLI is terminated abruptly, e.g., in response to a user interrupt, such as typing Ctrl + C."
   },
   {
-    "Key": "execution.submit-failed-job-on-application-error",
-    "Default": "false",
-    "Type": "Boolean",
-    "Description": "If a failed job should be submitted (in the application mode) when there is an error in the application driver before an actual job submission. This is intended for providing a clean way of reporting failures back to the user and is especially useful in combination with \u0027execution.shutdown-on-application-finish\u0027. This option only works when the single job submission is enforced (\u0027high-availability.type\u0027 is enabled). Please note that this is an experimental option and may be changed in the future."
-  },
-  {
     "Key": "execution.target",
     "Default": "(none)",
     "Type": "String",
     "Description": "The deployment target for the execution. This can take one of the following values when calling bin/flink run: remote local yarn-application yarn-session kubernetes-application kubernetes-session"
+  },
+  {
+    "Key": "execution.terminate-application-on-any-job-terminated-exceptionally",
+    "Default": "true",
+    "Type": "Boolean",
+    "Description": "When it is set to true, the application will complete exceptionally if any job fails or is canceled. When it is set to false, the application will finish after all jobs reach terminal states."
   },
   {
     "Key": "execution.batch-shuffle-mode",
@@ -2352,6 +2436,12 @@
     "Description": "If watermark alignment is used, sources with multiple splits will attempt to pause/resume split readers to avoid watermark drift of source splits. However, if split readers don\u0027t support pause/resume, an UnsupportedOperationException will be thrown when there is an attempt to pause/resume. To allow use of split readers that don\u0027t support pause/resume and, hence, to allow unaligned splits while still using watermark alignment, set this parameter to true. The default value is false. Note: This parameter may be removed in future releases."
   },
   {
+    "Key": "pipeline.watermark-alignment.buffer-size",
+    "Default": "3",
+    "Type": "Integer",
+    "Description": "Controls size of the ring buffer used to smooth out watermark alignment due to the inherent latency of the alignment process. Allowed watermarks are announced at the updateInterval and this means they are often out of date after the round trip, which means that watermark alignment might be pausing splits too much using this outdated information. To address this problem, when pausing consumption of records, max allowed watermark is not checked against the latest value of the watermark in any given split/source, but against the oldest value in the ring buffer, that is updated at every updateInterval. This is the config option that controls the size of the ring buffer. The default buffer size is 3. Buffer size of 1 can result in under utilised job\u0027s resources when processing backlog of records. Size of the buffer de facto delays the application of the watermark alignment process by that many updateIntervals. With the default size 3, splits can produce arbitrary amount of records for the duration of 3 * updateInterval before watermark alignment might pause them. You can set the watermarkBufferSize to 0 to restore pre Flink 2.3 behaviour with sampling disabled and always using the latest watermark. The default value of 3 has been chosen to cover the round trip delay of watermark alignment that is equal to 2 updateIntervals plus one more to cover for network/GC or other hiccups."
+  },
+  {
     "Key": "execution.checkpointing.aligned-checkpoint-timeout",
     "Default": "0 ms",
     "Type": "Duration",
@@ -2386,6 +2476,12 @@
     "Default": "(none)",
     "Type": "String",
     "Description": "The default directory used for storing the data files and meta data of checkpoints in a Flink supported filesystem. The storage path must be accessible from all participating processes/nodes(i.e. all TaskManagers and JobManagers). If the \u0027execution.checkpointing.storage\u0027 is set to \u0027jobmanager\u0027, only the meta data of checkpoints will be stored in this directory."
+  },
+  {
+    "Key": "execution.checkpointing.during-recovery.enabled",
+    "Default": "false",
+    "Type": "Boolean",
+    "Description": "Whether to enable checkpointing during recovery from an unaligned checkpoint. When enabled, the job can take checkpoints while still recovering channel state (inflight data) from a previous unaligned checkpoint. This avoids the need to wait for full recovery before the first checkpoint can be triggered, which reduces the window of vulnerability to failures during recovery. This option requires execution.checkpointing.unaligned.recover-output-on-downstream.enabled to be enabled. It does not require unaligned checkpoints to be currently enabled, because a job may restore from an unaligned checkpoint while having unaligned checkpoints disabled for the new execution."
   },
   {
     "Key": "execution.checkpointing.externalized-checkpoint-retention",
@@ -2490,6 +2586,12 @@
     "Description": "The checkpoint storage implementation to be used to checkpoint state. The implementation can be specified either via their shortcut name, or via the class name of a CheckpointStorageFactory. If a factory is specified it is instantiated via its zero argument constructor and its CheckpointStorageFactory#createFromConfig(ReadableConfig, ClassLoader) method is called. Recognized shortcut names are \u0027jobmanager\u0027 and \u0027filesystem\u0027. \u0027execution.checkpointing.storage\u0027 and \u0027execution.checkpointing.dir\u0027 are usually combined to configure the checkpoint location. By default, the checkpoint meta data and actual program state will be stored in the JobManager\u0027s memory directly. When \u0027execution.checkpointing.storage\u0027 is set to \u0027jobmanager\u0027, if \u0027execution.checkpointing.dir\u0027 is configured, the meta data of checkpoints will be persisted to the path specified by \u0027execution.checkpointing.dir\u0027. Otherwise, the meta data will be stored in the JobManager\u0027s memory. When \u0027execution.checkpointing.storage\u0027 is set to \u0027filesystem\u0027, a valid path must be configured to \u0027execution.checkpointing.dir\u0027, and the checkpoint meta data and actual program state will both be persisted to the path."
   },
   {
+    "Key": "execution.checkpointing.sync-phase-timeout",
+    "Default": "0 ms",
+    "Type": "Duration",
+    "Description": "A timeout for the synchronous phase of a checkpoint, after which a task cancellation is triggered. If the task thread is merely slow, the task will restart and continue. If a true thread blockage is encountered, (e.g. by a blocking native call), a fatal error will be thrown after the task.cancellation.timeoutand trigger a TM restart to address the blockage. Defaults to 0 (disabled)."
+  },
+  {
     "Key": "execution.checkpointing.timeout",
     "Default": "10 min",
     "Type": "Duration",
@@ -2514,6 +2616,12 @@
     "Description": "Forces unaligned checkpoints, particularly allowing them for iterative jobs."
   },
   {
+    "Key": "execution.checkpointing.unaligned.interruptible-timers.emit-intermediate-watermarks",
+    "Default": "true",
+    "Type": "Boolean",
+    "Description": "When unaligned checkpoints with interruptible timers are enabled (see \u0027execution.checkpointing.unaligned.interruptible-timers.enabled\u0027) and firing the timers due for a watermark advance is interrupted before completing, an intermediate watermark reflecting the progress made so far is emitted downstream, at most as often as configured by \u0027pipeline.auto-watermark-interval\u0027. This keeps downstream operators from stalling on watermark progress during a long-running catch-up. Set to false to disable intermediate watermark emission."
+  },
+  {
     "Key": "execution.checkpointing.unaligned.interruptible-timers.enabled",
     "Default": "false",
     "Type": "Boolean",
@@ -2526,10 +2634,22 @@
     "Description": "Defines the maximum number of subtasks that share the same channel state file. It can reduce the number of small files when enable unaligned checkpoint. Each subtask will create a new channel state file when this is configured to 1."
   },
   {
+    "Key": "execution.checkpointing.unaligned.recover-output-on-downstream.enabled",
+    "Default": "false",
+    "Type": "Boolean",
+    "Description": "Whether recovering output buffers of upstream task on downstream task directly when job restores from the unaligned checkpoint."
+  },
+  {
     "Key": "execution.checkpointing.write-buffer-size",
     "Default": "4096",
     "Type": "Integer",
     "Description": "The default size of the write buffer for the checkpoint streams that write to file systems. The actual write buffer size is determined to be the maximum of the value of this option and option \u0027execution.checkpointing.data-inline-threshold\u0027."
+  },
+  {
+    "Key": "pipeline.sources.pause-until-first-checkpoint",
+    "Default": "false",
+    "Type": "Boolean",
+    "Description": "Don\u0027t pull any data from sources until the first checkpoint is triggered. This might be helpful in reducing recovery times in cases where recovered records from unaligned checkpoint compete with new incoming records for processing. Incompatible with value 0 (disabled) for execution.checkpointing.interval-during-backlog"
   },
   {
     "Key": "execution.state-recovery.claim-mode",
@@ -2640,6 +2760,30 @@
     "Description": "Whether to expose state name as a variable if tracking latency."
   },
   {
+    "Key": "state.size-track.history-size",
+    "Default": "128",
+    "Type": "Integer",
+    "Description": "Defines the number of measured size to maintain at each state access operation."
+  },
+  {
+    "Key": "state.size-track.keyed-state-enabled",
+    "Default": "false",
+    "Type": "Boolean",
+    "Description": "Whether to track size of keyed state operations, e.g value state put/get/clear. Please note that if state.ttl is enabled, the size of the value will include the size of the TTL-related timestamp."
+  },
+  {
+    "Key": "state.size-track.sample-interval",
+    "Default": "100",
+    "Type": "Integer",
+    "Description": "The sample interval of size track once \u0027state.size-track.keyed-state-enabled\u0027 is enabled. The default value is 100, which means we would track the size every 100 access requests."
+  },
+  {
+    "Key": "state.size-track.state-name-as-variable",
+    "Default": "true",
+    "Type": "Boolean",
+    "Description": "Whether to expose state name as a variable if tracking size."
+  },
+  {
     "Key": "state.backend.rocksdb.checkpoint.transfer.thread.num",
     "Default": "4",
     "Type": "Integer",
@@ -2650,6 +2794,48 @@
     "Default": "(none)",
     "Type": "String",
     "Description": "The local directory (on the TaskManager) where RocksDB puts its files. Per default, it will be \u003cWORKING_DIR\u003e/tmp. See process.taskmanager.working-dir for more details."
+  },
+  {
+    "Key": "state.backend.rocksdb.manual-compaction.max-auto-compactions",
+    "Default": "30",
+    "Type": "Integer",
+    "Description": "The maximum number of automatic compactions running for manual compaction to start. If the actual number is higher, manual compaction won\u0027t be started to avoid delaying automatic ones."
+  },
+  {
+    "Key": "state.backend.rocksdb.manual-compaction.max-file-size-to-compact",
+    "Default": "50 kb",
+    "Type": "MemorySize",
+    "Description": "The maximum size of individual input files"
+  },
+  {
+    "Key": "state.backend.rocksdb.manual-compaction.max-files-to-compact",
+    "Default": "30",
+    "Type": "Integer",
+    "Description": "The maximum number of input files to compact together in a single compaction run"
+  },
+  {
+    "Key": "state.backend.rocksdb.manual-compaction.max-output-file-size",
+    "Default": "64 mb",
+    "Type": "MemorySize",
+    "Description": "The maximum output file size"
+  },
+  {
+    "Key": "state.backend.rocksdb.manual-compaction.max-parallel-compactions",
+    "Default": "5",
+    "Type": "Integer",
+    "Description": "The maximum number of manual compactions to start. Note that only one of them can run at a time as of v8.10.0; all the others will be waiting"
+  },
+  {
+    "Key": "state.backend.rocksdb.manual-compaction.min-files-to-compact",
+    "Default": "5",
+    "Type": "Integer",
+    "Description": "The minimum number of input files to compact together in a single compaction run"
+  },
+  {
+    "Key": "state.backend.rocksdb.manual-compaction.min-interval",
+    "Default": "0 ms",
+    "Type": "Duration",
+    "Description": "The minimum interval between manual compactions. Zero disables manual compactions"
   },
   {
     "Key": "state.backend.rocksdb.options-factory",
@@ -2674,6 +2860,12 @@
     "Default": "3",
     "Type": "Integer",
     "Description": "When the number of eviction that a block in hot link is moved to cold link reaches this value, the block will be blocked from being promoted to the head of the LRU list. The default value is \u00273\u0027."
+  },
+  {
+    "Key": "state.backend.forst.checkpoint.transfer-thread-num",
+    "Default": "4",
+    "Type": "Integer",
+    "Description": "The number of threads used to transfer files during checkpoint (writing or copying files to the checkpoint storage) and restore (transferring state files back to the ForSt working directory). Consider increasing this value when snapshotting or restoring large state. Note that the pool is created per state backend instance. Setting it too high can saturate network bandwidth or trigger rate limiting depending on the remote storage; setting it too low can lead to long checkpoint durations or timeouts for large state. The default value is \u00274\u0027."
   },
   {
     "Key": "state.backend.forst.executor.inline-coordinator",
@@ -3210,6 +3402,12 @@
     "Description": "This option specifies how the job computation recovers from task failures. Accepted values are: \u0027full\u0027: Restarts all tasks to recover the job. \u0027region\u0027: Restarts all tasks that could be affected by the task failure. More details can be found here."
   },
   {
+    "Key": "cluster.id",
+    "Default": "\"00000000000000000000000000000000\"",
+    "Type": "String",
+    "Description": "The ID of the Flink cluster, used to separate multiple Flink clusters from each other. Currently, this option is primarily used to determine the archive path, and may also be used as the fixed application/job id (if not specified by the user) in high availability mode.The expected format is [0-9a-fA-F]{32}, e.g. fd72014d4c864993a2e5a9287b4a9c5d. If this option is not configured but high-availability.cluster-id is configured, the value will be derived from the value of high-availability.cluster-id."
+  },
+  {
     "Key": "cluster.intercept-user-system-exit",
     "Default": "DISABLED",
     "Type": "Enum",
@@ -3220,6 +3418,12 @@
     "Default": "false",
     "Type": "Boolean",
     "Description": "Whether processes should halt on fatal errors instead of performing a graceful shutdown. In some environments (e.g. Java 8 with the G1 garbage collector), a regular graceful shutdown can lead to a JVM deadlock. See FLINK-16510 for details."
+  },
+  {
+    "Key": "cluster.thread-dump.default-mode",
+    "Default": "FULL",
+    "Type": "Enum",
+    "Description": "Default granularity of the JobManager/TaskManager thread-dump REST endpoint when no explicit mode query parameter is supplied. The default is FULL to preserve historical behavior; operators of large clusters are strongly encouraged to switch to LITE to avoid heartbeat timeouts caused by long safepoint pauses. Possible values: \"LITE\": Stack traces only, without lock information. Negligible JVM pause. \"FULL\": Additionally collects locked monitors and j.u.c. synchronizers, equivalent to jstack -l. Pauses the JVM in a safepoint for a duration that scales with heap size and thread count, which can take seconds on large TaskManagers."
   },
   {
     "Key": "cluster.thread-dump.stacktrace-max-depth",
@@ -3360,6 +3564,12 @@
     "Description": "This parameter defines whether the adaptive scheduler prioritizes using the minimum number of TaskManagers when scheduling tasks. Note, this parameter is suitable if execution.state-recovery.from-local is not enabled. More details about this configuration are available at FLINK-33977."
   },
   {
+    "Key": "jobmanager.adaptive-scheduler.rescale-trigger.active-checkpoint.enabled",
+    "Default": "true",
+    "Type": "Boolean",
+    "Description": "When enabled, the Adaptive Scheduler actively triggers a checkpoint when resources change and rescaling is desired, rather than waiting for the next periodic checkpoint. This reduces rescaling latency, especially when checkpoint intervals are large. The active trigger respects the configured minimum pause between checkpoints and will not fire if a checkpoint is already in progress or being triggered."
+  },
+  {
     "Key": "jobmanager.adaptive-scheduler.rescale-trigger.max-checkpoint-failures",
     "Default": "2",
     "Type": "Integer",
@@ -3483,7 +3693,7 @@
     "Key": "taskmanager.load-balance.mode",
     "Default": "NONE",
     "Type": "Enum",
-    "Description": "Mode for the load-balance allocation strategy across all available TaskManagers. The SLOTS mode tries to spread out the slots evenly across all available TaskManagers. The MIN_RESOURCES mode tries to allocate slots on minimum number of available TaskManagers. The NONE mode is the default mode without any specified strategy. Possible values: \"NONE\" \"SLOTS\" \"MIN_RESOURCES\""
+    "Description": "Mode for the load-balance allocation strategy across all available TaskManagers. The SLOTS mode tries to spread out the slots evenly across all available TaskManagers. The MIN_RESOURCES mode tries to allocate slots on minimum number of available TaskManagers. The TASKS mode tries to schedule evenly tasks across all available TaskManagers with in the job scope based the number of tasks. The NONE mode is the default mode without any specified strategy. Possible values: \"NONE\" \"SLOTS\" \"MIN_RESOURCES\" \"TASKS\""
   },
   {
     "Key": "high-availability.jobmanager.port",
@@ -3516,6 +3726,12 @@
     "Description": "Defines the number of connection retries before the client gives up."
   },
   {
+    "Key": "high-availability.zookeeper.client.max-retry-wait",
+    "Default": "1 min",
+    "Type": "Duration",
+    "Description": "Defines the maximum retry wait time in milliseconds for each attempt. This caps the exponential backoff to prevent excessively long waits between retries."
+  },
+  {
     "Key": "high-availability.zookeeper.client.retry-wait",
     "Default": "5 s",
     "Type": "Duration",
@@ -3532,6 +3748,12 @@
     "Default": "false",
     "Type": "Boolean",
     "Description": "Defines whether a suspended ZooKeeper connection will be treated as an error that causes the leader information to be invalidated or not. In case you set this option to true, Flink will wait until a ZooKeeper connection is marked as lost before it revokes the leadership of components. This has the effect that Flink is more resilient against temporary connection instabilities at the cost of running more likely into timing issues with ZooKeeper."
+  },
+  {
+    "Key": "high-availability.zookeeper.path.applications",
+    "Default": "\"/applications\"",
+    "Type": "String",
+    "Description": "ZooKeeper root path (ZNode) for applications"
   },
   {
     "Key": "high-availability.zookeeper.path.execution-plans",
@@ -3610,6 +3832,12 @@
     "Default": "3 s",
     "Type": "Duration",
     "Description": "Duration from write after which cached checkpoints statistics are cleaned up. For backwards compatibility, if no value is configured, web.refresh-interval will be used instead."
+  },
+  {
+    "Key": "rest.cache.execution-graph.timeout",
+    "Default": "(none)",
+    "Type": "Duration",
+    "Description": "Time-to-live for cached ExecutionGraph. If not set, defaults to the value of web.refresh-interval. Setting this to 0 means the cache will always fetch fresh data, which is useful for real-time state synchronization scenarios."
   },
   {
     "Key": "rest.client.max-content-length",
@@ -3726,6 +3954,12 @@
     "Description": "Access-Control-Allow-Origin header for all responses from the web-frontend."
   },
   {
+    "Key": "web.adaptive-scheduler.rescale-history.size",
+    "Default": "0",
+    "Type": "Integer",
+    "Description": "The maximum number of the rescale records per job whose scheduler is Adaptive. The feature will be disabled when the configuration value is smaller or equals to 0. Note that high numbers may cause memory issues on the JobManager side."
+  },
+  {
     "Key": "web.cancel.enable",
     "Default": "true",
     "Type": "Boolean",
@@ -3792,6 +4026,30 @@
     "Description": "Local directory that is used by the REST API for storing uploaded jars. If not specified a dynamic directory will be created under web.tmpdir."
   },
   {
+    "Key": "completed-application-store.cache-size",
+    "Default": "52428800",
+    "Type": "Long",
+    "Description": "The cache size in bytes which is used to keep completed applications in memory."
+  },
+  {
+    "Key": "completed-application-store.expiration-time",
+    "Default": "1 h",
+    "Type": "Duration",
+    "Description": "The time after which a completed application expires and is purged from the store."
+  },
+  {
+    "Key": "completed-application-store.max-capacity",
+    "Default": "infinite",
+    "Type": "Integer",
+    "Description": "The max number of completed applications that can be kept in the store. NOTICE: if memory store keeps too many applications in session cluster, it may cause FullGC or OOM in jm."
+  },
+  {
+    "Key": "completed-application-store.type",
+    "Default": "File",
+    "Type": "Enum",
+    "Description": "Determines which store implementation is used in session cluster. Accepted values are: \u0027File\u0027: the file store keeps the completed applications in files \u0027Memory\u0027: the memory store keeps the completed applications in memory. You may need to limit the completed-application-store.max-capacity to mitigate FullGC or OOM when there are too many applications Possible values: \"File\" \"Memory\""
+  },
+  {
     "Key": "jobmanager.adaptive-scheduler.executing.cooldown-after-rescaling",
     "Default": "30 s",
     "Type": "Duration",
@@ -3808,6 +4066,12 @@
     "Default": "true",
     "Type": "Boolean",
     "Description": "This parameter defines whether the adaptive scheduler prioritizes using the minimum number of TaskManagers when scheduling tasks. Note, this parameter is suitable if execution.state-recovery.from-local is not enabled. More details about this configuration are available at FLINK-33977."
+  },
+  {
+    "Key": "jobmanager.adaptive-scheduler.rescale-trigger.active-checkpoint.enabled",
+    "Default": "true",
+    "Type": "Boolean",
+    "Description": "When enabled, the Adaptive Scheduler actively triggers a checkpoint when resources change and rescaling is desired, rather than waiting for the next periodic checkpoint. This reduces rescaling latency, especially when checkpoint intervals are large. The active trigger respects the configured minimum pause between checkpoints and will not fire if a checkpoint is already in progress or being triggered."
   },
   {
     "Key": "jobmanager.adaptive-scheduler.rescale-trigger.max-checkpoint-failures",
@@ -3918,28 +4182,10 @@
     "Description": "Determines which scheduler implementation is used to schedule tasks. If this option is not explicitly set, batch jobs will use the \u0027AdaptiveBatch\u0027 scheduler as the default, while streaming jobs will default to the \u0027Default\u0027 scheduler. Possible values: \"Default\": Default scheduler \"Adaptive\": Adaptive scheduler. More details can be found here. \"AdaptiveBatch\": Adaptive batch scheduler. More details can be found here."
   },
   {
-    "Key": "jobstore.cache-size",
-    "Default": "52428800",
-    "Type": "Long",
-    "Description": "The job store cache size in bytes which is used to keep completed jobs in memory."
-  },
-  {
-    "Key": "jobstore.expiration-time",
-    "Default": "3600",
-    "Type": "Long",
-    "Description": "The time in seconds after which a completed job expires and is purged from the job store."
-  },
-  {
-    "Key": "jobstore.max-capacity",
-    "Default": "infinite",
+    "Key": "web.adaptive-scheduler.rescale-history.size",
+    "Default": "0",
     "Type": "Integer",
-    "Description": "The max number of completed jobs that can be kept in the job store. NOTICE: if memory store keeps too many jobs in session cluster, it may cause FullGC or OOM in jm."
-  },
-  {
-    "Key": "jobstore.type",
-    "Default": "File",
-    "Type": "Enum",
-    "Description": "Determines which job store implementation is used in session cluster. Accepted values are: \u0027File\u0027: the file job store keeps the archived execution graphs in files \u0027Memory\u0027: the memory job store keeps the archived execution graphs in memory. You may need to limit the jobstore.max-capacity to mitigate FullGC or OOM when there are too many graphs Possible values: \"File\" \"Memory\""
+    "Description": "The maximum number of the rescale records per job whose scheduler is Adaptive. The feature will be disabled when the configuration value is smaller or equals to 0. Note that high numbers may cause memory issues on the JobManager side."
   },
   {
     "Key": "web.exception-history-size",
@@ -4179,7 +4425,7 @@
     "Key": "taskmanager.load-balance.mode",
     "Default": "NONE",
     "Type": "Enum",
-    "Description": "Mode for the load-balance allocation strategy across all available TaskManagers. The SLOTS mode tries to spread out the slots evenly across all available TaskManagers. The MIN_RESOURCES mode tries to allocate slots on minimum number of available TaskManagers. The NONE mode is the default mode without any specified strategy. Possible values: \"NONE\" \"SLOTS\" \"MIN_RESOURCES\""
+    "Description": "Mode for the load-balance allocation strategy across all available TaskManagers. The SLOTS mode tries to spread out the slots evenly across all available TaskManagers. The MIN_RESOURCES mode tries to allocate slots on minimum number of available TaskManagers. The TASKS mode tries to schedule evenly tasks across all available TaskManagers with in the job scope based the number of tasks. The NONE mode is the default mode without any specified strategy. Possible values: \"NONE\" \"SLOTS\" \"MIN_RESOURCES\" \"TASKS\""
   },
   {
     "Key": "taskmanager.log.path",
@@ -4270,6 +4516,18 @@
     "Default": "DEFAULT",
     "Type": "Enum",
     "Description": "Redirection mode of System.out and System.err for all TaskManagers. DEFAULT: TaskManagers don\u0027t redirect the System.out and System.err, it\u0027s the default value. LOG: TaskManagers redirect System.out and System.err to LOG.info and LOG.error. IGNORE: TaskManagers ignore System.out and System.err directly. Possible values: \"DEFAULT\" \"LOG\" \"IGNORE\""
+  },
+  {
+    "Key": "taskmanager.network.adaptive-partitioner.enabled",
+    "Default": "false",
+    "Type": "Boolean",
+    "Description": "Whether to enable adaptive partitioner feature for rescale and rebalance partitioners based on the load of the downstream tasks."
+  },
+  {
+    "Key": "taskmanager.network.adaptive-partitioner.max-traverse-size",
+    "Default": "4",
+    "Type": "Integer",
+    "Description": "Maximum number of channels to traverse when looking for the most idle channel for rescale and rebalance partitioners when taskmanager.network.adaptive-partitioner.enabled is enabled. Note, the value of the configuration option must be greater than `1`."
   },
   {
     "Key": "taskmanager.network.compression.codec",
