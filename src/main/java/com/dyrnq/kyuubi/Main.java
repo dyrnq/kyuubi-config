@@ -17,7 +17,8 @@ import picocli.CommandLine;
                 FlussConfig.class,
                 GravitinoConfig.class,
                 SpringBootConfig.class,
-                DebeziumConfig.class
+                DebeziumConfig.class,
+                VSCodeConfig.class
         },
         mixinStandardHelpOptions = true,
         showDefaultValues = true
