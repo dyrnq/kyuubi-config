@@ -96,6 +96,8 @@ atomic_write() {
 
 set -e
 
+REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
+
 kv="v1.10.3"
 mkdir -p kyuubi/$kv
 atomic_write kyuubi/$kv/kyuubi-config.json              java -jar target/kyuubi-config.jar kyuubi -ver $kv --format json $PROXY_ARGS $PROXY_TYPE_ARGS
@@ -197,3 +199,19 @@ for kv in "3.3" "stable"; do
   atomic_write debezium/$kv/debezium-postgresql-no-section.json     java -jar target/kyuubi-config.jar debezium -ver $kv --format json --no-section -t postgresql $PROXY_ARGS $PROXY_TYPE_ARGS
   atomic_write debezium/$kv/debezium-postgresql.conf                java -jar target/kyuubi-config.jar debezium -ver $kv --format conf              -t postgresql $PROXY_ARGS $PROXY_TYPE_ARGS
 done
+
+# VS Code's default settings come from VS Code's own configurationRegistry at
+# runtime; they are not published as a static JSON file on the web. We launch
+# the local `code` binary with a tiny dev extension (scripts/vscode-defaults-dumper/)
+# that opens the virtual vscode://defaultsettings/settings.json document and
+# writes it to /tmp/vscode-defaults.json. The Java side then parses that dump.
+# Requires: `code` in PATH and a display (DISPLAY env var).
+mkdir -p vscode/current
+VSCODE_DUMP="/tmp/vscode-defaults.json"
+if "$REPO_ROOT/scripts/vscode-defaults-dumper/dump.sh" "$VSCODE_DUMP"; then
+    atomic_write vscode/current/vscode-config.json                java -jar target/kyuubi-config.jar vscode -ver current --format json -src "$VSCODE_DUMP" $PROXY_ARGS $PROXY_TYPE_ARGS
+    atomic_write vscode/current/vscode-config-no-section.json     java -jar target/kyuubi-config.jar vscode -ver current --format json --no-section -src "$VSCODE_DUMP" $PROXY_ARGS $PROXY_TYPE_ARGS
+    atomic_write vscode/current/vscode-config.conf                java -jar target/kyuubi-config.jar vscode -ver current --format conf -src "$VSCODE_DUMP" $PROXY_ARGS $PROXY_TYPE_ARGS
+else
+    echo "SKIP vscode/current: dump failed; see errors above" >&2
+fi
