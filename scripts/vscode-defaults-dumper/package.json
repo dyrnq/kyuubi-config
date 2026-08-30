@@ -1,0 +1,17 @@
+{
+  "name": "vscode-defaults-dumper",
+  "displayName": "VS Code Defaults Dumper",
+  "description": "Internal helper: dumps VS Code default settings to a file and exits",
+  "version": "0.0.1",
+  "engines": { "vscode": "^1.60.0" },
+  "main": "./out/extension.js",
+  "activationEvents": ["*"],
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-defaults-dumper.dump",
+        "title": "Dumper: Dump Defaults"
+      }
+    ]
+  }
+}
