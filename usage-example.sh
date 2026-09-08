@@ -168,8 +168,8 @@ for kv in "0.5" "0.6" "current" "next" ; do
   atomic_write fluss/$kv/fluss-config.conf              java -jar target/kyuubi-config.jar fluss -ver $kv --format conf $PROXY_ARGS $PROXY_TYPE_ARGS
 done
 
-# for kv in "0.9.0-incubating" "0.9.1" "1.0.0" "1.1.0" "1.2.0"; do
-for kv in "1.1.0" "1.2.0"; do
+# for kv in "0.9.0-incubating" "0.9.1" "1.0.0" "1.1.0" "1.2.0" "1.3.0"; do
+for kv in "1.1.0" "1.2.0" "1.3.0"; do
   echo "version=$kv";
   mkdir -p gravitino/$kv;
   atomic_write gravitino/$kv/gravitino-config-no-section.json       java -jar target/kyuubi-config.jar gravitino -ver $kv --format json --no-section $PROXY_ARGS $PROXY_TYPE_ARGS
